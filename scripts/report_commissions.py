@@ -2,6 +2,13 @@ from __future__ import annotations
 
 import os
 import sys
+from pathlib import Path
+
+# Match the standalone checker: make the repository root importable when this
+# file is executed as "python scripts/report_commissions.py".
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from deal_hunter.takprodam import fetch_commissions, summarize_commissions
 
