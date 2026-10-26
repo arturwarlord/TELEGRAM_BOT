@@ -5,6 +5,7 @@ on:
   push:
     branches: [main]
     paths:
+      - ".github/workflows/source-diagnostics.yml"
       - "scripts/diagnose_sources.py"
       - "config/sources.json"
       - "deal_hunter/sources.py"
