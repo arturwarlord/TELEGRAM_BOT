@@ -100,6 +100,8 @@ class Deal:
     external_id: str | None = None
     commission: float | None = None
     legal_text: str = ""
+    reported_discount_percent: float | None = None
+    discount_is_maximum: bool = False
 
     @property
     def savings(self) -> float | None:
@@ -109,9 +111,13 @@ class Deal:
 
     @property
     def discount_percent(self) -> float | None:
-        if self.price is None or self.old_price is None or self.old_price <= self.price:
-            return None
-        return (self.old_price - self.price) / self.old_price * 100
+        # Prefer a mathematically verified price pair. Only fall back to the
+        # discount explicitly published by a source when no pair is available.
+        if self.price is not None and self.old_price is not None:
+            if self.old_price <= self.price:
+                return None
+            return (self.old_price - self.price) / self.old_price * 100
+        return self.reported_discount_percent
 
     @property
     def key(self) -> str:
@@ -119,6 +125,10 @@ class Deal:
         # one promotion link. Prefer its stable product ID over that link.
         if self.source.lower().startswith("takprodam:") and self.external_id:
             base = f"{self.source.lower()}|{self.external_id}"
+        elif (self.price is None or self.old_price is None) and (self.promo_code or self.reported_discount_percent is not None):
+            # Coupon cards may share a store landing page; use the offer identity,
+            # not just that shared URL, to keep distinct codes from collapsing.
+            base = f"coupon|{(self.promo_code or '').casefold()}|{self.title.casefold().strip()}"
         else:
             base = canonical_url(self.product_url)
         if not base:
