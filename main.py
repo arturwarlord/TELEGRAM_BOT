@@ -69,10 +69,20 @@ def main() -> int:
 
     publish_enabled = env_bool("PUBLISH_ENABLED", False)
     dry_run = env_bool("DRY_RUN", True)
+    allow_direct_links = env_bool("ALLOW_DIRECT_LINKS", False)
     publishing = publish_enabled and not dry_run
+    post_notice = os.getenv("POST_NOTICE", "").strip()
+    if not post_notice:
+        post_notice = (
+            "Ссылка ведёт напрямую на сайт магазина; цена, скидка и наличие могут зависеть от региона, "
+            "карты лояльности и условий продавца. Канал не получает комиссию с перехода."
+            if allow_direct_links
+            else os.getenv("AD_NOTICE", "").strip()
+        )
 
     print("===== DEAL HUNTER =====")
     print(f"Mode: {'PUBLISH' if publishing else 'DRY-RUN / PREVIEW'}")
+    print(f"Link mode: {'DIRECT STORE LINKS (NO AFFILIATE)' if allow_direct_links else 'AFFILIATE LINKS REQUIRED FOR PUBLISHING'}")
     partner_api_enabled = bool(os.getenv("TAKPRODAM_API_TOKEN", "").strip())
     print(f"Configured RSS/XML/JSON sources: {len(sources)}")
     print(f"Takprodam partner API: {'configured' if partner_api_enabled else 'not configured'}")
@@ -162,9 +172,8 @@ def main() -> int:
     if not os.getenv("TELEGRAM_CHAT_ID", "").strip():
         print("[FATAL] TELEGRAM_CHAT_ID Actions variable is missing.")
         return 2
-    ad_notice = os.getenv("AD_NOTICE", "").strip()
-    if not ad_notice:
-        print("[FATAL] AD_NOTICE Actions variable is missing; configure required partner/ad disclosure before publishing.")
+    if not post_notice:
+        print("[FATAL] POST_NOTICE is missing (or AD_NOTICE for affiliate mode).")
         return 2
 
     state = load_state(state_path)
@@ -197,7 +206,7 @@ def main() -> int:
             min_discount_percent=min_discount,
             min_savings=min_savings,
             max_discount_percent=max_discount,
-            require_affiliate=True,
+            require_affiliate=not allow_direct_links,
             require_image=require_image,
         )
         if not decision.eligible:
@@ -214,7 +223,12 @@ def main() -> int:
             continue
 
         try:
-            message_id = publisher.publish(deal, decision, ad_notice)
+            message_id = publisher.publish(
+                deal,
+                decision,
+                post_notice,
+                allow_direct_link=allow_direct_links,
+            )
             mark_published(deal, state, message_id=message_id)
             save_state(state_path, state)
             posted += 1
