@@ -19,30 +19,47 @@ def _rubles(value: float | None) -> str:
 def format_caption(deal: Deal, decision: DealDecision, ad_notice: str) -> str:
     discount = decision.discount_percent or 0.0
     savings = decision.savings or 0.0
-    parts = [
-        f"🔥 <b>ВЫГОДНАЯ НАХОДКА: −{discount:.0f}%</b>",
-        "",
-        f"<b>{html.escape(deal.title[:240])}</b>",
-        "",
-        f"❌ Было: <s>{_rubles(deal.old_price)}</s>",
-        f"✅ Сейчас: <b>{_rubles(deal.price)}</b>",
-        f"💰 Экономия: <b>{_rubles(savings)}</b>",
-        f"🏪 Магазин: {html.escape(deal.store[:100])}",
-    ]
-    if deal.promo_code:
-        parts.append(f"🎟 Промокод: <code>{html.escape(deal.promo_code[:80])}</code>")
-    if deal.expires_at:
-        parts.append(f"⏳ До: {html.escape(deal.expires_at[:80])}")
-    if ad_notice.strip():
-        parts.extend(["", html.escape(ad_notice.strip()[:300])])
-    caption = "\n".join(parts)
-    # Telegram photo captions are limited to 1024 characters after parsing.
-    if len(caption) > 1000:
-        short_title = html.escape(deal.title[:100]) + "…"
-        parts[2] = f"<b>{short_title}</b>"
-        caption = "\n".join(parts)
-    return caption[:1024]
 
+    notices: list[str] = []
+    seen_notices: set[str] = set()
+    for notice in (deal.legal_text, ad_notice):
+        cleaned = str(notice or "").strip()
+        if cleaned and cleaned.casefold() not in seen_notices:
+            notices.append(cleaned)
+            seen_notices.add(cleaned.casefold())
+    notice_html = "\n".join(html.escape(notice) for notice in notices)
+    if len(notice_html) > 900:
+        raise ValueError("Partner/legal disclosure is too long for a Telegram photo caption; review this offer manually")
+
+    def render(title_limit: int, include_promo: bool, include_expiry: bool) -> str:
+        title = deal.title[:title_limit]
+        if len(deal.title) > title_limit:
+            title += "…"
+        parts = [
+            f"🔥 <b>ВЫГОДНАЯ НАХОДКА: −{discount:.0f}%</b>",
+            "",
+            f"<b>{html.escape(title)}</b>",
+            "",
+            f"❌ Было: <s>{_rubles(deal.old_price)}</s>",
+            f"✅ Сейчас: <b>{_rubles(deal.price)}</b>",
+            f"💰 Экономия: <b>{_rubles(savings)}</b>",
+            f"🏪 Магазин: {html.escape(deal.store[:80])}",
+        ]
+        if include_promo and deal.promo_code:
+            parts.append(f"🎟 Промокод: <code>{html.escape(deal.promo_code[:60])}</code>")
+        if include_expiry and deal.expires_at:
+            parts.append(f"⏳ До: {html.escape(deal.expires_at[:60])}")
+        if notice_html:
+            parts.extend(["", notice_html])
+        return "\n".join(parts)
+
+    # Keep partner-provided legal metadata intact; shorten marketing copy before
+    # the disclosure rather than cutting off a legal label at the end.
+    for limits in ((240, True, True), (100, True, True), (80, False, True), (80, False, False)):
+        caption = render(*limits)
+        if len(caption) <= 1024:
+            return caption
+    raise ValueError("Caption does not fit Telegram's 1024-character photo caption limit; review this offer manually")
 
 class TelegramPublisher:
     def __init__(self, token: str, chat_id: str, timeout: int = 25) -> None:
