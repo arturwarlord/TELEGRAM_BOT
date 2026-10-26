@@ -58,6 +58,11 @@ def evaluate_deal(
         return DealDecision(False, "offer expired")
 
     has_price_pair = deal.price is not None and deal.old_price is not None
+    if not has_price_pair and (deal.price is not None or deal.old_price is not None):
+        # Keep the specific diagnostic for an incomplete price comparison unless
+        # the source also supplies a coupon/discount that can stand on its own.
+        if not deal.promo_code and deal.reported_discount_percent is None:
+            return DealDecision(False, "missing current or old price")
     if has_price_pair:
         if deal.price <= 0:
             return DealDecision(False, "current price must be positive")
