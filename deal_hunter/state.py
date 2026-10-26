@@ -81,6 +81,42 @@ def should_skip_as_duplicate(
     return True
 
 
+def count_published_within_hours(
+    state: dict[str, Any],
+    *,
+    hours: float = 24.0,
+    now: datetime | None = None,
+) -> int:
+    """Count actual posts, including price-drop reposts, within the rolling window."""
+    current_time = now or datetime.now(timezone.utc)
+    if current_time.tzinfo is None:
+        current_time = current_time.replace(tzinfo=timezone.utc)
+    cutoff = current_time.astimezone(timezone.utc).timestamp() - max(0.0, hours) * 3600.0
+    recent_posts = state.get("recent_posts")
+    if isinstance(recent_posts, list):
+        count = 0
+        for entry in recent_posts:
+            if not isinstance(entry, dict):
+                continue
+            timestamp = _parse_timestamp(entry.get("published_at"))
+            if timestamp and timestamp.timestamp() >= cutoff:
+                count += 1
+        return count
+
+    # Backward compatibility for a state file created before recent_posts existed.
+    published = state.get("published", {})
+    if not isinstance(published, dict):
+        return 0
+    count = 0
+    for entry in published.values():
+        if not isinstance(entry, dict):
+            continue
+        timestamp = _parse_timestamp(entry.get("published_at"))
+        if timestamp and timestamp.timestamp() >= cutoff:
+            count += 1
+    return count
+
+
 def mark_published(
     deal: Deal,
     state: dict[str, Any],
@@ -91,11 +127,27 @@ def mark_published(
     current_time = now or datetime.now(timezone.utc)
     if current_time.tzinfo is None:
         current_time = current_time.replace(tzinfo=timezone.utc)
+    timestamp = current_time.astimezone(timezone.utc).isoformat()
     state.setdefault("published", {})[deal.key] = {
         "title": deal.title[:240],
         "store": deal.store[:100],
         "price": deal.price,
-        "published_at": current_time.astimezone(timezone.utc).isoformat(),
+        "published_at": timestamp,
         "telegram_message_id": message_id,
         "affiliate_url": deal.affiliate_url,
     }
+    recent_posts = state.setdefault("recent_posts", [])
+    if isinstance(recent_posts, list):
+        recent_posts.append({
+            "key": deal.key,
+            "published_at": timestamp,
+            "telegram_message_id": message_id,
+        })
+        # Bound file growth while keeping enough history for daily rate limits.
+        cutoff = current_time.astimezone(timezone.utc).timestamp() - 7 * 24 * 3600
+        state["recent_posts"] = [
+            entry for entry in recent_posts
+            if isinstance(entry, dict)
+            and (parsed := _parse_timestamp(entry.get("published_at"))) is not None
+            and parsed.timestamp() >= cutoff
+        ]
