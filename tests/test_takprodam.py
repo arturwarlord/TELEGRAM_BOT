@@ -4,7 +4,13 @@ import unittest
 from unittest.mock import patch
 
 from deal_hunter.scoring import evaluate_deal
-from deal_hunter.takprodam import parse_promotion_items, resolve_source_id
+from deal_hunter.takprodam import (
+    fetch_commissions,
+    fetch_promotion_deals,
+    parse_promotion_items,
+    resolve_source_id,
+    summarize_commissions,
+)
 
 
 class TakprodamTests(unittest.TestCase):
@@ -97,6 +103,70 @@ class TakprodamTests(unittest.TestCase):
         }
         with self.assertRaisesRegex(RuntimeError, "Telegram Channel=verification"):
             resolve_source_id("dummy-token")
+
+
+    @patch("deal_hunter.takprodam._request_json")
+    def test_promotion_fetch_passes_subid_for_attribution(self, mock_request):
+        mock_request.return_value = {"items": []}
+        fetch_promotion_deals(
+            "dummy-token",
+            "7",
+            ["Ozon"],
+            limit=20,
+            max_pages=1,
+            subid="telegram_deal_hunter",
+        )
+        self.assertEqual(
+            mock_request.call_args.kwargs["params"],
+            {
+                "source_id": "7",
+                "marketplace": "Ozon",
+                "page": 1,
+                "limit": 20,
+                "subid": "telegram_deal_hunter",
+            },
+        )
+
+    @patch("deal_hunter.takprodam._request_json")
+    def test_fetch_commissions_filters_by_subid(self, mock_request):
+        mock_request.return_value = {
+            "total_count": 1,
+            "items": [{
+                "id": "commission-1",
+                "status": "approved",
+                "commission_amount": 125.5,
+                "cart_amount": 2500,
+                "subid": "telegram_deal_hunter",
+            }],
+        }
+        items = fetch_commissions(
+            "dummy-token",
+            subid="telegram_deal_hunter",
+            limit=50,
+            max_pages=3,
+        )
+        self.assertEqual(len(items), 1)
+        self.assertEqual(mock_request.call_args.kwargs["params"]["subid"], "telegram_deal_hunter")
+        self.assertEqual(mock_request.call_args.kwargs["params"]["page"], 1)
+
+    def test_summarizes_commissions_by_status_without_order_details(self):
+        summary = summarize_commissions([
+            {"status": "approved", "commission_amount": 10.25, "cart_amount": 100},
+            {"status": "approved", "commission_amount": 1.75, "cart_amount": 50},
+            {"status": "pending", "commission_amount": 5, "cart_amount": 25},
+            {"status": "declined", "commission_amount": 3, "cart_amount": 30},
+        ])
+        self.assertEqual(summary["approved"], {
+            "count": 2,
+            "commission_amount": 12.0,
+            "cart_amount": 150.0,
+        })
+        self.assertEqual(summary["pending"]["count"], 1)
+        self.assertEqual(summary["declined"]["count"], 1)
+
+    def test_rejects_unsupported_commission_status_filter(self):
+        with self.assertRaisesRegex(ValueError, "Commission status must be"):
+            fetch_commissions("dummy-token", status="confirmed")
 
 if __name__ == "__main__":
     unittest.main()
