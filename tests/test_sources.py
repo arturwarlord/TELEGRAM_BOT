@@ -139,5 +139,52 @@ class FeedParserTests(unittest.TestCase):
         }
         self.assertEqual(parse_feed(payload, source), [])
 
+
+    def test_parses_public_html_sale_card_with_parenthesized_discount(self):
+        payload = b"""
+        <html><body>
+          <article class="deal">
+            <a href="/deals/coffee-123">Кофе зерновой Example 1 кг</a>
+            <img src="/images/coffee.jpg" alt="Кофе зерновой Example">
+            <div>799 ₽</div><del>1 299 ₽</del><span>(38%)</span>
+          </article>
+        </body></html>
+        """
+        source = {
+            "name": "Pepper public discounts",
+            "type": "html",
+            "url": "https://www.pepper.ru/",
+            "store": "Pepper.ru",
+            "enabled": True,
+        }
+        deals = parse_feed(payload, source)
+        self.assertEqual(len(deals), 1)
+        deal = deals[0]
+        self.assertEqual(deal.title, "Кофе зерновой Example 1 кг")
+        self.assertEqual(deal.price, 799.0)
+        self.assertEqual(deal.old_price, 1299.0)
+        self.assertEqual(deal.discount_percent, (1299.0 - 799.0) / 1299.0 * 100)
+        self.assertEqual(deal.product_url, "https://www.pepper.ru/deals/coffee-123")
+        self.assertEqual(deal.image_url, "https://www.pepper.ru/images/coffee.jpg")
+        self.assertIsNone(deal.affiliate_url)
+
+    def test_html_parser_does_not_invent_a_discount_without_price_pair(self):
+        payload = b"""
+        <html><body>
+          <article>
+            <a href="/deals/random">Случайный товар за выгодной ценой</a>
+            <img src="/img/item.jpg">
+            <div>999 ₽</div><span>Популярный товар сегодня</span>
+          </article>
+        </body></html>
+        """
+        source = {
+            "name": "test-html",
+            "type": "html",
+            "url": "https://shop.example.test/sale",
+            "enabled": True,
+        }
+        self.assertEqual(parse_feed(payload, source), [])
+
 if __name__ == "__main__":
     unittest.main()
