@@ -98,6 +98,8 @@ class Deal:
     promo_code: str | None = None
     expires_at: str | None = None
     external_id: str | None = None
+    commission: float | None = None
+    legal_text: str = ""
 
     @property
     def savings(self) -> float | None:
