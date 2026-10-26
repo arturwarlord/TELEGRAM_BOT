@@ -12,7 +12,7 @@ from deal_hunter.models import Deal
 from deal_hunter.scoring import DealDecision, evaluate_deal
 from deal_hunter.sources import fetch_source
 from deal_hunter.state import count_published_within_hours, load_state, mark_published, save_state, should_skip_as_duplicate
-from deal_hunter.takprodam import fetch_configured_takprodam_deals
+from deal_hunter.takprodam import NoApprovedSourceError, fetch_configured_takprodam_deals
 from deal_hunter.telegram import TelegramPublisher
 
 
@@ -93,6 +93,8 @@ def main() -> int:
             partner_deals, partner_source_id = fetch_configured_takprodam_deals(timeout=timeout)
             print(f"[OK] Takprodam API source {partner_source_id}: {len(partner_deals)} promotion product(s)")
             all_deals.extend(partner_deals)
+        except NoApprovedSourceError as exc:
+            print(f"[WAITING] Takprodam publisher source: {exc}")
         except Exception as exc:
             source_errors += 1
             print(f"[ERROR] Takprodam API: {type(exc).__name__}: {exc}")
