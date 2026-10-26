@@ -13,6 +13,10 @@ from .models import Deal, clean_text, is_http_url, parse_price
 API_BASE = "https://api.takprodam.ru/v2/publisher"
 
 
+class NoApprovedSourceError(RuntimeError):
+    """The API token works, but no publisher source is approved yet."""
+
+
 def _request_json(
     token: str,
     endpoint: str,
@@ -44,14 +48,18 @@ def _request_json(
     return data
 
 
-def get_approved_sources(token: str, timeout: int = 25) -> list[dict[str, Any]]:
+def get_source_list(token: str, timeout: int = 25) -> list[dict[str, Any]]:
     response = _request_json(token, "source", timeout=timeout)
     items = response.get("items", [])
     if not isinstance(items, list):
         raise RuntimeError("Takprodam API source-list response has no items array")
+    return [item for item in items if isinstance(item, dict)]
+
+
+def get_approved_sources(token: str, timeout: int = 25) -> list[dict[str, Any]]:
     return [
-        item for item in items
-        if isinstance(item, dict) and str(item.get("status", "")).lower() == "approved"
+        source for source in get_source_list(token, timeout=timeout)
+        if str(source.get("status", "")).lower() == "approved"
     ]
 
 
@@ -60,24 +68,43 @@ def resolve_source_id(
     configured_source_id: str | int | None = None,
     timeout: int = 25,
 ) -> str:
-    approved = get_approved_sources(token, timeout=timeout)
+    sources = get_source_list(token, timeout=timeout)
+    approved = [
+        source for source in sources
+        if str(source.get("status", "")).lower() == "approved"
+    ]
+
     if configured_source_id is not None and str(configured_source_id).strip():
         expected = str(configured_source_id).strip()
-        match = next((source for source in approved if str(source.get("id")) == expected), None)
+        match = next((source for source in sources if str(source.get("id")) == expected), None)
         if not match:
-            raise RuntimeError(
-                f"TAKPRODAM_SOURCE_ID={expected} is not in the approved sources returned by the API. "
-                "Check the ID and wait for publisher-source approval."
+            registered = ", ".join(
+                f"{source.get('id')}:{clean_text(source.get('title'), 100)}={source.get('status', 'unknown')}"
+                for source in sources
+            ) or "no sources registered in this account"
+            raise NoApprovedSourceError(
+                f"TAKPRODAM_SOURCE_ID={expected} was not returned by the API. Registered sources: {registered}"
+            )
+        if str(match.get("status", "")).lower() != "approved":
+            raise NoApprovedSourceError(
+                f"Takprodam source {expected} is not approved yet "
+                f"(status={match.get('status', 'unknown')}; title={clean_text(match.get('title'), 100)}). "
+                "Wait for approval; no products were fetched."
             )
         return expected
 
     if len(approved) == 1:
         return str(approved[0].get("id"))
     if not approved:
-        raise RuntimeError(
-            "No approved Takprodam publisher source found. Add your Telegram channel as a source "
-            "and wait for approval, then set Actions Variable TAKPRODAM_SOURCE_ID if needed."
+        registered = ", ".join(
+            f"{source.get('id')}:{clean_text(source.get('title'), 100)}={source.get('status', 'unknown')}"
+            for source in sources
+        ) or "no sources registered in this account"
+        raise NoApprovedSourceError(
+            "No approved Takprodam publisher source found. Add your public Telegram channel as a source "
+            "and wait for approval. API-reported sources: " + registered
         )
+
     choices = ", ".join(
         f"{source.get('id')} ({clean_text(source.get('title') or source.get('source_url'), 120)})"
         for source in approved
