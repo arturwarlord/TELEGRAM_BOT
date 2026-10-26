@@ -56,5 +56,22 @@ class StateTests(unittest.TestCase):
         ))
 
 
+    def test_allows_small_price_improvement_after_duplicate_cooldown(self):
+        state = {"version": 1, "published": {}}
+        mark_published(
+            self.make_deal(price=500),
+            state,
+            message_id=42,
+            now=datetime(2026, 1, 1, 12, tzinfo=timezone.utc),
+        )
+        self.assertFalse(should_skip_as_duplicate(
+            self.make_deal(price=480),
+            state,
+            cooldown_hours=72,
+            repost_if_price_drop_percent=10,
+            repost_min_wait_hours=6,
+            now=datetime(2026, 1, 4, 13, tzinfo=timezone.utc),
+        ))
+
 if __name__ == "__main__":
     unittest.main()
