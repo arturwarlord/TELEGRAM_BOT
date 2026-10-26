@@ -310,5 +310,26 @@ class FeedParserTests(unittest.TestCase):
         self.assertNotIn("erid", deals[0].description.lower())
         self.assertNotIn("реклама.", deals[0].description.lower())
 
+
+    def test_does_not_attach_unrelated_percent_to_free_points_offer(self):
+        payload = """
+        <html><body>
+          <article class="coupon-card">
+            <a href="/promo/points">Как получить бесплатно 1000 ВАУ баллов Озона</a>
+            <img src="/images/points.jpg" alt="Бонусы">
+            <p>Условия акции для новых пользователей.</p>
+            <div>Перейти на сайт</div>
+            <aside>Скидки до 80% на другие товары</aside>
+          </article>
+        </body></html>
+        """.encode("utf-8")
+        source = {
+            "name": "test-coupons",
+            "type": "html_promos",
+            "url": "https://promos.example.test/catalog",
+            "enabled": True,
+        }
+        self.assertEqual(parse_feed(payload, source), [])
+
 if __name__ == "__main__":
     unittest.main()
