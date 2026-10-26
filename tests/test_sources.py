@@ -124,13 +124,13 @@ class FeedParserTests(unittest.TestCase):
         self.assertEqual(deals[0].old_price, 99.99)
 
     def test_html_parser_does_not_invent_old_price(self):
-        payload = b"""
+        payload = """
         <div class="product-card">
           <a href="/product/item"><img src="/item.jpg" alt="Просто товар"></a>
           <a href="/product/item">Просто товар</a>
           <span>Цена 1 000 ₽</span>
         </div>
-        """
+        """.encode("utf-8")
         source = {
             "name": "test-retailer",
             "type": "html",
