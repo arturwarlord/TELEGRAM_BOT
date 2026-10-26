@@ -6,7 +6,6 @@ import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
 from typing import Any
-from urllib.parse import urlparse
 
 from .models import Deal, clean_text, is_http_url, parse_price
 
@@ -90,7 +89,7 @@ def _extract_image(record: Any, description: str = "") -> str | None:
                     if is_http_url(candidate):
                         return candidate.strip()
     html_text = str(description or "")
-    match = re.search(r"(?is)<img\\b[^>]*?\\bsrc=[\\\"']([^\\\"']+)", html_text)
+    match = re.search(r"""(?is)<img\b[^>]*?\bsrc=["']([^"']+)""", html_text)
     if match and is_http_url(match.group(1)):
         return match.group(1).strip()
     return None
@@ -98,33 +97,26 @@ def _extract_image(record: Any, description: str = "") -> str | None:
 
 def _infer_price_pair(text: str) -> tuple[float | None, float | None]:
     """Infer current/old prices only when the text signals a comparison."""
-    pattern = re.compile(r"(?<!\\w)(\\d[\\d\\s\\u00a0\\u202f]*(?:[.,]\\d{1,2})?)\\s*(?:₽|руб(?:лей|ля|ль)?\\.?|р\\.)", re.IGNORECASE)
+    pattern = re.compile(r"(?<!\w)(\d[\d\s\u00a0\u202f]*(?:[.,]\d{1,2})?)\s*(?:₽|руб(?:лей|ля|ль)?\.?|р\.)", re.IGNORECASE)
     matches = list(pattern.finditer(text or ""))
-    if len(matches) < 2:
-        return None, None
     snippet = (text or "").lower()
     old_markers = ("вместо", "везде", "обычно", "обычная цена", "было", "до скидки", "без скидки")
-    if not any(marker in snippet for marker in old_markers):
-        # Handle a direct statement such as «с 2 000 ₽ до 1 000 ₽».
-        direct = re.search(
-            r"с\\s*(\\d[\\d\\s\\u00a0\\u202f]*(?:[.,]\\d{1,2})?)\\s*(?:₽|руб\\.?|р\\.)?\\s*до\\s*(\\d[\\d\\s\\u00a0\\u202f]*(?:[.,]\\d{1,2})?)\\s*(?:₽|руб\\.?|р\\.)",
-            snippet,
-            re.IGNORECASE,
-        )
-        if direct:
-            return parse_price(direct.group(2)), parse_price(direct.group(1))
-        return None, None
-    values = [parse_price(m.group(1)) for m in matches[:3]]
-    values = [x for x in values if x is not None]
-    if len(values) < 2:
-        return None, None
-    # Common deal headlines lead with the actual price, then the comparison price.
-    current, old = values[0], values[1]
-    if old > current:
-        return current, old
-    # Some publishers write «было 2 000 ₽, сейчас 1 000 ₽».
-    if len(values) >= 2 and values[0] > values[1]:
-        return values[1], values[0]
+    if len(matches) >= 2 and any(marker in snippet for marker in old_markers):
+        values = [parse_price(m.group(1)) for m in matches[:3]]
+        values = [x for x in values if x is not None]
+        if len(values) >= 2 and values[1] > values[0]:
+            return values[0], values[1]
+        if len(values) >= 2 and values[0] > values[1]:
+            return values[1], values[0]
+
+    # Handle a direct statement such as «с 2 000 ₽ до 1 000 ₽».
+    direct = re.search(
+        r"с\s*(\d[\d\s\u00a0\u202f]*(?:[.,]\d{1,2})?)\s*(?:₽|руб\.?|р\.)?\s*до\s*(\d[\d\s\u00a0\u202f]*(?:[.,]\d{1,2})?)\s*(?:₽|руб\.?|р\.)",
+        snippet,
+        re.IGNORECASE,
+    )
+    if direct:
+        return parse_price(direct.group(2)), parse_price(direct.group(1))
     return None, None
 
 
