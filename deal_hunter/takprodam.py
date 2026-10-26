@@ -56,6 +56,15 @@ def get_source_list(token: str, timeout: int = 25) -> list[dict[str, Any]]:
     return [item for item in items if isinstance(item, dict)]
 
 
+def _describe_source_status(source: dict[str, Any]) -> str:
+    source_id = source.get("id", "unknown")
+    title = clean_text(source.get("title"), 100)
+    status = clean_text(source.get("status") or "unknown", 40)
+    created_at = clean_text(source.get("created_at"), 40)
+    created_suffix = f" (created_at={created_at})" if created_at else ""
+    return f"{source_id}:{title}={status}{created_suffix}"
+
+
 def get_approved_sources(token: str, timeout: int = 25) -> list[dict[str, Any]]:
     return [
         source for source in get_source_list(token, timeout=timeout)
@@ -78,31 +87,32 @@ def resolve_source_id(
         expected = str(configured_source_id).strip()
         match = next((source for source in sources if str(source.get("id")) == expected), None)
         if not match:
-            registered = ", ".join(
-                f"{source.get('id')}:{clean_text(source.get('title'), 100)}={source.get('status', 'unknown')}"
-                for source in sources
-            ) or "no sources registered in this account"
+            registered = ", ".join(_describe_source_status(source) for source in sources) or "no sources registered in this account"
             raise NoApprovedSourceError(
                 f"TAKPRODAM_SOURCE_ID={expected} was not returned by the API. Registered sources: {registered}"
             )
         if str(match.get("status", "")).lower() != "approved":
+            created_at = clean_text(match.get("created_at"), 40)
+            created_note = f"; created_at={created_at}" if created_at else ""
             raise NoApprovedSourceError(
                 f"Takprodam source {expected} is not approved yet "
-                f"(status={match.get('status', 'unknown')}; title={clean_text(match.get('title'), 100)}). "
-                "Wait for approval; no products were fetched."
+                f"(status={match.get('status', 'unknown')}; title={clean_text(match.get('title'), 100)}{created_note}). "
+                "Takprodam's publisher instructions say verification may take up to 48 hours. "
+                "Confirm the verification code/text is present in the channel description; if the source "
+                "is still pending more than 48 hours after creation, contact support@takprodam.ru. "
+                "No products were fetched."
             )
         return expected
 
     if len(approved) == 1:
         return str(approved[0].get("id"))
     if not approved:
-        registered = ", ".join(
-            f"{source.get('id')}:{clean_text(source.get('title'), 100)}={source.get('status', 'unknown')}"
-            for source in sources
-        ) or "no sources registered in this account"
+        registered = ", ".join(_describe_source_status(source) for source in sources) or "no sources registered in this account"
         raise NoApprovedSourceError(
-            "No approved Takprodam publisher source found. Add your public Telegram channel as a source "
-            "and wait for approval. API-reported sources: " + registered
+            "No approved Takprodam publisher source found. Confirm the verification code/text is present "
+            "in the channel description. Takprodam's publisher instructions say verification may take up to "
+            "48 hours; if a source is still pending more than 48 hours after creation, contact "
+            "support@takprodam.ru. API-reported sources: " + registered
         )
 
     choices = ", ".join(
