@@ -2,6 +2,12 @@ name: Telegram Setup Check
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/telegram-check.yml"
+      - "scripts/check_telegram.py"
+      - "deal_hunter/telegram_check.py"
 
 permissions:
   contents: read
