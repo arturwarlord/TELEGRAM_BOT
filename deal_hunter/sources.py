@@ -348,20 +348,27 @@ def _html_price_pair(text: str) -> tuple[float | None, float | None]:
 
     # Common retailer labels, including Kuper's "Цена без скидки / Цена со скидкой".
     old_patterns = [
-        rf"(?:старая цена|цена без скидки|обычная цена|цена до скидки|было)\s*[:—-]?\s*{_PRICE_TOKEN}",
-    ]
-    current_patterns = [
-        rf"цена со скидкой\s*[:—-]?\s*{_PRICE_TOKEN}",
-        rf"цена\s*[:—-]?\s*{_PRICE_TOKEN}",
+        rf"(?:старая цена|цена без скидки|обычная цена|цена до скидки|было)\b.{{0,90}}?{_PRICE_TOKEN}",
     ]
     for pattern in old_patterns:
         match = re.search(pattern, normalized, flags=re.IGNORECASE)
         if match:
             old = parse_price(match.group(1))
             break
-    for pattern in current_patterns:
-        match = re.search(pattern, normalized, flags=re.IGNORECASE)
-        if match:
+
+    # First look for explicitly discounted price labels. These often include
+    # unit text ("за 1 шт." / "за 1 кг") before the amount.
+    discounted = re.search(rf"цена со скидкой\b.{{0,90}}?{_PRICE_TOKEN}", normalized, flags=re.IGNORECASE)
+    if discounted:
+        current = parse_price(discounted.group(1))
+
+    # Otherwise use a generic "Цена N ₽" occurrence but skip old/regular-price labels.
+    if current is None:
+        for match in re.finditer(rf"\bцена\b.{{0,60}}?{_PRICE_TOKEN}", normalized, flags=re.IGNORECASE):
+            prefix = normalized[max(0, match.start() - 24):match.start()].casefold()
+            label_window = normalized[match.start():min(len(normalized), match.start() + 35)].casefold()
+            if any(marker in prefix for marker in ("старая ", "обычная ")) or "без скидки" in label_window or "до скидки" in label_window:
+                continue
             candidate = parse_price(match.group(1))
             if candidate is not None and (old is None or candidate < old):
                 current = candidate
@@ -423,12 +430,14 @@ def _parse_jsonld_products(parser: _HtmlTreeParser, source: dict[str, Any], base
                     offers = offers[0] if offers else {}
                 if isinstance(offers, dict):
                     price = parse_price(offers.get("price") or offers.get("lowPrice"))
-                    old_price = parse_price(
+                    price_spec = offers.get("priceSpecification")
+                    old_price_value = (
                         value.get("highPrice")
                         or offers.get("highPrice")
                         or offers.get("listPrice")
-                        or offers.get("priceSpecification", {}).get("price") if isinstance(offers.get("priceSpecification"), dict) else None
+                        or (price_spec.get("price") if isinstance(price_spec, dict) else None)
                     )
+                    old_price = parse_price(old_price_value)
                     name = clean_text(value.get("name"), 300)
                     product_url = urljoin(base_url, str(value.get("url") or offers.get("url") or "").strip())
                     image = value.get("image")
