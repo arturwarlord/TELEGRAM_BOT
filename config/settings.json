@@ -10,5 +10,6 @@
   "fetch_timeout_seconds": 20,
   "max_feed_bytes": 5242880,
   "max_items_per_source": 200,
-  "max_posts_per_day": 8
+  "max_posts_per_day": 8,
+  "min_coupon_discount_percent": 10
 }
