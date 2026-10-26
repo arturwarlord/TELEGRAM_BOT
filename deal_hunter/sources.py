@@ -6,6 +6,7 @@ from datetime import date
 import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
+from datetime import date, datetime, timezone
 from typing import Any
 
 from .models import Deal, clean_text, is_http_url, parse_price
@@ -257,8 +258,42 @@ def _extract_promo_expiry(text: str) -> str | None:
             return date(year, month, day).isoformat()
         except ValueError:
             return None
-    match = re.search(r"\bдо\s+(?:\d{1,2}\s+)?(?:января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)(?:\s+\d{4})?\b", text, flags=re.IGNORECASE)
-    return match.group(0) if match else None
+
+    month_numbers = {
+        "января": 1, "февраля": 2, "марта": 3, "апреля": 4,
+        "мая": 5, "июня": 6, "июля": 7, "августа": 8,
+        "сентября": 9, "октября": 10, "ноября": 11, "декабря": 12,
+    }
+    match = re.search(
+        r"\bдо\s+(?:(\d{1,2})\s+)?(января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)(?:\s+(\d{4}))?\b",
+        text,
+        flags=re.IGNORECASE,
+    )
+    if not match:
+        return None
+    day = int(match.group(1) or "1")
+    month = month_numbers[match.group(2).lower()]
+    year = int(match.group(3) or datetime.now(timezone.utc).year)
+    try:
+        return date(year, month, day).isoformat()
+    except ValueError:
+        return None
+
+
+def _extract_offer_description(text: str) -> str:
+    """Keep offer conditions but strip CTA/tracking/legal footer noise from card copy."""
+    value = clean_text(text, 1400)
+    # Do not copy a coupon site's own advertising label/ERID as if it applied to
+    # this channel's post, and avoid CTA text that exposes tracking destinations.
+    cut_markers = (
+        "перейти на сайт", "перейти в магазин", "в магазин", "скопировать промокод",
+        "скопировать", "копировать", "показать код", "открыть акцию",
+        "реклама.", "erid:", "erid ",
+    )
+    positions = [value.lower().find(marker) for marker in cut_markers if value.lower().find(marker) >= 0]
+    if positions:
+        value = value[:min(positions)].strip()
+    return value[:700]
 
 
 def parse_html_promotions(payload: bytes, source: dict[str, Any], max_items: int = 200) -> list[Deal]:
@@ -360,7 +395,7 @@ def parse_html_promotions(payload: bytes, source: dict[str, Any], max_items: int
             affiliate_url=None,
             image_url=images[0],
             currency=str(source.get("currency") or "RUB").upper(),
-            description=text[:700],
+            description=_extract_offer_description(text),
             promo_code=code,
             expires_at=_extract_promo_expiry(text),
             reported_discount_percent=reported_percent,
