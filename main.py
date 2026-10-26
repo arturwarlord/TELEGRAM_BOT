@@ -71,22 +71,25 @@ def main() -> int:
     dry_run = env_bool("DRY_RUN", True)
     allow_direct_links = env_bool("ALLOW_DIRECT_LINKS", False)
     publishing = publish_enabled and not dry_run
-    post_notice = os.getenv("POST_NOTICE", "").strip()
-    if not post_notice:
-        post_notice = (
-            "Ссылка ведёт напрямую на сайт магазина; цена, скидка и наличие могут зависеть от региона, "
-            "карты лояльности и условий продавца. Канал не получает комиссию с перехода."
-            if allow_direct_links
-            else os.getenv("AD_NOTICE", "").strip()
+    if allow_direct_links:
+        post_notice = os.getenv("DIRECT_POST_NOTICE", "").strip() or (
+            "Ссылка ведёт на публичную страницу предложения; условия, цена и наличие могут зависеть от "
+            "региона, карты лояльности и требований продавца. Канал не получает комиссию с перехода."
         )
+    else:
+        post_notice = os.getenv("POST_NOTICE", "").strip() or os.getenv("AD_NOTICE", "").strip()
 
     print("===== DEAL HUNTER =====")
     print(f"Mode: {'PUBLISH' if publishing else 'DRY-RUN / PREVIEW'}")
     print(f"Link mode: {'DIRECT STORE LINKS (NO AFFILIATE)' if allow_direct_links else 'AFFILIATE LINKS REQUIRED FOR PUBLISHING'}")
     partner_api_enabled = bool(os.getenv("TAKPRODAM_API_TOKEN", "").strip())
-    print(f"Configured RSS/XML/JSON sources: {len(sources)}")
+    print(f"Configured public feed/page sources: {len(sources)}")
     print(f"Takprodam partner API: {'configured' if partner_api_enabled else 'not configured'}")
-    print("Safety: no post is sent unless the deal has a valid affiliate URL and product image.")
+    print(
+        "Safety: direct store/promo links are used; the channel receives no commission."
+        if allow_direct_links
+        else "Safety: partner link and product image are required before publishing."
+    )
     if not sources and not partner_api_enabled:
         print(f"No enabled feeds are configured in {source_config_path.relative_to(ROOT) if source_config_path.is_relative_to(ROOT) else source_config_path}.")
         print("Connect the Takprodam API or add an approved RSS/XML/JSON partner feed. Nothing was published.")
@@ -127,6 +130,7 @@ def main() -> int:
     min_discount = float(settings.get("min_discount_percent", 30))
     min_savings = float(settings.get("min_savings_rub", 100))
     max_discount = float(settings.get("max_discount_percent", 90))
+    min_coupon_discount = float(settings.get("min_coupon_discount_percent", 10))
     require_image = bool(settings.get("require_image_for_publication", True))
 
     evaluated: list[tuple[Deal, DealDecision]] = []
@@ -137,6 +141,7 @@ def main() -> int:
             min_discount_percent=min_discount,
             min_savings=min_savings,
             max_discount_percent=max_discount,
+            min_coupon_discount_percent=min_coupon_discount,
             require_affiliate=False,
             require_image=False,
         )
@@ -156,10 +161,21 @@ def main() -> int:
             has_link = "yes" if deal.affiliate_url else "NO"
             has_image = "yes" if deal.image_url else "NO"
             commission_text = f"{deal.commission:g}" if deal.commission is not None else "n/a"
+            if deal.price is not None and deal.old_price is not None and decision.discount_percent is not None:
+                offer_summary = (
+                    f"-{decision.discount_percent:.1f}% | {format_rub(deal.price)} instead of "
+                    f"{format_rub(deal.old_price)} | saved {format_rub(decision.savings)}"
+                )
+            else:
+                discount_label = (
+                    f"discount {'up to ' if deal.discount_is_maximum else ''}{decision.discount_percent:.1f}%"
+                    if decision.discount_percent is not None
+                    else "coupon / special offer"
+                )
+                code_label = f" | code={deal.promo_code}" if deal.promo_code else ""
+                offer_summary = f"{discount_label}{code_label}"
             print(
-                f"[PREVIEW {index}] -{decision.discount_percent:.1f}% | "
-                f"{format_rub(deal.price)} instead of {format_rub(deal.old_price)} | "
-                f"saved {format_rub(decision.savings)} | "
+                f"[PREVIEW {index}] {offer_summary} | "
                 f"affiliate={has_link} image={has_image} commission={commission_text} | {deal.store} | {deal.title}"
             )
             print(f"  Product URL (not published): {deal.product_url}")
@@ -206,6 +222,7 @@ def main() -> int:
             min_discount_percent=min_discount,
             min_savings=min_savings,
             max_discount_percent=max_discount,
+            min_coupon_discount_percent=min_coupon_discount,
             require_affiliate=not allow_direct_links,
             require_image=require_image,
         )
@@ -232,7 +249,8 @@ def main() -> int:
             mark_published(deal, state, message_id=message_id)
             save_state(state_path, state)
             posted += 1
-            print(f"[PUBLISHED] {deal.store} | -{decision.discount_percent:.1f}% | message_id={message_id}")
+            discount_label = f"-{decision.discount_percent:.1f}%" if decision.discount_percent is not None else "coupon"
+            print(f"[PUBLISHED] {deal.store} | {discount_label} | message_id={message_id}")
             time.sleep(1.1)
         except Exception as exc:
             publish_errors += 1
