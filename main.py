@@ -12,6 +12,7 @@ from deal_hunter.models import Deal
 from deal_hunter.scoring import DealDecision, evaluate_deal
 from deal_hunter.sources import fetch_source
 from deal_hunter.state import load_state, mark_published, save_state, should_skip_as_duplicate
+from deal_hunter.takprodam import fetch_configured_takprodam_deals
 from deal_hunter.telegram import TelegramPublisher
 
 
@@ -72,11 +73,13 @@ def main() -> int:
 
     print("===== DEAL HUNTER =====")
     print(f"Mode: {'PUBLISH' if publishing else 'DRY-RUN / PREVIEW'}")
-    print(f"Enabled sources: {len(sources)}")
+    partner_api_enabled = bool(os.getenv("TAKPRODAM_API_TOKEN", "").strip())
+    print(f"Configured RSS/XML/JSON sources: {len(sources)}")
+    print(f"Takprodam partner API: {'configured' if partner_api_enabled else 'not configured'}")
     print("Safety: no post is sent unless the deal has a valid affiliate URL and product image.")
-    if not sources:
-        print(f"No enabled sources are configured in {source_config_path.relative_to(ROOT) if source_config_path.is_relative_to(ROOT) else source_config_path}.")
-        print("Add an approved RSS/XML/JSON partner feed to config/sources.json. Nothing was published.")
+    if not sources and not partner_api_enabled:
+        print(f"No enabled feeds are configured in {source_config_path.relative_to(ROOT) if source_config_path.is_relative_to(ROOT) else source_config_path}.")
+        print("Connect the Takprodam API or add an approved RSS/XML/JSON partner feed. Nothing was published.")
         return 0
 
     timeout = int(settings.get("fetch_timeout_seconds", 20))
@@ -84,6 +87,17 @@ def main() -> int:
     max_items = int(settings.get("max_items_per_source", 200))
     all_deals: list[Deal] = []
     source_errors = 0
+
+    if partner_api_enabled:
+        try:
+            partner_deals, partner_source_id = fetch_configured_takprodam_deals(timeout=timeout)
+            print(f"[OK] Takprodam API source {partner_source_id}: {len(partner_deals)} promotion product(s)")
+            all_deals.extend(partner_deals)
+        except Exception as exc:
+            source_errors += 1
+            print(f"[ERROR] Takprodam API: {type(exc).__name__}: {exc}")
+    else:
+        print("[INFO] Takprodam API is not connected (TAKPRODAM_API_TOKEN secret not set).")
 
     for source in sources:
         name = str(source.get("name") or "unnamed")
@@ -129,11 +143,12 @@ def main() -> int:
         for index, (deal, decision) in enumerate(evaluated[:20], start=1):
             has_link = "yes" if deal.affiliate_url else "NO"
             has_image = "yes" if deal.image_url else "NO"
+            commission_text = f"{deal.commission:g}" if deal.commission is not None else "n/a"
             print(
                 f"[PREVIEW {index}] -{decision.discount_percent:.1f}% | "
                 f"{format_rub(deal.price)} instead of {format_rub(deal.old_price)} | "
                 f"saved {format_rub(decision.savings)} | "
-                f"affiliate={has_link} image={has_image} | {deal.store} | {deal.title}"
+                f"affiliate={has_link} image={has_image} commission={commission_text} | {deal.store} | {deal.title}"
             )
             print(f"  Product URL (not published): {deal.product_url}")
         print("DRY-RUN finished: Telegram was not contacted.")
