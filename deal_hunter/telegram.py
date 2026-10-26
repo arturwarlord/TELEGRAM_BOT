@@ -69,17 +69,30 @@ class TelegramPublisher:
         if not self.token or not self.chat_id:
             raise ValueError("Telegram bot token and chat ID are required")
 
-    def publish(self, deal: Deal, decision: DealDecision, ad_notice: str) -> int | None:
+    def publish(
+        self,
+        deal: Deal,
+        decision: DealDecision,
+        ad_notice: str,
+        *,
+        allow_direct_link: bool = False,
+    ) -> int | None:
         if not decision.eligible:
             raise ValueError(f"Refusing to publish an ineligible deal: {decision.reason}")
-        if not is_http_url(deal.affiliate_url):
-            raise ValueError("Refusing to publish without an approved affiliate URL")
+        # When direct-link mode is enabled, deliberately ignore all affiliate URLs,
+        # including links supplied by third-party feeds. The button always goes to
+        # the retailer's product page so this mode does not claim/track commissions.
+        target_url = deal.product_url if allow_direct_link else deal.affiliate_url
+        if not is_http_url(target_url):
+            reason = "a valid direct product URL" if allow_direct_link else "an approved affiliate URL"
+            raise ValueError(f"Refusing to publish without {reason}")
         if not is_http_url(deal.image_url):
             raise ValueError("Refusing to publish without a product image URL")
         if not ad_notice.strip():
-            raise ValueError("AD_NOTICE is required before commercial posts can be published")
+            raise ValueError("A post disclosure/notice is required before publication")
 
         caption = format_caption(deal, decision, ad_notice)
+        button_text = "🛍 Открыть в магазине" if allow_direct_link else "🔥 Забрать скидку"
         payload = {
             "chat_id": self.chat_id,
             "photo": deal.image_url,
@@ -87,7 +100,7 @@ class TelegramPublisher:
             "parse_mode": "HTML",
             "reply_markup": {
                 "inline_keyboard": [[
-                    {"text": "🔥 Забрать скидку", "url": deal.affiliate_url}
+                    {"text": button_text, "url": target_url}
                 ]]
             },
         }
