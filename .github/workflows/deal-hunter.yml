@@ -45,6 +45,11 @@ jobs:
       TELEGRAM_CHAT_ID: ${{ vars.TELEGRAM_CHAT_ID }}
       AD_NOTICE: ${{ vars.AD_NOTICE }}
       SOURCE_CONFIG_PATH: config/sources.json
+      TAKPRODAM_API_TOKEN: ${{ secrets.TAKPRODAM_API_TOKEN }}
+      TAKPRODAM_SOURCE_ID: ${{ vars.TAKPRODAM_SOURCE_ID }}
+      TAKPRODAM_MARKETPLACES: ${{ vars.TAKPRODAM_MARKETPLACES }}
+      TAKPRODAM_LIMIT: ${{ vars.TAKPRODAM_LIMIT }}
+      TAKPRODAM_MAX_PAGES: ${{ vars.TAKPRODAM_MAX_PAGES }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
