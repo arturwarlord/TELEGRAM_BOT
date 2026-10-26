@@ -19,7 +19,7 @@ from deal_hunter.sources import (  # noqa: E402
     _html_text,
     _html_walk,
     _html_price_pair,
-    parse_html_catalog,
+    parse_feed,
 )
 from deal_hunter.models import clean_text  # noqa: E402
 
@@ -71,7 +71,7 @@ def inspect_source(source: dict) -> None:
     print(f"Page title: {title or '(not found)'}")
 
     try:
-        deals = parse_html_catalog(payload, source, max_items=30)
+        deals = parse_feed(payload, source, max_items=30)
     except Exception as exc:
         print(f"[PARSER ERROR] {type(exc).__name__}: {exc}")
         deals = []
