@@ -74,7 +74,7 @@ class TakprodamTests(unittest.TestCase):
                 {"id": 8, "title": "Pending website", "status": "verification"},
             ]
         }
-        with self.assertRaisesRegex(RuntimeError, "not in the approved sources"):
+        with self.assertRaisesRegex(RuntimeError, "not approved yet"):
             resolve_source_id("dummy-token", "8")
 
 
@@ -87,6 +87,16 @@ class TakprodamTests(unittest.TestCase):
         deals = parse_promotion_items([first, second], "Ozon")
         self.assertEqual(len(deals), 2)
         self.assertEqual(deals[0].key, deals[1].key)
+
+    @patch("deal_hunter.takprodam._request_json")
+    def test_explains_when_channel_source_is_pending_approval(self, mock_request):
+        mock_request.return_value = {
+            "items": [
+                {"id": 21, "title": "Telegram Channel", "status": "verification"}
+            ]
+        }
+        with self.assertRaisesRegex(RuntimeError, "Telegram Channel=verification"):
+            resolve_source_id("dummy-token")
 
 if __name__ == "__main__":
     unittest.main()
