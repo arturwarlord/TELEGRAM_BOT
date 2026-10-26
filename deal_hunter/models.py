@@ -115,7 +115,12 @@ class Deal:
 
     @property
     def key(self) -> str:
-        base = canonical_url(self.product_url)
+        # Takprodam can expose the same marketplace product through more than
+        # one promotion link. Prefer its stable product ID over that link.
+        if self.source.lower().startswith("takprodam:") and self.external_id:
+            base = f"{self.source.lower()}|{self.external_id}"
+        else:
+            base = canonical_url(self.product_url)
         if not base:
             base = f"{self.store.lower()}|{self.title.lower().strip()}"
         return hashlib.sha256(base.encode("utf-8")).hexdigest()[:24]
