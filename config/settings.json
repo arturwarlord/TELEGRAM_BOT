@@ -1,6 +1,6 @@
 {
-  "min_discount_percent": 30,
-  "min_savings_rub": 100,
+  "min_discount_percent": 25,
+  "min_savings_rub": 50,
   "max_discount_percent": 90,
   "require_image_for_publication": true,
   "max_posts_per_run": 2,
