@@ -141,7 +141,7 @@ class FeedParserTests(unittest.TestCase):
 
 
     def test_parses_public_html_sale_card_with_parenthesized_discount(self):
-        payload = b"""
+        payload = """
         <html><body>
           <article class="deal">
             <a href="/deals/coffee-123">Кофе зерновой Example 1 кг</a>
@@ -149,7 +149,7 @@ class FeedParserTests(unittest.TestCase):
             <div>799 ₽</div><del>1 299 ₽</del><span>(38%)</span>
           </article>
         </body></html>
-        """
+        """.encode("utf-8")
         source = {
             "name": "Pepper public discounts",
             "type": "html",
@@ -169,7 +169,7 @@ class FeedParserTests(unittest.TestCase):
         self.assertIsNone(deal.affiliate_url)
 
     def test_html_parser_does_not_invent_a_discount_without_price_pair(self):
-        payload = b"""
+        payload = """
         <html><body>
           <article>
             <a href="/deals/random">Случайный товар за выгодной ценой</a>
@@ -177,7 +177,7 @@ class FeedParserTests(unittest.TestCase):
             <div>999 ₽</div><span>Популярный товар сегодня</span>
           </article>
         </body></html>
-        """
+        """.encode("utf-8")
         source = {
             "name": "test-html",
             "type": "html",
