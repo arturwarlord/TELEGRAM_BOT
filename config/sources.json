@@ -1,4 +1,101 @@
 {
   "version": 1,
-  "sources": []
+  "sources": [
+    {
+      "name": "Перекрёсток — публичные акции",
+      "type": "html",
+      "enabled": true,
+      "url": "https://www.perekrestok.ru/promotions",
+      "store": "Перекрёсток",
+      "currency": "RUB"
+    },
+    {
+      "name": "ВкусВилл — скидки и предложения",
+      "type": "html",
+      "enabled": true,
+      "url": "https://vkusvill.ru/offers/",
+      "store": "ВкусВилл",
+      "currency": "RUB"
+    },
+    {
+      "name": "Купер / Лента — скидки и акции",
+      "type": "html",
+      "enabled": true,
+      "url": "https://kuper.ru/fdlenta/c/skidki-i-aktsii",
+      "store": "Лента / Купер",
+      "currency": "RUB"
+    },
+    {
+      "name": "Купер / АШАН — каталог товаров",
+      "type": "html",
+      "enabled": true,
+      "url": "https://kuper.ru/auchansm",
+      "store": "АШАН / Купер",
+      "currency": "RUB"
+    },
+    {
+      "name": "Купер / METRO — каталог товаров",
+      "type": "html",
+      "enabled": true,
+      "url": "https://kuper.ru/metro",
+      "store": "METRO / Купер",
+      "currency": "RUB"
+    },
+    {
+      "name": "Wildberries — товары с распродажи",
+      "type": "html",
+      "enabled": true,
+      "url": "https://www.wildberries.ru/",
+      "store": "Wildberries",
+      "currency": "RUB"
+    },
+    {
+      "name": "Ozon — скидки и распродажа",
+      "type": "html",
+      "enabled": true,
+      "url": "https://www.ozon.ru/category/skidki-i-rasprodazha/",
+      "store": "Ozon",
+      "currency": "RUB"
+    },
+    {
+      "name": "Детский мир — распродажа",
+      "type": "html",
+      "enabled": true,
+      "url": "https://www.detmir.ru/catalog/index/name/rasprodazha_dm_rf/",
+      "store": "Детский мир",
+      "currency": "RUB"
+    },
+    {
+      "name": "Lamoda — Outlet",
+      "type": "html",
+      "enabled": true,
+      "url": "https://www.lamoda.ru/outlet/",
+      "store": "Lamoda",
+      "currency": "RUB"
+    },
+    {
+      "name": "Спортмастер — все скидки",
+      "type": "html",
+      "enabled": true,
+      "url": "https://www.sportmaster.ru/catalog/sale/all/?page=1",
+      "store": "Спортмастер",
+      "currency": "RUB"
+    },
+    {
+      "name": "DNS — акции и предложения",
+      "type": "html",
+      "enabled": true,
+      "url": "https://www.dns-shop.ru/actions/",
+      "store": "DNS",
+      "currency": "RUB"
+    },
+    {
+      "name": "Ситилинк — акции",
+      "type": "html",
+      "enabled": true,
+      "url": "https://www.citilink.ru/actions/",
+      "store": "Ситилинк",
+      "currency": "RUB"
+    }
+  ]
 }
