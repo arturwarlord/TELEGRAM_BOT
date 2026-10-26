@@ -1,0 +1,28 @@
+name: Takprodam Commission Report
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 8 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    name: Read commission statistics
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Read and summarize commissions
+        env:
+          TAKPRODAM_API_TOKEN: ${{ secrets.TAKPRODAM_API_TOKEN }}
+          TAKPRODAM_SUBID: ${{ vars.TAKPRODAM_SUBID }}
+          TAKPRODAM_REPORT_LIMIT: ${{ vars.TAKPRODAM_REPORT_LIMIT }}
+          TAKPRODAM_REPORT_MAX_PAGES: ${{ vars.TAKPRODAM_REPORT_MAX_PAGES }}
+        run: python scripts/report_commissions.py
