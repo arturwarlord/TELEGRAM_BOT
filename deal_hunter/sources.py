@@ -175,6 +175,9 @@ def parse_feed(payload: bytes, source: dict[str, Any], max_items: int = 200) -> 
     feed_type = str(source.get("type", "rss")).lower()
     records: list[Any]
 
+    if feed_type == "html":
+        return parse_html_catalog(payload, source, max_items=max_items)
+
     if feed_type == "json":
         decoded = json.loads(payload.decode("utf-8-sig"))
         if isinstance(decoded, list):
@@ -237,3 +240,290 @@ def fetch_source(
     if len(payload) > max_bytes:
         raise ValueError(f"Source '{source.get('name', 'unnamed')}' exceeded the {max_bytes}-byte limit")
     return parse_feed(payload, source, max_items=max_items)
+
+from html.parser import HTMLParser
+from urllib.parse import urljoin, urlsplit
+
+
+class _HtmlNode:
+    __slots__ = ("tag", "attrs", "children", "parent")
+
+    def __init__(self, tag: str, attrs: dict[str, str], parent: "_HtmlNode | None" = None):
+        self.tag = tag
+        self.attrs = attrs
+        self.children: list["_HtmlNode | str"] = []
+        self.parent = parent
+
+
+class _HtmlTreeParser(HTMLParser):
+    """Small stdlib-only DOM builder for public, server-rendered sale pages."""
+
+    VOID_TAGS = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"}
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.root = _HtmlNode("document", {})
+        self.stack = [self.root]
+
+    def handle_starttag(self, tag, attrs):
+        node = _HtmlNode(tag.lower(), {str(k).lower(): str(v or "") for k, v in attrs}, self.stack[-1])
+        self.stack[-1].children.append(node)
+        if tag.lower() not in self.VOID_TAGS:
+            self.stack.append(node)
+
+    def handle_startendtag(self, tag, attrs):
+        node = _HtmlNode(tag.lower(), {str(k).lower(): str(v or "") for k, v in attrs}, self.stack[-1])
+        self.stack[-1].children.append(node)
+
+    def handle_endtag(self, tag):
+        target = tag.lower()
+        for index in range(len(self.stack) - 1, 0, -1):
+            if self.stack[index].tag == target:
+                del self.stack[index:]
+                break
+
+    def handle_data(self, data):
+        if data:
+            self.stack[-1].children.append(data)
+
+
+def _html_walk(node: _HtmlNode):
+    yield node
+    for child in node.children:
+        if isinstance(child, _HtmlNode):
+            yield from _html_walk(child)
+
+
+def _html_text(node: _HtmlNode) -> str:
+    parts: list[str] = []
+    for child in node.children:
+        if isinstance(child, str):
+            parts.append(child)
+        elif child.tag not in {"script", "style", "noscript", "svg"}:
+            parts.append(_html_text(child))
+    return clean_text(" ".join(parts), 5000)
+
+
+def _html_links(node: _HtmlNode, base_url: str) -> list[tuple[str, str]]:
+    links: list[tuple[str, str]] = []
+    for child in _html_walk(node):
+        if child.tag != "a":
+            continue
+        href = urljoin(base_url, child.attrs.get("href", "").strip())
+        label = _html_text(child)
+        if is_http_url(href) and label:
+            links.append((href, label))
+    return links
+
+
+def _html_images(node: _HtmlNode, base_url: str) -> list[str]:
+    images: list[str] = []
+    for child in _html_walk(node):
+        if child.tag != "img":
+            continue
+        value = (
+            child.attrs.get("src")
+            or child.attrs.get("data-src")
+            or child.attrs.get("data-original")
+            or child.attrs.get("data-lazy-src")
+            or ""
+        ).strip()
+        if not value:
+            srcset = child.attrs.get("srcset", "").strip()
+            if srcset:
+                value = srcset.split(",")[0].strip().split(" ")[0]
+        candidate = urljoin(base_url, value)
+        if is_http_url(candidate) and candidate not in images:
+            images.append(candidate)
+    return images
+
+
+_PRICE_TOKEN = r"(\d[\d\s\u00a0\u202f]*(?:[.,]\d{1,2})?)\s*(?:₽|руб(?:лей|ля|ль)?\.?|р\.)"
+
+
+def _html_price_pair(text: str) -> tuple[float | None, float | None]:
+    normalized = clean_text(text, 5000)
+    current: float | None = None
+    old: float | None = None
+
+    # Common retailer labels, including Kuper's "Цена без скидки / Цена со скидкой".
+    old_patterns = [
+        rf"(?:старая цена|цена без скидки|обычная цена|цена до скидки|было)\s*[:—-]?\s*{_PRICE_TOKEN}",
+    ]
+    current_patterns = [
+        rf"цена со скидкой\s*[:—-]?\s*{_PRICE_TOKEN}",
+        rf"цена\s*[:—-]?\s*{_PRICE_TOKEN}",
+    ]
+    for pattern in old_patterns:
+        match = re.search(pattern, normalized, flags=re.IGNORECASE)
+        if match:
+            old = parse_price(match.group(1))
+            break
+    for pattern in current_patterns:
+        match = re.search(pattern, normalized, flags=re.IGNORECASE)
+        if match:
+            candidate = parse_price(match.group(1))
+            if candidate is not None and (old is None or candidate < old):
+                current = candidate
+                break
+
+    # If explicit labels are absent, only accept two prices when the card clearly
+    # shows a discount marker (e.g. "-35%") and the values are ordered.
+    if current is None or old is None:
+        if re.search(r"-\s*\d{1,2}\s*%", normalized):
+            values = [
+                parse_price(m.group(1))
+                for m in re.finditer(_PRICE_TOKEN, normalized, flags=re.IGNORECASE)
+            ]
+            values = [value for value in values if value is not None]
+            if len(values) >= 2:
+                low, high = min(values[:2]), max(values[:2])
+                if high > low:
+                    current, old = low, high
+    if current is None or old is None or old <= current:
+        return None, None
+    return current, old
+
+
+def _is_generic_link_label(label: str) -> bool:
+    normalized = clean_text(label, 250).casefold()
+    generic = {
+        "подробнее", "купить", "в корзину", "все товары", "ещё", "еще",
+        "показать все", "смотреть все", "перейти", "акции", "скидки",
+        "каталог", "главная", "войти", "избранное",
+    }
+    return not normalized or normalized in generic or len(normalized) < 5
+
+
+def _parse_jsonld_products(parser: _HtmlTreeParser, source: dict[str, Any], base_url: str) -> list[Deal]:
+    deals: list[Deal] = []
+    for node in _html_walk(parser.root):
+        if node.tag != "script" or "ld+json" not in node.attrs.get("type", "").lower():
+            continue
+        raw = "".join(child for child in node.children if isinstance(child, str)).strip()
+        if not raw:
+            continue
+        try:
+            data = json.loads(raw)
+        except (json.JSONDecodeError, TypeError):
+            continue
+
+        def visit(value: Any):
+            if isinstance(value, list):
+                for item in value:
+                    visit(item)
+                return
+            if not isinstance(value, dict):
+                return
+            kind = value.get("@type", [])
+            types = [kind] if isinstance(kind, str) else kind if isinstance(kind, list) else []
+            if any(str(item).lower() == "product" for item in types):
+                offers = value.get("offers") or {}
+                if isinstance(offers, list):
+                    offers = offers[0] if offers else {}
+                if isinstance(offers, dict):
+                    price = parse_price(offers.get("price") or offers.get("lowPrice"))
+                    old_price = parse_price(
+                        value.get("highPrice")
+                        or offers.get("highPrice")
+                        or offers.get("listPrice")
+                        or offers.get("priceSpecification", {}).get("price") if isinstance(offers.get("priceSpecification"), dict) else None
+                    )
+                    name = clean_text(value.get("name"), 300)
+                    product_url = urljoin(base_url, str(value.get("url") or offers.get("url") or "").strip())
+                    image = value.get("image")
+                    if isinstance(image, list):
+                        image = image[0] if image else None
+                    image_url = urljoin(base_url, str(image or "").strip())
+                    if (
+                        name and is_http_url(product_url) and is_http_url(image_url)
+                        and price is not None and old_price is not None and old_price > price
+                    ):
+                        deals.append(Deal(
+                            title=name,
+                            product_url=product_url,
+                            store=str(source.get("store") or source.get("name") or "Магазин"),
+                            source=str(source.get("name") or "public-html"),
+                            price=price,
+                            old_price=old_price,
+                            image_url=image_url,
+                            currency=str(offers.get("priceCurrency") or source.get("currency") or "RUB").upper(),
+                            external_id=str(value.get("sku") or value.get("productID") or "") or None,
+                            description=clean_text(value.get("description"), 800),
+                        ))
+            for child_value in value.values():
+                if isinstance(child_value, (dict, list)):
+                    visit(child_value)
+
+        visit(data)
+    return deals
+
+
+def parse_html_catalog(payload: bytes, source: dict[str, Any], max_items: int = 200) -> list[Deal]:
+    """Extract only explicit old/current price pairs from a public store catalogue page.
+
+    No pages are bypassed and no prices are guessed from separate pages. If the site
+    renders prices only after login/location selection, it will simply produce no deals.
+    """
+    base_url = str(source.get("url") or "").strip()
+    parser = _HtmlTreeParser()
+    parser.feed(payload.decode("utf-8-sig", errors="replace"))
+    parser.close()
+
+    deals = _parse_jsonld_products(parser, source, base_url)
+    seen = {deal.key for deal in deals}
+    nodes = list(_html_walk(parser.root))
+    # Smallest elements are visited first, making repeated outer containers harmless.
+    for node in reversed(nodes):
+        if node.tag in {"document", "html", "body", "main", "script", "style", "nav", "footer", "header"}:
+            continue
+        text = _html_text(node)
+        if len(text) < 30 or len(text) > 2200:
+            continue
+        current_price, old_price = _html_price_pair(text)
+        if current_price is None or old_price is None:
+            continue
+
+        links = _html_links(node, base_url)
+        images = _html_images(node, base_url)
+        if not links or not images:
+            continue
+        # Prefer a plausible product link with a product name, not navigation or category.
+        candidates = [
+            (href, label) for href, label in links
+            if not _is_generic_link_label(label)
+            and href.rstrip("/") != base_url.rstrip("/")
+            and not re.search(r"/(promotions?|actions?|offers?|personaloffers|sp|catalog)(/|$)", urlsplit(href).path, re.I)
+        ]
+        if not candidates:
+            continue
+        href, title = max(candidates, key=lambda pair: min(len(pair[1]), 300))
+        title = clean_text(title, 300)
+        if len(title) < 5:
+            # Sometimes the title is only available as an image alt attribute.
+            title = next(
+                (clean_text(child.attrs.get("alt"), 300) for child in _html_walk(node)
+                 if child.tag == "img" and len(clean_text(child.attrs.get("alt"), 300)) >= 5),
+                "",
+            )
+        if not title or len(title) < 5:
+            continue
+
+        deal = Deal(
+            title=title,
+            product_url=href,
+            store=str(source.get("store") or source.get("name") or "Магазин"),
+            source=str(source.get("name") or "public-html"),
+            price=current_price,
+            old_price=old_price,
+            image_url=images[0],
+            currency=str(source.get("currency") or "RUB").upper(),
+            description=text[:800],
+        )
+        if deal.key not in seen:
+            deals.append(deal)
+            seen.add(deal.key)
+            if len(deals) >= max(1, max_items):
+                break
+    return deals
+
