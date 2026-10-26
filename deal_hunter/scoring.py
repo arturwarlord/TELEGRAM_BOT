@@ -38,11 +38,12 @@ def evaluate_deal(
     min_discount_percent: float = 30.0,
     min_savings: float = 100.0,
     max_discount_percent: float = 90.0,
+    min_coupon_discount_percent: float = 10.0,
     require_affiliate: bool = True,
     require_image: bool = True,
     now: datetime | None = None,
 ) -> DealDecision:
-    """Check whether a deal has enough verified data to be considered for posting."""
+    """Validate either a price-comparison deal or an explicit coupon offer."""
     current_time = now or datetime.now(timezone.utc)
     if current_time.tzinfo is None:
         current_time = current_time.replace(tzinfo=timezone.utc)
@@ -51,33 +52,53 @@ def evaluate_deal(
         return DealDecision(False, "invalid product URL")
     if deal.currency.upper() not in {"RUB", "RUR", "₽"}:
         return DealDecision(False, f"unsupported currency: {deal.currency}")
-    if deal.price is None or deal.old_price is None:
-        return DealDecision(False, "missing current or old price")
-    if deal.price <= 0:
-        return DealDecision(False, "current price must be positive")
-    if deal.old_price <= deal.price:
-        return DealDecision(False, "old price is not higher than current price")
-
-    discount = deal.discount_percent
-    savings = deal.savings
-    if discount is None or savings is None:
-        return DealDecision(False, "could not calculate savings")
-    if discount < min_discount_percent:
-        return DealDecision(False, f"discount below threshold ({discount:.1f}%)", discount, savings)
-    if savings < min_savings:
-        return DealDecision(False, f"savings below threshold ({savings:.0f} RUB)", discount, savings)
-    if discount > max_discount_percent:
-        return DealDecision(False, f"suspicious discount ({discount:.1f}%)", discount, savings)
 
     expiry = _parse_expiry(deal.expires_at)
     if expiry and expiry < current_time.astimezone(timezone.utc):
-        return DealDecision(False, "offer expired", discount, savings)
+        return DealDecision(False, "offer expired")
+
+    has_price_pair = deal.price is not None and deal.old_price is not None
+    if has_price_pair:
+        if deal.price <= 0:
+            return DealDecision(False, "current price must be positive")
+        if deal.old_price <= deal.price:
+            return DealDecision(False, "old price is not higher than current price")
+
+        discount = deal.discount_percent
+        savings = deal.savings
+        if discount is None or savings is None:
+            return DealDecision(False, "could not calculate savings")
+        if discount < min_discount_percent:
+            return DealDecision(False, f"discount below threshold ({discount:.1f}%)", discount, savings)
+        if savings < min_savings:
+            return DealDecision(False, f"savings below threshold ({savings:.0f} RUB)", discount, savings)
+        if discount > max_discount_percent:
+            return DealDecision(False, f"suspicious discount ({discount:.1f}%)", discount, savings)
+
+        if require_affiliate and not is_http_url(deal.affiliate_url):
+            return DealDecision(False, "missing approved affiliate URL", discount, savings)
+        if require_image and not is_http_url(deal.image_url):
+            return DealDecision(False, "missing product image URL", discount, savings)
+
+        score = min(100.0, discount * 1.2 + min(savings / 500.0, 20.0))
+        return DealDecision(True, "eligible", discount, savings, score)
+
+    # Coupon/promotional cards often state a working code or discount but don't
+    # expose two comparable prices. Accept only an explicit code or a percentage
+    # actually printed by the source; never synthesize a "was / now" price.
+    discount = deal.reported_discount_percent
+    if not deal.promo_code and discount is None:
+        return DealDecision(False, "missing price pair or explicit coupon/discount")
+    if discount is not None:
+        if discount < min_coupon_discount_percent:
+            return DealDecision(False, f"coupon discount below threshold ({discount:.1f}%)", discount, None)
+        if discount > max_discount_percent:
+            return DealDecision(False, f"suspicious coupon discount ({discount:.1f}%)", discount, None)
 
     if require_affiliate and not is_http_url(deal.affiliate_url):
-        return DealDecision(False, "missing approved affiliate URL", discount, savings)
+        return DealDecision(False, "missing approved affiliate URL", discount, None)
     if require_image and not is_http_url(deal.image_url):
-        return DealDecision(False, "missing product image URL", discount, savings)
+        return DealDecision(False, "missing product image URL", discount, None)
 
-    # Favor both large percentage discounts and meaningful absolute savings.
-    score = min(100.0, discount * 1.2 + min(savings / 500.0, 20.0))
-    return DealDecision(True, "eligible", discount, savings, score)
+    score = min(100.0, discount * 1.2) if discount is not None else 5.0
+    return DealDecision(True, "eligible coupon", discount, None, score)
