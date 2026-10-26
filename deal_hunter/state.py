@@ -71,11 +71,13 @@ def should_skip_as_duplicate(
 
     if old_post_price > 0 and deal.price is not None and deal.price < old_post_price:
         drop_percent = (old_post_price - deal.price) / old_post_price * 100.0
+        # A large price drop can be reposted sooner; a small improvement waits for
+        # the general duplicate cooldown. An unchanged or higher price stays skipped.
         if drop_percent >= repost_if_price_drop_percent and elapsed_hours >= repost_min_wait_hours:
             return False
+        if elapsed_hours >= cooldown_hours:
+            return False
 
-    # Do not repost unchanged prices, even after the cooldown; the cooldown only
-    # controls how quickly a qualifying lower price may be republished.
     return True
 
 
