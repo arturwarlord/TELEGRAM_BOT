@@ -174,13 +174,16 @@ def _record_to_deal(record: Any, source: dict[str, Any]) -> Deal | None:
 
 
 def _extract_reported_percent(text: str) -> tuple[float | None, bool]:
+    """Read a percentage only when the visible text explicitly ties it to an offer."""
     normalized = clean_text(text, 2000)
     patterns = [
-        r"(?:скидк\w*|до)\s*[^0-9]{0,16}(\d{1,2}(?:[.,]\d+)?)\s*%",
-        r"[−-]\s*(\d{1,2}(?:[.,]\d+)?)\s*%",
-        r"\(\s*(\d{1,2}(?:[.,]\d+)?)\s*%\s*\)",
+        (r"скидк\w*\s+до\s*(\d{1,2}(?:[.,]\d+)?)\s*%", True),
+        (r"скидк\w*[^%\d]{0,16}(\d{1,2}(?:[.,]\d+)?)\s*%", False),
+        (r"[−-]\s*(\d{1,2}(?:[.,]\d+)?)\s*%", False),
+        (r"\(\s*(\d{1,2}(?:[.,]\d+)?)\s*%\s*\)", False),
+        (r"(\d{1,2}(?:[.,]\d+)?)\s*%\s*(?:скидк\w*|на\s+(?:все|весь|любые|первый|повторный)\s+\w+)", False),
     ]
-    for pattern in patterns:
+    for pattern, is_maximum in patterns:
         match = re.search(pattern, normalized, flags=re.IGNORECASE)
         if not match:
             continue
@@ -188,13 +191,8 @@ def _extract_reported_percent(text: str) -> tuple[float | None, bool]:
             value = float(match.group(1).replace(",", "."))
         except ValueError:
             continue
-        if not (0 < value <= 100):
-            continue
-        prefix = normalized[max(0, match.start() - 24):match.start()]
-        is_maximum = bool(re.search(r"\bдо\s*$", prefix, flags=re.IGNORECASE))
-        if not is_maximum:
-            is_maximum = bool(re.search(r"скидк\w*\s+до\s+\d", normalized[max(0, match.start() - 24):match.end()], flags=re.IGNORECASE))
-        return value, is_maximum
+        if 0 < value <= 100:
+            return value, is_maximum
     return None, False
 
 
@@ -349,8 +347,9 @@ def parse_html_promotions(payload: bytes, source: dict[str, Any], max_items: int
             if href.rstrip("/") == base_url.rstrip("/"):
                 continue
             if any(marker in path for marker in (
-                "/category/", "/categories/", "/okgo/", "/redirect/", "/out/",
-                "/click/", "/clickout/", "/tracking/", "/track/",
+                "/category/", "/categories/", "/profile/", "/account/", "/personal/",
+                "/login/", "/signin/", "/cart/", "/checkout/", "/okgo/", "/redirect/",
+                "/out/", "/click/", "/clickout/", "/tracking/", "/track/",
             )):
                 continue
             if any(key in query for key in (
@@ -387,6 +386,18 @@ def parse_html_promotions(payload: bytes, source: dict[str, Any], max_items: int
         if not title:
             title = f"Промокод {code}" if code else "Акция со скидкой"
 
+        description = _extract_offer_description(text)
+        # A percent picked up from a broad parent node is not enough on its own.
+        # Re-check against the selected offer title and trimmed card copy so an
+        # unrelated "up to 80%" from a neighbouring card cannot become this deal's claim.
+        local_percent, local_is_maximum = _extract_reported_percent(f"{title} {description}")
+        if local_percent is None:
+            reported_percent = None
+            is_maximum = False
+        else:
+            reported_percent = local_percent
+            is_maximum = local_is_maximum
+
         deal = Deal(
             title=title,
             product_url=href,
@@ -395,7 +406,7 @@ def parse_html_promotions(payload: bytes, source: dict[str, Any], max_items: int
             affiliate_url=None,
             image_url=images[0],
             currency=str(source.get("currency") or "RUB").upper(),
-            description=_extract_offer_description(text),
+            description=description,
             promo_code=code,
             expires_at=_extract_promo_expiry(text),
             reported_discount_percent=reported_percent,
