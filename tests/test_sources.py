@@ -76,7 +76,7 @@ class FeedParserTests(unittest.TestCase):
 
 
     def test_parses_public_html_retailer_card_with_old_and_current_prices(self):
-        payload = b"""
+        payload = """
         <html><body><main>
           <div class="product-card">
             <a href="/product/headphones"><img src="/images/headphones.jpg" alt="Наушники Example"></a>
@@ -85,7 +85,7 @@ class FeedParserTests(unittest.TestCase):
             <span>Старая цена 2 000 ₽</span>
           </div>
         </main></body></html>
-        """
+        """.encode("utf-8")
         source = {
             "name": "test-retailer",
             "type": "html",
