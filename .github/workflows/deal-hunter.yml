@@ -1,12 +1,14 @@
 name: Deal Hunter
 
 on:
+  push:
+    branches: [main]
   schedule:
     - cron: "*/30 * * * *"
   workflow_dispatch:
     inputs:
       publish:
-        description: "Опубликовать подходящие предложения в Telegram (использовать только после настройки партнёрских ссылок)"
+        description: "Опубликовать подходящие предложения в Telegram (только после настройки партнёрских ссылок)"
         required: true
         type: boolean
         default: false
