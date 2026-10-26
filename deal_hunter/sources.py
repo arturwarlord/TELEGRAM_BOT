@@ -299,16 +299,49 @@ def parse_html_promotions(payload: bytes, source: dict[str, Any], max_items: int
         if reported_percent is None and code is None:
             continue
 
-        links = _html_links(node, base_url)
-        links = [
-            (href, label) for href, label in links
-            if not _is_generic_link_label(label) and href.rstrip("/") != base_url.rstrip("/")
-        ]
+        all_links = _html_links(node, base_url)
+        base_host = (urlsplit(base_url).hostname or "").lower().removeprefix("www.")
+        links: list[tuple[str, str]] = []
+        for href, label in all_links:
+            parsed = urlsplit(href)
+            host = (parsed.hostname or "").lower().removeprefix("www.")
+            path = parsed.path.lower()
+            query = parsed.query.lower()
+            # The goal in no-affiliate mode is a direct page on the coupon source,
+            # not an affiliate redirect to a retailer (often marked by erid/adj/prfl).
+            if host != base_host:
+                continue
+            if href.rstrip("/") == base_url.rstrip("/"):
+                continue
+            if any(marker in path for marker in (
+                "/category/", "/categories/", "/okgo/", "/redirect/", "/out/",
+                "/click/", "/clickout/", "/tracking/", "/track/",
+            )):
+                continue
+            if any(key in query for key in (
+                "erid=", "affiliate=", "aff_id=", "subid=", "click_id=",
+                "adj_", "prfl", "utm_source=",
+            )):
+                continue
+            if _is_generic_link_label(label):
+                continue
+            links.append((href, label))
+
         images = _html_images(node, base_url)
         if not links or not images:
             continue
 
-        href, title = max(links, key=lambda pair: min(len(pair[1]), 300))
+        def link_priority(link: tuple[str, str]) -> tuple[int, int]:
+            path = urlsplit(link[0]).path.lower()
+            if any(segment in path for segment in ("/promo/", "/offer/", "/coupon/", "/discount/", "/deal/", "/deals/", "/action/")):
+                priority = 3
+            elif any(segment in path for segment in ("/store/", "/shop/", "/shops/")):
+                priority = 2
+            else:
+                priority = 1
+            return priority, min(len(link[1]), 300)
+
+        href, title = max(links, key=link_priority)
         title = clean_text(title, 300)
         if not title or len(title) < 4:
             title = next(
@@ -569,8 +602,10 @@ def _is_generic_link_label(label: str) -> bool:
     normalized = clean_text(label, 250).casefold()
     generic = {
         "подробнее", "купить", "в корзину", "все товары", "ещё", "еще",
-        "показать все", "смотреть все", "перейти", "акции", "скидки",
-        "каталог", "главная", "войти", "избранное",
+        "показать все", "смотреть все", "перейти", "перейти на сайт",
+        "перейти в магазин", "открыть акцию", "показать код",
+        "скопировать", "копировать", "акции", "скидки", "каталог",
+        "главная", "войти", "избранное",
     }
     return not normalized or normalized in generic or len(normalized) < 5
 
