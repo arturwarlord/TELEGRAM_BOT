@@ -2,64 +2,43 @@
   "version": 1,
   "sources": [
     {
-      "name": "Pepper — горячие скидки",
-      "type": "html",
-      "url": "https://www.pepper.ru/",
-      "store": "Pepper.ru — сообщество скидок",
+      "name": "ПромоФакт — все купоны и скидки",
+      "type": "html_promos",
+      "url": "https://promofact.ru/catalog",
+      "store": "ПромоФакт",
       "enabled": true
     },
     {
-      "name": "Pepper — одежда и обувь",
-      "type": "html",
-      "url": "https://www.pepper.ru/groups/clothes/discounts?order_by=new",
-      "store": "Pepper.ru — одежда",
+      "name": "PROMKO.NET — промокоды и скидки",
+      "type": "html_promos",
+      "url": "https://promko.net/ru",
+      "store": "PROMKO.NET",
       "enabled": true
     },
     {
-      "name": "Pepper — напитки и продукты",
-      "type": "html",
-      "url": "https://www.pepper.ru/groups/drinks",
-      "store": "Pepper.ru — продукты",
+      "name": "Халявщики — каталог скидок",
+      "type": "html_promos",
+      "url": "https://hl.ru/shops",
+      "store": "hl.ru",
       "enabled": true
     },
     {
-      "name": "DNS — акции и электроника",
-      "type": "html",
-      "url": "https://www.dns-shop.ru/actions/",
-      "store": "DNS",
+      "name": "БериКод — промокоды",
+      "type": "html_promos",
+      "url": "https://berikod.ru/",
+      "store": "БериКод",
       "enabled": true
     },
     {
       "name": "Детский мир — акции",
-      "type": "html",
+      "type": "html_promos",
       "url": "https://www.detmir.ru/actions/",
       "store": "Детский мир",
       "enabled": true
     },
     {
-      "name": "Перекрёсток — бонусы и скидки",
-      "type": "html",
-      "url": "https://www.perekrestok.ru/promotions",
-      "store": "Перекрёсток",
-      "enabled": true
-    },
-    {
-      "name": "О’КЕЙ — товары со скидками",
-      "type": "html",
-      "url": "https://www.okmarket.ru/products/",
-      "store": "О’КЕЙ",
-      "enabled": true
-    },
-    {
-      "name": "Лента — акции",
-      "type": "html",
-      "url": "https://lenta.com/action/",
-      "store": "Лента",
-      "enabled": true
-    },
-    {
       "name": "Слата — акции",
-      "type": "html",
+      "type": "html_promos",
       "url": "https://www.slata.ru/promotions/",
       "store": "Слата",
       "enabled": true
