@@ -78,5 +78,15 @@ class TakprodamTests(unittest.TestCase):
             resolve_source_id("dummy-token", "8")
 
 
+    def test_same_product_dedupes_across_promotion_links(self):
+        first = self.sample_item()
+        second = dict(first)
+        first.pop("external_link", None)
+        second.pop("external_link", None)
+        second["tracking_link"] = "https://track.example.test/other-promotion"
+        deals = parse_promotion_items([first, second], "Ozon")
+        self.assertEqual(len(deals), 2)
+        self.assertEqual(deals[0].key, deals[1].key)
+
 if __name__ == "__main__":
     unittest.main()
