@@ -397,6 +397,8 @@ def parse_html_promotions(payload: bytes, source: dict[str, Any], max_items: int
         else:
             reported_percent = local_percent
             is_maximum = local_is_maximum
+        if reported_percent is None and code is None:
+            continue
 
         deal = Deal(
             title=title,
