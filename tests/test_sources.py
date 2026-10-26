@@ -261,5 +261,54 @@ class FeedParserTests(unittest.TestCase):
         }
         self.assertEqual(parse_feed(payload, source), [])
 
+
+    def test_html_promotions_normalizes_russian_month_expiry(self):
+        from datetime import datetime, timezone
+
+        payload = """
+        <html><body>
+          <article class="coupon-card">
+            <a href="/promo/october">Скидка 25% на заказ</a>
+            <img src="/images/deal.jpg" alt="Товар">
+            <span>Промокод: OCT25</span>
+            <span>до 31 октября</span>
+          </article>
+        </body></html>
+        """.encode("utf-8")
+        source = {
+            "name": "test-coupons",
+            "type": "html_promos",
+            "url": "https://promos.example.test/catalog",
+            "enabled": True,
+        }
+        deal = parse_feed(payload, source)[0]
+        current_year = datetime.now(timezone.utc).year
+        self.assertEqual(deal.expires_at, f"{current_year}-10-31")
+
+    def test_html_promo_description_excludes_tracking_and_erid_footer(self):
+        payload = """
+        <html><body>
+          <article>
+            <a href="/promo/netprint">Скидка 40% на фотокниги</a>
+            <img src="/images/netprint.jpg">
+            <span>Промокод: ALL40</span>
+            <p>Скидка на фотопечать и фотокниги по промокоду.</p>
+            <a href="https://retailer.example.test/click?erid=abc">Перейти на сайт</a>
+            <p>Реклама. ООО «Пример». ИНН 1234567890. erid: 2RanyExample</p>
+          </article>
+        </body></html>
+        """.encode("utf-8")
+        source = {
+            "name": "test-coupons",
+            "type": "html_promos",
+            "url": "https://promos.example.test/catalog",
+            "enabled": True,
+        }
+        deals = parse_feed(payload, source)
+        self.assertEqual(len(deals), 1)
+        self.assertIn("Скидка на фотопечать", deals[0].description)
+        self.assertNotIn("erid", deals[0].description.lower())
+        self.assertNotIn("реклама.", deals[0].description.lower())
+
 if __name__ == "__main__":
     unittest.main()
