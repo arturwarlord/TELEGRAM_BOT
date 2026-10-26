@@ -52,6 +52,22 @@ class TelegramSetupCheckTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "not a channel administrator"):
             verify_telegram_setup("secret-token", "@deals", fake_api)
 
+    def test_explains_how_to_fix_inaccessible_member_list(self):
+        def fake_api(token, method, params=None):
+            if method == "getMe":
+                return {"id": 12345, "username": "sample_deals_bot"}
+            if method == "getChat":
+                return {"id": -100123, "title": "Deals Channel", "type": "channel"}
+            raise RuntimeError(
+                "Telegram API getChatMember returned HTTP 400: Bad Request: member list is inaccessible"
+            )
+
+        with self.assertRaisesRegex(
+            RuntimeError,
+            "add @sample_deals_bot as an administrator.*enable 'Post Messages'",
+        ):
+            verify_telegram_setup("secret-token", "@deals", fake_api)
+
     def test_rejects_admin_without_post_permission(self):
         def fake_api(token, method, params=None):
             if method == "getMe":
