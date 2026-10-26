@@ -8,6 +8,7 @@ on:
       - ".github/workflows/telegram-check.yml"
       - "scripts/check_telegram.py"
       - "deal_hunter/telegram_check.py"
+      - "tests/test_telegram_check.py"
 
 permissions:
   contents: read
@@ -23,6 +24,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - name: Test Telegram setup checker
+        run: python -m unittest discover -s tests -p "test_telegram_check.py" -v
       - name: Check Telegram configuration without publishing
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
