@@ -1,6 +1,13 @@
 name: Takprodam Commission Report
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/takprodam-commission-report.yml"
+      - "scripts/report_commissions.py"
+      - "deal_hunter/takprodam.py"
+      - "tests/test_takprodam.py"
   workflow_dispatch:
   schedule:
     - cron: "17 8 * * *"
@@ -19,6 +26,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - name: Compile API integration and report
+        run: python -m py_compile scripts/report_commissions.py deal_hunter/takprodam.py
       - name: Read and summarize commissions
         env:
           TAKPRODAM_API_TOKEN: ${{ secrets.TAKPRODAM_API_TOKEN }}
