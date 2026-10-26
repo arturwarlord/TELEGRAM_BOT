@@ -79,6 +79,7 @@ class TakprodamTests(unittest.TestCase):
                 {"id": 7, "title": "Telegram deals", "status": "approved"},
                 {"id": 8, "title": "Pending website", "status": "verification", "created_at": "2026-10-20T12:00:00Z"},
             ]
+        }
         with self.assertRaisesRegex(RuntimeError, "not approved yet.*created_at=2026-10-20T12:00:00Z.*48 hours"):
             resolve_source_id("dummy-token", "8")
 
