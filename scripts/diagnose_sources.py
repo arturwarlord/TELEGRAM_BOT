@@ -21,6 +21,7 @@ from deal_hunter.sources import (  # noqa: E402
     _html_price_pair,
     parse_html_catalog,
 )
+from deal_hunter.models import clean_text  # noqa: E402
 
 
 def _read_config() -> list[dict]:
@@ -33,7 +34,7 @@ def _read_config() -> list[dict]:
 def inspect_source(source: dict) -> None:
     name = str(source.get("name") or "unnamed")
     url = str(source.get("url") or "")
-    print(f"\n===== {name} =====")
+    print(f"\n===== {name} =====", flush=True)
     request = urllib.request.Request(
         url,
         headers={
@@ -57,7 +58,7 @@ def inspect_source(source: dict) -> None:
         print("[LIMIT] Page exceeded 2 MiB diagnostic sample")
         payload = payload[:2 * 1024 * 1024]
 
-    print(f"[FETCH OK] status={status}; bytes={len(payload)}; content_type={content_type}")
+    print(f"[FETCH OK] status={status}; bytes={len(payload)}; content_type={content_type}", flush=True)
     parser = _HtmlTreeParser()
     parser.feed(payload.decode("utf-8-sig", errors="replace"))
     parser.close()
@@ -81,11 +82,25 @@ def inspect_source(source: dict) -> None:
             f"title={deal.title[:120]} | image={'yes' if deal.image_url else 'no'} | url={deal.product_url[:180]}"
         )
 
+    nodes = list(_html_walk(parser.root))
+    # Build all element text once in reverse document order. Re-running a recursive
+    # text walk for every ancestor is quadratic on large retail pages.
+    text_by_id: dict[int, str] = {}
+    ignored = {"script", "style", "noscript", "svg"}
+    for node in reversed(nodes):
+        parts: list[str] = []
+        for child in node.children:
+            if isinstance(child, str):
+                parts.append(child)
+            elif child.tag not in ignored:
+                parts.append(text_by_id.get(id(child), ""))
+        text_by_id[id(node)] = clean_text(" ".join(parts), 5000)
+
     candidates = []
-    for node in reversed(list(_html_walk(parser.root))):
+    for node in reversed(nodes):
         if node.tag in {"document", "html", "body", "main", "script", "style", "nav", "footer", "header"}:
             continue
-        text = _html_text(node)
+        text = text_by_id.get(id(node), "")
         if len(text) < 25 or len(text) > 1200:
             continue
         money_count = len(re.findall(_PRICE_TOKEN, text, flags=re.IGNORECASE))
@@ -115,10 +130,10 @@ def inspect_source(source: dict) -> None:
 
     if not candidates and not deals:
         money_samples = []
-        for node in reversed(list(_html_walk(parser.root))):
+        for node in reversed(nodes):
             if node.tag in {"document", "html", "body", "main", "script", "style", "nav", "footer", "header"}:
                 continue
-            text = _html_text(node)
+            text = text_by_id.get(id(node), "")
             if 30 <= len(text) <= 300 and re.search(_PRICE_TOKEN, text, flags=re.IGNORECASE):
                 money_samples.append((node.tag, node.attrs.get("class", "")[:80], text))
                 if len(money_samples) >= 3:
