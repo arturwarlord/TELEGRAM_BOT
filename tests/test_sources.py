@@ -186,5 +186,59 @@ class FeedParserTests(unittest.TestCase):
         }
         self.assertEqual(parse_feed(payload, source), [])
 
+
+    def test_parses_html_coupon_card_without_inventing_prices(self):
+        from deal_hunter.sources import parse_feed
+
+        payload = """
+        <html><body>
+          <article class="coupon-card">
+            <a href="/offers/summer-jacket">Куртка со скидкой</a>
+            <img src="/images/jacket.jpg" alt="Куртка">
+            <div>Скидка до 25%</div>
+            <span>Промокод: SAVE25</span>
+            <span>до 31.12.2026</span>
+          </article>
+        </body></html>
+        """.encode("utf-8")
+        source = {
+            "name": "test-coupons",
+            "type": "html_promos",
+            "url": "https://promos.example.test/catalog",
+            "store": "Тест промокодов",
+            "enabled": True,
+        }
+        deals = parse_feed(payload, source)
+        self.assertEqual(len(deals), 1)
+        deal = deals[0]
+        self.assertEqual(deal.title, "Куртка со скидкой")
+        self.assertEqual(deal.product_url, "https://promos.example.test/offers/summer-jacket")
+        self.assertEqual(deal.image_url, "https://promos.example.test/images/jacket.jpg")
+        self.assertEqual(deal.promo_code, "SAVE25")
+        self.assertEqual(deal.reported_discount_percent, 25)
+        self.assertTrue(deal.discount_is_maximum)
+        self.assertIsNone(deal.price)
+        self.assertIsNone(deal.old_price)
+        self.assertEqual(deal.expires_at, "2026-12-31")
+
+    def test_html_promotions_ignores_navigation_without_explicit_offer(self):
+        payload = """
+        <html><body>
+          <nav><a href="/catalog">Каталог</a><span>Скидки и акции</span></nav>
+          <article>
+            <a href="/offers/jacket">Куртка обычная</a>
+            <img src="/images/jacket.jpg">
+            <span>Новая коллекция</span>
+          </article>
+        </body></html>
+        """.encode("utf-8")
+        source = {
+            "name": "test-coupons",
+            "type": "html_promos",
+            "url": "https://promos.example.test/",
+            "enabled": True,
+        }
+        self.assertEqual(parse_feed(payload, source), [])
+
 if __name__ == "__main__":
     unittest.main()
