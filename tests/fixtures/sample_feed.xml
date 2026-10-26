@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Test affiliate feed</title>
+    <item>
+      <title>Наушники Example за 1 000 ₽ (обычно 2 000 ₽)</title>
+      <link>https://shop.example.test/item/123?utm_source=feed</link>
+      <affiliate_url>https://affiliate.example.test/click?id=abc</affiliate_url>
+      <price>1000</price>
+      <old_price>2000</old_price>
+      <merchant>Тестовый магазин</merchant>
+      <enclosure url="https://cdn.example.test/item-123.jpg" type="image/jpeg" />
+      <guid>offer-123</guid>
+    </item>
+  </channel>
+</rss>
