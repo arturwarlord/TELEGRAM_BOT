@@ -37,11 +37,11 @@ jobs:
     needs: tests
     runs-on: ubuntu-latest
     env:
-      PUBLISH_ENABLED: \${{ (github.event_name == 'workflow_dispatch' && inputs.publish == true) || (github.event_name == 'schedule' && vars.PUBLISH_ENABLED == 'true') }}
-      DRY_RUN: \${{ (github.event_name == 'workflow_dispatch' && inputs.publish != true) || (github.event_name == 'schedule' && vars.DRY_RUN != 'false') }}
-      TELEGRAM_BOT_TOKEN: \${{ secrets.TELEGRAM_BOT_TOKEN }}
-      TELEGRAM_CHAT_ID: \${{ vars.TELEGRAM_CHAT_ID }}
-      AD_NOTICE: \${{ vars.AD_NOTICE }}
+      PUBLISH_ENABLED: ${{ (github.event_name == 'workflow_dispatch' && inputs.publish == true) || (github.event_name == 'schedule' && vars.PUBLISH_ENABLED == 'true') }}
+      DRY_RUN: ${{ (github.event_name == 'workflow_dispatch' && inputs.publish != true) || (github.event_name == 'schedule' && vars.DRY_RUN != 'false') }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ vars.TELEGRAM_CHAT_ID }}
+      AD_NOTICE: ${{ vars.AD_NOTICE }}
       SOURCE_CONFIG_PATH: config/sources.json
     steps:
       - name: Checkout
