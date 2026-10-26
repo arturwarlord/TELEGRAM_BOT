@@ -170,6 +170,176 @@ def _record_to_deal(record: Any, source: dict[str, Any]) -> Deal | None:
     )
 
 
+
+def _extract_reported_percent(text: str) -> tuple[float | None, bool]:
+    normalized = clean_text(text, 2000)
+    patterns = [
+        r"(?:скидк\w*|до)\s*[^0-9]{0,16}(\d{1,2}(?:[.,]\d+)?)\s*%",
+        r"[−-]\s*(\d{1,2}(?:[.,]\d+)?)\s*%",
+        r"\(\s*(\d{1,2}(?:[.,]\d+)?)\s*%\s*\)",
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, normalized, flags=re.IGNORECASE)
+        if not match:
+            continue
+        try:
+            value = float(match.group(1).replace(",", "."))
+        except ValueError:
+            continue
+        if not (0 < value <= 100):
+            continue
+        prefix = normalized[max(0, match.start() - 24):match.start()]
+        is_maximum = bool(re.search(r"\bдо\s*$", prefix, flags=re.IGNORECASE))
+        if not is_maximum:
+            is_maximum = bool(re.search(r"скидк\w*\s+до\s+\d", normalized[max(0, match.start() - 24):match.end()], flags=re.IGNORECASE))
+        return value, is_maximum
+    return None, False
+
+
+def _extract_promo_code(node: _HtmlNode, text: str) -> str | None:
+    stopwords = {
+        "ПРОМОКОД", "ПРОМОКОДОМ", "СКОПИРОВАТЬ", "ПОЛУЧИТЬ", "ПРИМЕНИТЬ",
+        "СКИДКА", "СКИДКИ", "ОНЛАЙН", "КАССЕ", "ТОВАРЫ", "МАГАЗИН", "АКЦИЯ",
+        "АКЦИИ", "ДОСТАВКА", "НОВЫЙ", "ЗАКАЗ", "ДО", "РЕКЛАМА", "БЕСПЛАТНО",
+    }
+
+    def valid(value: object) -> str | None:
+        candidate = clean_text(value, 60).strip().strip("\"'")
+        if not candidate or len(candidate) < 3 or len(candidate) > 32:
+            return None
+        if any(ch.isspace() for ch in candidate):
+            return None
+        if not re.fullmatch(r"[A-Za-zА-Яа-яЁё0-9_-]+", candidate):
+            return None
+        if candidate.upper() in stopwords or candidate.isdigit():
+            return None
+        if candidate != candidate.upper():
+            return None
+        return candidate
+
+    for child in _html_walk(node):
+        for attr in ("data-promo-code", "data-coupon", "data-code", "data-promocode"):
+            value = valid(child.attrs.get(attr))
+            if value:
+                return value
+        class_name = child.attrs.get("class", "").lower()
+        if child.tag in {"code", "kbd"} or any(part in class_name for part in ("promo-code", "coupon-code", "promocode", "coupon__code")):
+            value = valid(_html_text(child))
+            if value:
+                return value
+
+    for match in re.finditer(r"\b(?:промокод|код)\b\s*[:№#-]\s*([^\s,.;:]+)", text, flags=re.IGNORECASE):
+        value = valid(match.group(1))
+        if value:
+            return value
+
+    if re.search(r"скопировать\s+промокод|получить\s+код|товары\s+с\s+промокодом|используйте\s+код", text, flags=re.IGNORECASE):
+        copied_match = re.search(r"скопировать\s+промокод|получить\s+код|товары\s+с\s+промокодом|используйте\s+код", text, flags=re.IGNORECASE)
+        max_position = copied_match.start() if copied_match else len(text)
+        percent_match = re.search(r"[−-]?\s*\d{1,2}\s*%", text)
+        min_position = percent_match.end() if percent_match else 0
+        for match in re.finditer(r"(?<![\w])([A-ZА-ЯЁ0-9][A-ZА-ЯЁ0-9_-]{2,23})(?![\w])", text):
+            if min_position <= match.start() < max_position:
+                value = valid(match.group(1))
+                if value:
+                    return value
+    return None
+
+
+def _extract_promo_expiry(text: str) -> str | None:
+    match = re.search(r"\bдо\s+(\d{1,2})[./](\d{1,2})[./](\d{2,4})\b", text, flags=re.IGNORECASE)
+    if match:
+        day, month, year = (int(match.group(i)) for i in (1, 2, 3))
+        if year < 100:
+            year += 2000
+        try:
+            return date(year, month, day).isoformat()
+        except ValueError:
+            return None
+    match = re.search(r"\bдо\s+(?:\d{1,2}\s+)?(?:января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)(?:\s+\d{4})?\b", text, flags=re.IGNORECASE)
+    return match.group(0) if match else None
+
+
+def parse_html_promotions(payload: bytes, source: dict[str, Any], max_items: int = 200) -> list[Deal]:
+    """Parse public HTML offer cards that publish a promo code or an explicit percentage.
+
+    This parser never invents old/current prices. It uses the source's stated
+    percentage (if any) and preserves coupon terms so posts can be useful before
+    affiliate links are available.
+    """
+    base_url = str(source.get("url") or "").strip()
+    parser = _HtmlTreeParser()
+    parser.feed(payload.decode("utf-8-sig", errors="replace"))
+    parser.close()
+    nodes = list(_html_walk(parser.root))
+
+    text_by_id: dict[int, str] = {}
+    ignored = {"script", "style", "noscript", "svg"}
+    for node in reversed(nodes):
+        parts: list[str] = []
+        for child in node.children:
+            if isinstance(child, str):
+                parts.append(child)
+            elif child.tag not in ignored:
+                parts.append(text_by_id.get(id(child), ""))
+        text_by_id[id(node)] = clean_text(" ".join(parts), 5000)
+
+    deals: list[Deal] = []
+    seen: set[str] = set()
+    for node in reversed(nodes):
+        if node.tag in {"document", "html", "body", "main", "script", "style", "nav", "footer", "header"}:
+            continue
+        text = text_by_id.get(id(node), "")
+        if len(text) < 25 or len(text) > 1400:
+            continue
+
+        reported_percent, is_maximum = _extract_reported_percent(text)
+        code = _extract_promo_code(node, text)
+        if reported_percent is None and code is None:
+            continue
+
+        links = _html_links(node, base_url)
+        links = [
+            (href, label) for href, label in links
+            if not _is_generic_link_label(label) and href.rstrip("/") != base_url.rstrip("/")
+        ]
+        images = _html_images(node, base_url)
+        if not links or not images:
+            continue
+
+        href, title = max(links, key=lambda pair: min(len(pair[1]), 300))
+        title = clean_text(title, 300)
+        if not title or len(title) < 4:
+            title = next(
+                (clean_text(child.attrs.get("alt"), 300) for child in _html_walk(node)
+                 if child.tag == "img" and len(clean_text(child.attrs.get("alt"), 300)) >= 4),
+                "",
+            )
+        if not title:
+            title = f"Промокод {code}" if code else "Акция со скидкой"
+
+        deal = Deal(
+            title=title,
+            product_url=href,
+            store=str(source.get("store") or source.get("name") or "Промокоды"),
+            source=str(source.get("name") or "public-html-promotions"),
+            affiliate_url=None,
+            image_url=images[0],
+            currency=str(source.get("currency") or "RUB").upper(),
+            description=text[:700],
+            promo_code=code,
+            expires_at=_extract_promo_expiry(text),
+            reported_discount_percent=reported_percent,
+            discount_is_maximum=is_maximum,
+        )
+        if deal.key not in seen:
+            deals.append(deal)
+            seen.add(deal.key)
+            if len(deals) >= max(1, max_items):
+                break
+    return deals
+
+
 def parse_feed(payload: bytes, source: dict[str, Any], max_items: int = 200) -> list[Deal]:
     """Parse an RSS/Atom/XML catalogue or a JSON offer feed without network access."""
     feed_type = str(source.get("type", "rss")).lower()
@@ -177,6 +347,8 @@ def parse_feed(payload: bytes, source: dict[str, Any], max_items: int = 200) -> 
 
     if feed_type == "html":
         return parse_html_catalog(payload, source, max_items=max_items)
+    if feed_type in {"html_promos", "html-coupons"}:
+        return parse_html_promotions(payload, source, max_items=max_items)
 
     if feed_type == "json":
         decoded = json.loads(payload.decode("utf-8-sig"))
