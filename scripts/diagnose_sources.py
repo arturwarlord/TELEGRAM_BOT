@@ -77,9 +77,15 @@ def inspect_source(source: dict) -> None:
         deals = []
     print(f"Deals extracted by production parser: {len(deals)}")
     for deal in deals[:3]:
+        discount_label = (
+            f"{'up to ' if deal.discount_is_maximum else ''}{deal.discount_percent:.1f}%"
+            if deal.discount_percent is not None
+            else "no stated %"
+        )
         print(
-            f"  [DEAL] {deal.discount_percent:.1f}% | now={deal.price} | old={deal.old_price} | "
-            f"title={deal.title[:120]} | image={'yes' if deal.image_url else 'no'} | url={deal.product_url[:180]}"
+            f"  [DEAL] {discount_label} | now={deal.price} | old={deal.old_price} | "
+            f"code={deal.promo_code or 'none'} | title={deal.title[:120]} | "
+            f"image={'yes' if deal.image_url else 'no'} | url={deal.product_url[:180]}"
         )
 
     nodes = list(_html_walk(parser.root))
