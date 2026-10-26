@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "name": "approved-affiliate-feed",
+      "type": "xml",
+      "enabled": false,
+      "url": "https://replace-with-your-approved-partner-feed.example/feed.xml",
+      "links_are_affiliate": true,
+      "fields": {
+        "title": ["name", "title", "product_name"],
+        "product_url": ["url", "link", "product_link"],
+        "affiliate_url": ["affiliate_url", "tracking_link", "deep_link"],
+        "image_url": ["picture", "image", "image_url"],
+        "price": ["price", "sale_price", "current_price"],
+        "old_price": ["oldprice", "old_price", "regular_price"],
+        "store": ["merchant", "shop", "store"]
+      }
+    },
+    {
+      "name": "approved-rss-source",
+      "type": "rss",
+      "enabled": false,
+      "url": "https://replace-with-permitted-rss-feed.example/rss.xml",
+      "links_are_affiliate": false
+    }
+  ]
+}
