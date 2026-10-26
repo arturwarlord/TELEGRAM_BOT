@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import sys
 import time
 from collections import Counter
 from pathlib import Path
 from typing import Any
 
-from deal_hunter.models import Deal
+from deal_hunter.models import Deal, canonical_url
 from deal_hunter.scoring import DealDecision, evaluate_deal
 from deal_hunter.sources import fetch_source
 from deal_hunter.state import count_published_within_hours, load_state, mark_published, save_state, should_skip_as_duplicate
@@ -40,17 +41,107 @@ def format_rub(value: float | None) -> str:
     return f"{value:,.0f}".replace(",", " ") + " ₽"
 
 
+def _coupon_brand_key(deal: Deal) -> str:
+    """Approximate merchant identity from coupon title for cross-catalog deduplication."""
+    ignored = {
+        "promo", "promocode", "промокод", "код", "скидка", "скидки", "скидкой", "скидку",
+        "акция", "акции", "бесплатно", "бесплатный", "бесплатная", "до", "от", "на", "в",
+        "для", "всем", "новым", "пользователям", "первый", "первого", "повторный", "заказ",
+        "товары", "товаров", "октябрь", "октябре", "ноябрь", "ноябре", "декабрь", "декабре",
+        "январь", "января", "февраль", "февраля", "март", "марта", "апрель", "апреля",
+        "май", "мая", "июнь", "июня", "июль", "июля", "август", "августа", "сентябрь",
+        "сентября", "2025", "2026", "2027", "руб", "рублей", "доставка", "интернет-магазин",
+        "интернет", "магазин", "получить", "открыть", "актуальные", "новые", "лучшие",
+        "все", "весь", "все", "каталог",
+    }
+    tokens = re.findall(r"[a-zа-яё0-9]+", deal.title.casefold())
+    normalized: list[str] = []
+    for token in tokens:
+        if token in ignored or token.isdigit():
+            continue
+        # Lightweight Russian case normalization. Keep at least four letters so
+        # short brand names and Latin names remain intact.
+        for suffix in ("иями", "ями", "ами", "ого", "ему", "ыми", "ими", "ая", "яя", "ое", "ее", "ый", "ий", "ом", "ем", "ых", "их", "ую", "юю", "ой", "ей", "ов", "ев", "ам", "ям", "ах", "ях", "ы", "и", "а", "я", "е", "у", "ю"):
+            if token.endswith(suffix) and len(token) - len(suffix) >= 4:
+                token = token[:-len(suffix)]
+                break
+        normalized.append(token)
+    return " ".join(normalized[:3])
+
+
+def _direct_page_priority(deal: Deal) -> int:
+    path = canonical_url(deal.product_url).casefold()
+    if any(marker in path for marker in ("/promo/", "/coupon/", "/offer/", "/deal/", "/deals/", "/action/")):
+        return 3
+    if any(marker in path for marker in ("/store/", "/shop/", "/shops/")):
+        return 2
+    return 1
+
+
 def choose_best_duplicates(deals: list[Deal]) -> list[Deal]:
-    """Keep one item per canonical product URL, preferring the lowest valid price."""
+    """Dedupe exact records, then collapse duplicate coupon cards across source sites."""
     best: dict[str, Deal] = {}
     for deal in deals:
         previous = best.get(deal.key)
         if previous is None:
             best[deal.key] = deal
             continue
-        if deal.price is not None and (previous.price is None or deal.price < previous.price):
+        # Prefer the version with a code, more explicit discount, and direct image.
+        previous_quality = (
+            bool(previous.promo_code),
+            previous.discount_percent is not None,
+            bool(previous.image_url),
+            len(previous.description),
+        )
+        deal_quality = (
+            bool(deal.promo_code),
+            deal.discount_percent is not None,
+            bool(deal.image_url),
+            len(deal.description),
+        )
+        if deal.price is not None and previous.price is not None and deal.price != previous.price:
+            if deal.price < previous.price:
+                best[deal.key] = deal
+        elif deal_quality > previous_quality:
             best[deal.key] = deal
-    return list(best.values())
+
+    unique = list(best.values())
+    coupon_groups: dict[tuple[str, int | None], list[Deal]] = {}
+    non_coupon: list[Deal] = []
+    for deal in unique:
+        is_coupon_only = deal.price is None or deal.old_price is None
+        brand_key = _coupon_brand_key(deal)
+        if not is_coupon_only or not brand_key:
+            non_coupon.append(deal)
+            continue
+        rounded_discount = round(deal.discount_percent) if deal.discount_percent is not None else None
+        coupon_groups.setdefault((brand_key, rounded_discount), []).append(deal)
+
+    deduped_coupons: list[Deal] = []
+    for group in coupon_groups.values():
+        coded: dict[str, Deal] = {}
+        uncoded: list[Deal] = []
+        for deal in group:
+            code = (deal.promo_code or "").strip().casefold()
+            if not code:
+                uncoded.append(deal)
+                continue
+            previous = coded.get(code)
+            if previous is None or (_direct_page_priority(deal), len(deal.description)) > (
+                _direct_page_priority(previous), len(previous.description)
+            ):
+                coded[code] = deal
+
+        if coded:
+            # A coupon card with an explicit code is more actionable than the same
+            # merchant/percentage surfaced as a generic store landing card.
+            deduped_coupons.extend(coded.values())
+        elif uncoded:
+            # Same merchant and same explicitly stated discount on several catalogs:
+            # prefer the detailed offer page over a generic merchant page.
+            deduped_coupons.append(max(uncoded, key=lambda d: (_direct_page_priority(d), len(d.description))))
+
+    return non_coupon + deduped_coupons
 
 
 def main() -> int:
