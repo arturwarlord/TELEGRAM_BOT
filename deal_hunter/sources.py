@@ -390,7 +390,7 @@ def parse_html_promotions(payload: bytes, source: dict[str, Any], max_items: int
         # A percent picked up from a broad parent node is not enough on its own.
         # Re-check against the selected offer title and trimmed card copy so an
         # unrelated "up to 80%" from a neighbouring card cannot become this deal's claim.
-        local_percent, local_is_maximum = _extract_reported_percent(f"{title} {description}")
+        local_percent, local_is_maximum = _extract_reported_percent(f"{title} {description[:240]}")
         if local_percent is None:
             reported_percent = None
             is_maximum = False
