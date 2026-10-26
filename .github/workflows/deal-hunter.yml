@@ -51,6 +51,9 @@ jobs:
       TAKPRODAM_LIMIT: ${{ vars.TAKPRODAM_LIMIT }}
       TAKPRODAM_MAX_PAGES: ${{ vars.TAKPRODAM_MAX_PAGES }}
       TAKPRODAM_SUBID: ${{ vars.TAKPRODAM_SUBID }}
+      # Keep direct-link mode on while building traffic before partner approval.
+      ALLOW_DIRECT_LINKS: "true"
+      POST_NOTICE: ${{ vars.POST_NOTICE }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
