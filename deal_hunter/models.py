@@ -16,10 +16,10 @@ _TRACKING_KEYS = {
 def clean_text(value: object, limit: int = 4000) -> str:
     """Convert a feed field or HTML fragment to readable plain text."""
     text = html.unescape(str(value or ""))
-    text = re.sub(r"(?is)<(script|style).*?>.*?</\\1>", " ", text)
+    text = re.sub(r"(?is)<(script|style).*?>.*?</\1>", " ", text)
     text = re.sub(r"(?s)<[^>]+>", " ", text)
     text = html.unescape(text)
-    text = re.sub(r"\\s+", " ", text).strip()
+    text = re.sub(r"\s+", " ", text).strip()
     return text[:limit]
 
 
@@ -61,10 +61,10 @@ def parse_price(value: object) -> float | None:
         return number if number > 0 else None
 
     text = html.unescape(str(value)).replace("\u00a0", " ").replace("\u202f", " ")
-    match = re.search(r"(?<!\\w)(\\d[\\d\\s]*(?:[.,]\\d{1,2})?)", text)
+    match = re.search(r"(?<!\w)(\d[\d\s]*(?:[.,]\d{1,2})?)", text)
     if not match:
         return None
-    raw = re.sub(r"\\s+", "", match.group(1))
+    raw = re.sub(r"\s+", "", match.group(1))
     if "," in raw and "." in raw:
         if raw.rfind(",") > raw.rfind("."):
             raw = raw.replace(".", "").replace(",", ".")
