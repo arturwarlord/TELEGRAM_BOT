@@ -377,7 +377,7 @@ def _html_price_pair(text: str) -> tuple[float | None, float | None]:
     # If explicit labels are absent, only accept two prices when the card clearly
     # shows a discount marker (e.g. "-35%") and the values are ordered.
     if current is None or old is None:
-        if re.search(r"-\s*\d{1,2}\s*%", normalized):
+        if re.search(r"(?:-\s*|\(\s*)\d{1,2}\s*%(?:\s*\))?", normalized):
             values = [
                 parse_price(m.group(1))
                 for m in re.finditer(_PRICE_TOKEN, normalized, flags=re.IGNORECASE)
