@@ -87,7 +87,21 @@ def verify_telegram_setup(
             "Use the public channel @username or the private channel's numeric ID."
         )
 
-    member = api(token, "getChatMember", {"chat_id": chat_id, "user_id": str(bot_id)})
+    try:
+        member = api(token, "getChatMember", {"chat_id": chat_id, "user_id": str(bot_id)})
+    except RuntimeError as exc:
+        if "member list is inaccessible" in str(exc).lower():
+            bot_username = str(bot.get("username") or "unknown")
+            chat_title = str(chat.get("title") or chat_id)
+            raise RuntimeError(
+                f"Telegram could not verify @{bot_username} as a member of channel '{chat_title}'. "
+                "Telegram reports 'member list is inaccessible'. This usually means the bot is not an "
+                "administrator of this exact channel, or the admin change has not taken effect. "
+                f"Open the channel '{chat_title}' in Telegram > Manage Channel > Administrators, add "
+                f"@{bot_username} as an administrator, enable 'Post Messages', and save. Then confirm "
+                "TELEGRAM_CHAT_ID points to this same channel and run Telegram Setup Check again."
+            ) from None
+        raise
     status = str(member.get("status", "")).lower()
     if status not in {"administrator", "creator"}:
         raise RuntimeError(
