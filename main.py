@@ -100,10 +100,12 @@ def main() -> int:
     max_items = int(settings.get("max_items_per_source", 200))
     all_deals: list[Deal] = []
     source_errors = 0
+    successful_sources = 0
 
     if partner_api_enabled:
         try:
             partner_deals, partner_source_id = fetch_configured_takprodam_deals(timeout=timeout)
+            successful_sources += 1
             print(f"[OK] Takprodam API source {partner_source_id}: {len(partner_deals)} promotion product(s)")
             all_deals.extend(partner_deals)
         except NoApprovedSourceError as exc:
@@ -118,6 +120,7 @@ def main() -> int:
         name = str(source.get("name") or "unnamed")
         try:
             items = fetch_source(source, timeout=timeout, max_bytes=max_bytes, max_items=max_items)
+            successful_sources += 1
             print(f"[OK] {name}: {len(items)} item(s)")
             all_deals.extend(items)
         except Exception as exc:
@@ -180,7 +183,11 @@ def main() -> int:
             )
             print(f"  Product URL (not published): {deal.product_url}")
         print("DRY-RUN finished: Telegram was not contacted.")
-        return 1 if source_errors and not all_deals else 0
+        if source_errors:
+            print(f"[WARN] Source failures: {source_errors}; successfully fetched sources: {successful_sources}.")
+        # One unavailable shop must not fail the whole scan if other sources were
+        # fetched successfully. Fail only when every configured source errored.
+        return 1 if source_errors and successful_sources == 0 else 0
 
     if not os.getenv("TELEGRAM_BOT_TOKEN", "").strip():
         print("[FATAL] TELEGRAM_BOT_TOKEN secret is missing.")
@@ -259,7 +266,9 @@ def main() -> int:
     print(f"Run finished: published={posted}; publish_errors={publish_errors}.")
     if publish_skips:
         print("Publication skips: " + ", ".join(f"{reason}: {count}" for reason, count in publish_skips.most_common()))
-    return 1 if source_errors or publish_errors else 0
+    if source_errors:
+        print(f"[WARN] Source failures: {source_errors}; successfully fetched sources: {successful_sources}.")
+    return 1 if publish_errors or (source_errors and successful_sources == 0) else 0
 
 
 if __name__ == "__main__":
