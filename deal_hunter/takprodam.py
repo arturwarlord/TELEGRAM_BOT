@@ -145,7 +145,7 @@ def parse_promotion_items(
                 title=title,
                 product_url=product_url,
                 store=store,
-                source="takprodam",
+                source=f"takprodam:{marketplace.lower()}",
                 price=price,
                 old_price=old_price,
                 affiliate_url=affiliate_url,
