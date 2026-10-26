@@ -50,6 +50,7 @@ jobs:
       TAKPRODAM_MARKETPLACES: ${{ vars.TAKPRODAM_MARKETPLACES }}
       TAKPRODAM_LIMIT: ${{ vars.TAKPRODAM_LIMIT }}
       TAKPRODAM_MAX_PAGES: ${{ vars.TAKPRODAM_MAX_PAGES }}
+      TAKPRODAM_SUBID: ${{ vars.TAKPRODAM_SUBID }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
