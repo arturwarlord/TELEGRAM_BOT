@@ -74,5 +74,70 @@ class FeedParserTests(unittest.TestCase):
         self.assertEqual(deals, [])
 
 
+
+    def test_parses_public_html_retailer_card_with_old_and_current_prices(self):
+        payload = b"""
+        <html><body><main>
+          <div class="product-card">
+            <a href="/product/headphones"><img src="/images/headphones.jpg" alt="Наушники Example"></a>
+            <a href="/product/headphones">Наушники Example</a>
+            <span>Цена 1 000 ₽</span>
+            <span>Старая цена 2 000 ₽</span>
+          </div>
+        </main></body></html>
+        """
+        source = {
+            "name": "test-retailer",
+            "type": "html",
+            "enabled": True,
+            "url": "https://shop.example.test/promotions",
+            "store": "Тест-магазин",
+        }
+        deals = parse_feed(payload, source)
+        self.assertEqual(len(deals), 1)
+        self.assertEqual(deals[0].title, "Наушники Example")
+        self.assertEqual(deals[0].product_url, "https://shop.example.test/product/headphones")
+        self.assertEqual(deals[0].image_url, "https://shop.example.test/images/headphones.jpg")
+        self.assertEqual(deals[0].price, 1000.0)
+        self.assertEqual(deals[0].old_price, 2000.0)
+        self.assertIsNone(deals[0].affiliate_url)
+
+    def test_parses_kuper_style_discounted_price_labels(self):
+        payload = """
+        <div class="product-card">
+          <a href="/product/pasta"><img src="https://cdn.example.test/pasta.jpg" alt="Макароны Example 400 г"></a>
+          <a href="/product/pasta">Макароны Example 400 г</a>
+          <span>Скидка-38%</span>
+          <span>Цена без скидки за 1 шт. 99,99 ₽</span>
+          <span>Цена со скидкой за 1 шт. 61,99 ₽</span>
+        </div>
+        """.encode()
+        source = {
+            "name": "test-kuper",
+            "type": "html",
+            "enabled": True,
+            "url": "https://kuper.ru/shop/c/sale",
+        }
+        deals = parse_feed(payload, source)
+        self.assertEqual(len(deals), 1)
+        self.assertEqual(deals[0].price, 61.99)
+        self.assertEqual(deals[0].old_price, 99.99)
+
+    def test_html_parser_does_not_invent_old_price(self):
+        payload = b"""
+        <div class="product-card">
+          <a href="/product/item"><img src="/item.jpg" alt="Просто товар"></a>
+          <a href="/product/item">Просто товар</a>
+          <span>Цена 1 000 ₽</span>
+        </div>
+        """
+        source = {
+            "name": "test-retailer",
+            "type": "html",
+            "enabled": True,
+            "url": "https://shop.example.test/promotions",
+        }
+        self.assertEqual(parse_feed(payload, source), [])
+
 if __name__ == "__main__":
     unittest.main()
