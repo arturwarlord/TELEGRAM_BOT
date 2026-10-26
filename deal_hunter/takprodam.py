@@ -196,6 +196,7 @@ def fetch_promotion_deals(
     limit: int = 1000,
     max_pages: int = 1,
     timeout: int = 25,
+    subid: str | None = None,
 ) -> list[Deal]:
     """Fetch approved-partner promotion products and their tracking links."""
     if not token.strip():
@@ -217,10 +218,13 @@ def fetch_promotion_deals(
                 token,
                 "promotion/product",
                 params={
-                    "source_id": str(source_id),
-                    "marketplace": normalized,
-                    "page": page,
-                    "limit": page_limit,
+                    **{
+                        "source_id": str(source_id),
+                        "marketplace": normalized,
+                        "page": page,
+                        "limit": page_limit,
+                    },
+                    **({"subid": subid.strip()} if subid and subid.strip() else {}),
                 },
                 timeout=timeout,
             )
@@ -247,6 +251,9 @@ def fetch_configured_takprodam_deals(timeout: int = 25) -> tuple[list[Deal], str
     marketplaces = [name.strip() for name in marketplace_setting.split(",") if name.strip()]
     limit = int(os.getenv("TAKPRODAM_LIMIT", "1000"))
     max_pages = int(os.getenv("TAKPRODAM_MAX_PAGES", "1"))
+    # A stable subid lets the commissions API attribute this bot's traffic separately.
+    # The value can be overridden in GitHub Actions Variables for campaign experiments.
+    subid = os.getenv("TAKPRODAM_SUBID", "").strip() or "telegram_deal_hunter"
     deals = fetch_promotion_deals(
         token,
         source_id,
@@ -254,5 +261,71 @@ def fetch_configured_takprodam_deals(timeout: int = 25) -> tuple[list[Deal], str
         limit=limit,
         max_pages=max_pages,
         timeout=timeout,
+        subid=subid,
     )
     return deals, source_id
+
+def fetch_commissions(
+    token: str,
+    *,
+    subid: str | None = None,
+    status: str | None = None,
+    limit: int = 1000,
+    max_pages: int = 5,
+    timeout: int = 25,
+) -> list[dict[str, Any]]:
+    """Fetch publisher commission records, optionally filtered to this bot's subid."""
+    if not token.strip():
+        raise ValueError("Takprodam API token is empty")
+
+    page_limit = max(1, min(int(limit), 1000))
+    pages = max(1, min(int(max_pages), 10))
+    all_items: list[dict[str, Any]] = []
+
+    for page in range(1, pages + 1):
+        params: dict[str, str | int] = {"page": page, "limit": page_limit}
+        if subid and subid.strip():
+            params["subid"] = subid.strip()
+        if status and status.strip():
+            normalized_status = status.strip().lower()
+            if normalized_status not in {"pending", "approved", "declined"}:
+                raise ValueError("Commission status must be pending, approved, or declined")
+            params["status"] = normalized_status
+
+        response = _request_json(token, "commission", params=params, timeout=timeout)
+        items = response.get("items", [])
+        if not isinstance(items, list):
+            raise RuntimeError("Takprodam API commission response has no items array")
+        page_items = [item for item in items if isinstance(item, dict)]
+        all_items.extend(page_items)
+
+        total_count = response.get("total_count")
+        try:
+            total_count_value = int(total_count)
+        except (TypeError, ValueError):
+            total_count_value = 0
+        if not page_items or len(page_items) < page_limit:
+            break
+        if total_count_value > 0 and page * page_limit >= total_count_value:
+            break
+
+    return all_items
+
+
+def summarize_commissions(items: list[dict[str, Any]]) -> dict[str, dict[str, float | int]]:
+    """Aggregate commission counts and amounts by status without exposing order details."""
+    summary: dict[str, dict[str, float | int]] = {}
+    for item in items:
+        status = str(item.get("status") or "unknown").strip().lower()
+        row = summary.setdefault(status, {"count": 0, "commission_amount": 0.0, "cart_amount": 0.0})
+        row["count"] = int(row["count"]) + 1
+        for field in ("commission_amount", "cart_amount"):
+            value = item.get(field)
+            try:
+                amount = float(value)
+            except (TypeError, ValueError):
+                continue
+            if amount >= 0:
+                row[field] = round(float(row[field]) + amount, 2)
+    return summary
+
