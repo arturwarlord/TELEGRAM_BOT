@@ -1,0 +1,27 @@
+name: Public Deal Source Diagnostics
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/diagnose_sources.py"
+      - "config/sources.json"
+      - "deal_hunter/sources.py"
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    name: Inspect public deal pages without posting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Inspect published HTML
+        run: python scripts/diagnose_sources.py
