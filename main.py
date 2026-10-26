@@ -11,7 +11,7 @@ from typing import Any
 from deal_hunter.models import Deal
 from deal_hunter.scoring import DealDecision, evaluate_deal
 from deal_hunter.sources import fetch_source
-from deal_hunter.state import load_state, mark_published, save_state, should_skip_as_duplicate
+from deal_hunter.state import count_published_within_hours, load_state, mark_published, save_state, should_skip_as_duplicate
 from deal_hunter.takprodam import fetch_configured_takprodam_deals
 from deal_hunter.telegram import TelegramPublisher
 
@@ -166,12 +166,19 @@ def main() -> int:
         return 2
 
     state = load_state(state_path)
+    daily_cap = max(1, int(settings.get("max_posts_per_day", 8)))
+    published_last_24h = count_published_within_hours(state, hours=24)
+    configured_per_run = max(1, int(settings.get("max_posts_per_run", 2)))
+    max_posts = min(configured_per_run, max(0, daily_cap - published_last_24h))
+    if max_posts <= 0:
+        print(f"Daily publication limit reached: {published_last_24h}/{daily_cap} posts in the last 24 hours.")
+        return 0
+
     publisher = TelegramPublisher(
         token=os.environ["TELEGRAM_BOT_TOKEN"],
         chat_id=os.environ["TELEGRAM_CHAT_ID"],
         timeout=int(settings.get("telegram_timeout_seconds", 25)),
     )
-    max_posts = max(1, int(settings.get("max_posts_per_run", 3)))
     cooldown = float(settings.get("duplicate_cooldown_hours", 72))
     price_drop = float(settings.get("repost_if_price_drop_percent", 10))
     repost_wait = float(settings.get("repost_min_wait_hours", 6))
