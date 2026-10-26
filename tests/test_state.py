@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from deal_hunter.models import Deal
-from deal_hunter.state import load_state, mark_published, save_state, should_skip_as_duplicate
+from deal_hunter.state import count_published_within_hours, load_state, mark_published, save_state, should_skip_as_duplicate
 
 
 class StateTests(unittest.TestCase):
@@ -72,6 +72,29 @@ class StateTests(unittest.TestCase):
             repost_min_wait_hours=6,
             now=datetime(2026, 1, 4, 13, tzinfo=timezone.utc),
         ))
+
+    def test_counts_actual_posts_in_rolling_window(self):
+        state = {"version": 1, "published": {}}
+        mark_published(
+            self.make_deal(price=500),
+            state,
+            message_id=42,
+            now=datetime(2026, 1, 1, 12, tzinfo=timezone.utc),
+        )
+        self.assertEqual(
+            count_published_within_hours(
+                state, hours=24,
+                now=datetime(2026, 1, 1, 13, tzinfo=timezone.utc),
+            ),
+            1,
+        )
+        self.assertEqual(
+            count_published_within_hours(
+                state, hours=24,
+                now=datetime(2026, 1, 2, 13, tzinfo=timezone.utc),
+            ),
+            0,
+        )
 
 if __name__ == "__main__":
     unittest.main()
