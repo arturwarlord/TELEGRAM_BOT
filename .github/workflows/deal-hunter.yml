@@ -1,0 +1,68 @@
+name: Deal Hunter
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Опубликовать подходящие предложения в Telegram (использовать только после настройки партнёрских ссылок)"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: deal-hunter-main
+  cancel-in-progress: false
+
+jobs:
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+
+  scan:
+    name: Scan deals
+    needs: tests
+    runs-on: ubuntu-latest
+    env:
+      PUBLISH_ENABLED: \${{ (github.event_name == 'workflow_dispatch' && inputs.publish == true) || (github.event_name == 'schedule' && vars.PUBLISH_ENABLED == 'true') }}
+      DRY_RUN: \${{ (github.event_name == 'workflow_dispatch' && inputs.publish != true) || (github.event_name == 'schedule' && vars.DRY_RUN != 'false') }}
+      TELEGRAM_BOT_TOKEN: \${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: \${{ vars.TELEGRAM_CHAT_ID }}
+      AD_NOTICE: \${{ vars.AD_NOTICE }}
+      SOURCE_CONFIG_PATH: config/sources.json
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Scan configured feeds
+        run: python main.py
+      - name: Persist publication state
+        if: success() && env.PUBLISH_ENABLED == 'true' && env.DRY_RUN == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/state.json
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: persist deal publication state"
+            git push
+          else
+            echo "No state changes to save."
+          fi
