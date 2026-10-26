@@ -240,5 +240,26 @@ class FeedParserTests(unittest.TestCase):
         }
         self.assertEqual(parse_feed(payload, source), [])
 
+
+    def test_html_promotions_never_use_outbound_tracking_urls_or_category_links(self):
+        payload = """
+        <html><body>
+          <article class="coupon-card">
+            <a href="/categories/products">Скидки на товары до 50%</a>
+            <a href="https://retailer.example.test/click?erid=example">Перейти на сайт</a>
+            <img src="/images/store.jpg" alt="Магазин">
+            <div>Скидка до 50%</div>
+            <span>Промокод: SAVE50</span>
+          </article>
+        </body></html>
+        """.encode("utf-8")
+        source = {
+            "name": "test-coupons",
+            "type": "html_promos",
+            "url": "https://promos.example.test/catalog",
+            "enabled": True,
+        }
+        self.assertEqual(parse_feed(payload, source), [])
+
 if __name__ == "__main__":
     unittest.main()
