@@ -2,100 +2,67 @@
   "version": 1,
   "sources": [
     {
-      "name": "Перекрёсток — публичные акции",
+      "name": "Pepper — горячие скидки",
       "type": "html",
-      "enabled": true,
-      "url": "https://www.perekrestok.ru/promotions",
-      "store": "Перекрёсток",
-      "currency": "RUB"
+      "url": "https://www.pepper.ru/",
+      "store": "Pepper.ru — сообщество скидок",
+      "enabled": true
     },
     {
-      "name": "ВкусВилл — скидки и предложения",
+      "name": "Pepper — одежда и обувь",
       "type": "html",
-      "enabled": true,
-      "url": "https://vkusvill.ru/offers/",
-      "store": "ВкусВилл",
-      "currency": "RUB"
+      "url": "https://www.pepper.ru/groups/clothes/discounts?order_by=new",
+      "store": "Pepper.ru — одежда",
+      "enabled": true
     },
     {
-      "name": "Купер / Лента — скидки и акции",
+      "name": "Pepper — напитки и продукты",
       "type": "html",
-      "enabled": true,
-      "url": "https://kuper.ru/fdlenta/c/skidki-i-aktsii",
-      "store": "Лента / Купер",
-      "currency": "RUB"
+      "url": "https://www.pepper.ru/groups/drinks",
+      "store": "Pepper.ru — продукты",
+      "enabled": true
     },
     {
-      "name": "Купер / АШАН — каталог товаров",
+      "name": "DNS — акции и электроника",
       "type": "html",
-      "enabled": true,
-      "url": "https://kuper.ru/auchansm",
-      "store": "АШАН / Купер",
-      "currency": "RUB"
-    },
-    {
-      "name": "Купер / METRO — каталог товаров",
-      "type": "html",
-      "enabled": true,
-      "url": "https://kuper.ru/metro",
-      "store": "METRO / Купер",
-      "currency": "RUB"
-    },
-    {
-      "name": "Wildberries — товары с распродажи",
-      "type": "html",
-      "enabled": true,
-      "url": "https://www.wildberries.ru/",
-      "store": "Wildberries",
-      "currency": "RUB"
-    },
-    {
-      "name": "Ozon — скидки и распродажа",
-      "type": "html",
-      "enabled": true,
-      "url": "https://www.ozon.ru/category/skidki-i-rasprodazha/",
-      "store": "Ozon",
-      "currency": "RUB"
-    },
-    {
-      "name": "Детский мир — распродажа",
-      "type": "html",
-      "enabled": true,
-      "url": "https://www.detmir.ru/catalog/index/name/rasprodazha_dm_rf/",
-      "store": "Детский мир",
-      "currency": "RUB"
-    },
-    {
-      "name": "Lamoda — Outlet",
-      "type": "html",
-      "enabled": true,
-      "url": "https://www.lamoda.ru/outlet/",
-      "store": "Lamoda",
-      "currency": "RUB"
-    },
-    {
-      "name": "Спортмастер — все скидки",
-      "type": "html",
-      "enabled": true,
-      "url": "https://www.sportmaster.ru/catalog/sale/all/?page=1",
-      "store": "Спортмастер",
-      "currency": "RUB"
-    },
-    {
-      "name": "DNS — акции и предложения",
-      "type": "html",
-      "enabled": true,
       "url": "https://www.dns-shop.ru/actions/",
       "store": "DNS",
-      "currency": "RUB"
+      "enabled": true
     },
     {
-      "name": "Ситилинк — акции",
+      "name": "Детский мир — акции",
       "type": "html",
-      "enabled": true,
-      "url": "https://www.citilink.ru/actions/",
-      "store": "Ситилинк",
-      "currency": "RUB"
+      "url": "https://www.detmir.ru/actions/",
+      "store": "Детский мир",
+      "enabled": true
+    },
+    {
+      "name": "Перекрёсток — бонусы и скидки",
+      "type": "html",
+      "url": "https://www.perekrestok.ru/promotions",
+      "store": "Перекрёсток",
+      "enabled": true
+    },
+    {
+      "name": "О’КЕЙ — товары со скидками",
+      "type": "html",
+      "url": "https://www.okmarket.ru/products/",
+      "store": "О’КЕЙ",
+      "enabled": true
+    },
+    {
+      "name": "Лента — акции",
+      "type": "html",
+      "url": "https://lenta.com/action/",
+      "store": "Лента",
+      "enabled": true
+    },
+    {
+      "name": "Слата — акции",
+      "type": "html",
+      "url": "https://www.slata.ru/promotions/",
+      "store": "Слата",
+      "enabled": true
     }
   ]
 }
