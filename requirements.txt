@@ -1,0 +1,1 @@
+# No third-party runtime dependencies; the first version uses Python's standard library only.
