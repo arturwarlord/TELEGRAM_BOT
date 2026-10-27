@@ -390,13 +390,33 @@ def parse_html_promotions(payload: bytes, source: dict[str, Any], max_items: int
         # A percent picked up from a broad parent node is not enough on its own.
         # Re-check against the selected offer title and trimmed card copy so an
         # unrelated "up to 80%" from a neighbouring card cannot become this deal's claim.
-        local_percent, local_is_maximum = _extract_reported_percent(f"{title} {description[:240]}")
+        local_offer_text = f"{title} {description[:240]}"
+        local_percent, local_is_maximum = _extract_reported_percent(local_offer_text)
         if local_percent is None:
             reported_percent = None
             is_maximum = False
         else:
             reported_percent = local_percent
             is_maximum = local_is_maximum
+
+        # Avoid attaching a neighbouring card's "up to 80%" to a loyalty-points
+        # or bonus offer. For points/cashback titles, only trust a percentage when
+        # the title itself describes a discount; broad parent text is not enough.
+        value_terms_in_title = re.search(
+            r"\\b(?:балл\\w*|бонус\\w*|кешбэк|кэшбэк|кеш[- ]?бек|кэш[- ]?бек|cashback|вау)\\b",
+            title,
+            flags=re.IGNORECASE,
+        )
+        title_explicitly_describes_discount = bool(re.search(
+            r"(?:скидк\\w*[^%\\d]{0,16}\\d{1,2}(?:[.,]\\d+)?\\s*%|"
+            r"[−-]\\s*\\d{1,2}(?:[.,]\\d+)?\\s*%|"
+            r"\\d{1,2}(?:[.,]\\d+)?\\s*%\\s*(?:скидк\\w*|на\\b))",
+            title,
+            flags=re.IGNORECASE,
+        ))
+        if value_terms_in_title and not title_explicitly_describes_discount:
+            reported_percent = None
+            is_maximum = False
         if reported_percent is None and code is None:
             continue
 
