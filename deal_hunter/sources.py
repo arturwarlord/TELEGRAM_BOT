@@ -388,6 +388,40 @@ def parse_html_promotions(payload: bytes, source: dict[str, Any], max_items: int
         if not title:
             title = f"Промокод {code}" if code else "Акция со скидкой"
 
+        parsed_offer_link = urlsplit(href)
+        offer_path = parsed_offer_link.path.casefold()
+        offer_fragment = parsed_offer_link.fragment.casefold()
+        is_store_index_path = any(
+            marker in offer_path
+            for marker in ("/store/", "/shop/", "/shops/", "/magazin/", "/promokody/")
+        )
+        is_generic_store_title = bool(re.search(
+            r"(?:^\\s*все\\s+(?:промокоды|купоны)\\b|"
+            r"\\b\\d+\\s+(?:купон\\w*|товар\\w*)\\b|"
+            r"^\\s*от\\s+\\w+|↗\\s*$)",
+            title,
+            flags=re.IGNORECASE,
+        ))
+        has_offer_detail_path = any(
+            marker in offer_path
+            for marker in ("/promo/", "/promocodes/", "/coupon/", "/discount/", "/deal/", "/deals/", "/action/", "/shares/")
+        )
+        has_offer_anchor = bool(re.search(
+            r"(?:promo|offer|coupon|deal|discount|action|stock)[-_]?\\d+",
+            offer_fragment,
+            flags=re.IGNORECASE,
+        ))
+        # Store directories can contain unrelated codes/percentages from neighbouring
+        # cards. Only keep a generic store-title when its link identifies an individual
+        # promo/offer (including anchors such as #promo-1461).
+        if (
+            is_store_index_path
+            and is_generic_store_title
+            and not has_offer_detail_path
+            and not has_offer_anchor
+        ):
+            continue
+
         description = _extract_offer_description(text)
         # A percent picked up from a broad parent node is not enough on its own.
         # Re-check against the selected offer title and trimmed card copy so an

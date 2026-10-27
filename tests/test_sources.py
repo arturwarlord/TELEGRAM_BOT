@@ -331,5 +331,47 @@ class FeedParserTests(unittest.TestCase):
         }
         self.assertEqual(parse_feed(payload, source), [])
 
+
+    def test_rejects_generic_store_index_with_unrelated_percentage_and_code(self):
+        payload = """
+        <html><body>
+          <article class="coupon-card">
+            <a href="/store/foxford-ru">Все промокоды Фоксфорд (8)</a>
+            <img src="/images/foxford.jpg" alt="Фоксфорд">
+            <span>Скидка 52%</span>
+            <code>LANG50</code>
+          </article>
+        </body></html>
+        """.encode()
+        source = {
+            "name": "test-coupon-directory",
+            "type": "html_promos",
+            "url": "https://coupons.example.test/",
+            "enabled": True,
+        }
+        self.assertEqual(parse_feed(payload, source), [])
+
+    def test_keeps_offer_anchor_inside_store_page(self):
+        payload = """
+        <html><body>
+          <article class="coupon-card">
+            <a href="/store/rigla-ru#promo-1461">Скидки до 60% на товары в подборке</a>
+            <img src="/images/rigla.jpg" alt="Подборка товаров">
+            <span>Скидки до 60% на выбранные товары</span>
+          </article>
+        </body></html>
+        """.encode()
+        source = {
+            "name": "test-anchored-promo",
+            "type": "html_promos",
+            "url": "https://coupons.example.test/",
+            "enabled": True,
+        }
+        deals = parse_feed(payload, source)
+        self.assertEqual(len(deals), 1)
+        self.assertEqual(deals[0].reported_discount_percent, 60)
+        self.assertTrue(deals[0].discount_is_maximum)
+        self.assertIn("#promo-1461", deals[0].product_url)
+
 if __name__ == "__main__":
     unittest.main()
