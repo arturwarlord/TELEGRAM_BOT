@@ -146,11 +146,19 @@ def inspect_source(source: dict) -> None:
                 continue
             text = text_by_id.get(id(node), "")
             if 30 <= len(text) <= 300 and re.search(_PRICE_TOKEN, text, flags=re.IGNORECASE):
-                money_samples.append((node.tag, node.attrs.get("class", "")[:80], text))
+                money_samples.append((node, text))
                 if len(money_samples) >= 3:
                     break
-        for tag, class_name, text in money_samples:
+        for node, text in money_samples:
+            tag = node.tag
+            class_name = node.attrs.get("class", "")[:80]
             print(f"  [PRICE SAMPLE] tag={tag} class={class_name!r} text={text[:220]!r}")
+            links = _html_links(node, url)
+            images = _html_images(node, url)
+            if links:
+                print(f"    first_link={links[0][0][:180]!r} label={links[0][1][:100]!r}")
+            if images:
+                print(f"    first_image={images[0][:180]!r}")
 
 
 def main() -> int:
