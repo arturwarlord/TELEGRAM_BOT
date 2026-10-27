@@ -164,9 +164,9 @@
       "enabled": true
     },
     {
-      "name": "SocialKod — скидки, товары и промокоды",
+      "name": "SocialKod — актуальные купоны и товары дня",
       "type": "html_promos",
-      "url": "https://socialkod.ru/magazin",
+      "url": "https://socialkod.ru/",
       "store": "SocialKod",
       "enabled": true
     }
