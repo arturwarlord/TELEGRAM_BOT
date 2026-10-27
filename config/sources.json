@@ -382,7 +382,7 @@
       "disabled_reason": "The official homepage returned HTTP 401 from GitHub Actions. No access controls are being bypassed."
     },
     {
-      "name": "Aviasales API — билеты из Москва",
+      "name": "Aviasales API — билеты из Москвы",
       "type": "aviasales_api",
       "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
       "store": "Aviasales",
@@ -392,7 +392,7 @@
       "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
     },
     {
-      "name": "Aviasales API — билеты из Санкт-Петербург",
+      "name": "Aviasales API — билеты из Санкт-Петербурга",
       "type": "aviasales_api",
       "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
       "store": "Aviasales",
@@ -402,7 +402,7 @@
       "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
     },
     {
-      "name": "Aviasales API — билеты из Казань",
+      "name": "Aviasales API — билеты из Казани",
       "type": "aviasales_api",
       "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
       "store": "Aviasales",
@@ -412,7 +412,7 @@
       "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
     },
     {
-      "name": "Aviasales API — билеты из Екатеринбург",
+      "name": "Aviasales API — билеты из Екатеринбурга",
       "type": "aviasales_api",
       "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
       "store": "Aviasales",
@@ -422,7 +422,7 @@
       "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
     },
     {
-      "name": "Aviasales API — билеты из Новосибирск",
+      "name": "Aviasales API — билеты из Новосибирска",
       "type": "aviasales_api",
       "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
       "store": "Aviasales",
@@ -442,7 +442,7 @@
       "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
     },
     {
-      "name": "Aviasales API — билеты из Ташкент",
+      "name": "Aviasales API — билеты из Ташкента",
       "type": "aviasales_api",
       "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
       "store": "Aviasales",
@@ -476,96 +476,132 @@
       "type": "html_promos",
       "url": "https://travelata.ru/tury",
       "store": "Travelata",
-      "enabled": true,
-      "note": "Keep enabled only if production diagnostics returns specific current offer cards."
+      "enabled": false,
+      "note": "Keep enabled only if production diagnostics returns specific current offer cards.",
+      "disabled_reason": "HTTP 401 from GitHub Actions; public page is not available to this runner. Kept as a disabled candidate."
     },
     {
       "name": "Tourdom — спецпредложения и обзор цен",
       "type": "html_promos",
       "url": "https://www.tourdom.ru/",
       "store": "Tourdom",
-      "enabled": true,
-      "note": "Keep enabled only if production diagnostics returns specific current offer cards."
+      "enabled": false,
+      "note": "Keep enabled only if production diagnostics returns specific current offer cards.",
+      "disabled_reason": "Page returned an editorial/news homepage and 0 usable offer cards."
     },
     {
       "name": "Coral Travel — акции и спецпредложения",
       "type": "html_promos",
       "url": "https://www.coral.ru/poleznaya-informatsiya/offers/",
       "store": "Coral Travel",
-      "enabled": true,
-      "note": "Keep enabled only if production diagnostics returns specific current offer cards."
+      "enabled": false,
+      "note": "Keep enabled only if production diagnostics returns specific current offer cards.",
+      "disabled_reason": "HTTP 403 from GitHub Actions; no access controls are bypassed."
     },
     {
       "name": "Level.Travel — туры и скидки",
       "type": "html_promos",
       "url": "https://level.travel/",
       "store": "Level.Travel",
-      "enabled": true,
-      "note": "Keep enabled only if production diagnostics returns specific current offer cards."
+      "enabled": false,
+      "note": "Keep enabled only if production diagnostics returns specific current offer cards.",
+      "disabled_reason": "Returned a bot-check page instead of offers; no access controls are bypassed."
     },
     {
       "name": "OnlineTours — туры и акции",
       "type": "html_promos",
       "url": "https://www.onlinetours.ru/",
       "store": "OnlineTours",
-      "enabled": true,
-      "note": "Keep enabled only if production diagnostics returns specific current offer cards."
+      "enabled": false,
+      "note": "Keep enabled only if production diagnostics returns specific current offer cards.",
+      "disabled_reason": "HTTP 403 from GitHub Actions; no access controls are bypassed."
     },
     {
       "name": "FUN&SUN — туры и спецпредложения",
       "type": "html_promos",
       "url": "https://fstravel.com/",
       "store": "FUN&SUN",
-      "enabled": true,
-      "note": "Keep enabled only if production diagnostics returns specific current offer cards."
+      "enabled": false,
+      "note": "Keep enabled only if production diagnostics returns specific current offer cards.",
+      "disabled_reason": "HTTP 403 from GitHub Actions; no access controls are bypassed."
     },
     {
       "name": "Anex Tour — туры и акции",
       "type": "html_promos",
       "url": "https://anextour.com/",
       "store": "Anex Tour",
-      "enabled": true,
-      "note": "Keep enabled only if production diagnostics returns specific current offer cards."
+      "enabled": false,
+      "note": "Keep enabled only if production diagnostics returns specific current offer cards.",
+      "disabled_reason": "Page returned 0 usable current offer cards."
     },
     {
       "name": "TEZ TOUR — туры и акции",
       "type": "html_promos",
       "url": "https://www.tez-tour.com/",
       "store": "TEZ TOUR",
-      "enabled": true,
-      "note": "Keep enabled only if production diagnostics returns specific current offer cards."
+      "enabled": false,
+      "note": "Keep enabled only if production diagnostics returns specific current offer cards.",
+      "disabled_reason": "Page returned 0 usable current offer cards."
     },
     {
       "name": "Pegas Touristik — туры и предложения",
       "type": "html_promos",
       "url": "https://pegast.ru/",
       "store": "Pegas Touristik",
-      "enabled": true,
-      "note": "Keep enabled only if production diagnostics returns specific current offer cards."
+      "enabled": false,
+      "note": "Keep enabled only if production diagnostics returns specific current offer cards.",
+      "disabled_reason": "HTTP 403 from GitHub Actions; no access controls are bypassed."
     },
     {
       "name": "Sunmar — туры и акции",
       "type": "html_promos",
       "url": "https://www.sunmar.ru/",
       "store": "Sunmar",
-      "enabled": true,
-      "note": "Keep enabled only if production diagnostics returns specific current offer cards."
+      "enabled": false,
+      "note": "Keep enabled only if production diagnostics returns specific current offer cards.",
+      "disabled_reason": "HTTP 403 from GitHub Actions; no access controls are bypassed."
     },
     {
       "name": "Интурист — туры и предложения",
       "type": "html_promos",
       "url": "https://intourist.ru/",
       "store": "Интурист",
-      "enabled": true,
-      "note": "Keep enabled only if production diagnostics returns specific current offer cards."
+      "enabled": false,
+      "note": "Keep enabled only if production diagnostics returns specific current offer cards.",
+      "disabled_reason": "Page returned 0 usable current offer cards."
     },
     {
       "name": "Tutu — путешествия и предложения",
       "type": "html_promos",
       "url": "https://www.tutu.ru/",
       "store": "Tutu",
+      "enabled": false,
+      "note": "Keep enabled only if production diagnostics returns specific current offer cards.",
+      "disabled_reason": "Parser extracted an irrelevant generic page about commuter trains rather than a specific travel discount; disabled to prevent misleading posts."
+    },
+    {
+      "name": "БериКод — промокоды на путешествия и туры",
+      "type": "html_promos",
+      "url": "https://berikod.ru/travel/",
+      "store": "БериКод — путешествия",
       "enabled": true,
-      "note": "Keep enabled only if production diagnostics returns specific current offer cards."
+      "note": "Travel category with specific current ticket, hotel and tour promos. Filter known-expired offers before publication."
+    },
+    {
+      "name": "БериКод — скидки на авиабилеты и транспорт",
+      "type": "html_promos",
+      "url": "https://berikod.ru/travel/ticket/",
+      "store": "БериКод — билеты",
+      "enabled": true,
+      "note": "Travel ticket and transport coupon page; offers are filtered by stated expiry."
+    },
+    {
+      "name": "БериКод — промокоды на бронирование и отели",
+      "type": "html_promos",
+      "url": "https://berikod.ru/travel/booking/",
+      "store": "БериКод — бронирование",
+      "enabled": true,
+      "note": "Travel booking and hotel coupon page; offers are filtered by stated expiry."
     }
   ]
 }
