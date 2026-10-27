@@ -440,5 +440,37 @@ class FeedParserTests(unittest.TestCase):
         self.assertTrue(deals[0].discount_is_maximum)
         self.assertIn("coupon_id=3670", deals[0].product_url)
 
+
+    def test_parses_vkusvill_loyalty_card_price_pair(self):
+        payload = """
+        <html><body>
+          <main>
+            <div class="ProductCard">
+              <a href="/goods/mors-vishnevyy-1l">
+                <img src="/images/mors.jpg" alt="Морс вишневый, 1 л">
+              </a>
+              <a href="/goods/mors-vishnevyy-1l">Морс вишневый, 1 л</a>
+              <div class="ProductCard__priceBlock">
+                182 руб /шт <s>202 руб</s> 182 202
+                Скидка по карте лояльности по 01.11
+              </div>
+            </div>
+          </main>
+        </body></html>
+        """.encode("utf-8")
+        source = {
+            "name": "test-vkusvill",
+            "type": "html",
+            "url": "https://vkusvill.ru/offers/",
+            "store": "ВкусВилл",
+            "enabled": True,
+        }
+        deals = parse_feed(payload, source)
+        self.assertEqual(len(deals), 1)
+        self.assertEqual(deals[0].title, "Морс вишневый, 1 л")
+        self.assertEqual(deals[0].product_url, "https://vkusvill.ru/goods/mors-vishnevyy-1l")
+        self.assertEqual(deals[0].price, 182.0)
+        self.assertEqual(deals[0].old_price, 202.0)
+
 if __name__ == "__main__":
     unittest.main()

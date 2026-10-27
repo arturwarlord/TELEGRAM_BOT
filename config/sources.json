@@ -315,7 +315,8 @@
       "type": "html",
       "url": "https://kuper.ru/categories",
       "store": "Купер",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "The public category catalogue returned HTTP 403 from GitHub Actions. No access controls are being bypassed."
     }
   ]
 }
