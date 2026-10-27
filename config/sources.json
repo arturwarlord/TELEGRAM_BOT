@@ -577,8 +577,7 @@
       "store": "Tutu",
       "enabled": false,
       "note": "Keep enabled only if production diagnostics returns specific current offer cards.",
-      "disabled_reason": "Candidate official homepage; inspect current ticket-price cards with the retailer price-pair parser before activation.",
-      "diagnostic": true
+      "disabled_reason": "The production price-card parser extracted 0 actionable old/current price pairs from the public homepage."
     },
     {
       "name": "БериКод — промокоды на путешествия и туры",
@@ -1525,8 +1524,7 @@
       "url": "https://www.s7.ru/ru/",
       "store": "S7 Airlines",
       "enabled": false,
-      "diagnostic": true,
-      "disabled_reason": "Candidate official airline page; require matched old/current prices and direct product links."
+      "disabled_reason": "HTTP 403 from GitHub Actions; source remains disabled and access controls are not bypassed."
     },
     {
       "name": "Аэрофлот — специальные предложения",
@@ -1534,8 +1532,7 @@
       "url": "https://www.aeroflot.ru/ru-ru/offers/specials",
       "store": "Аэрофлот",
       "enabled": false,
-      "diagnostic": true,
-      "disabled_reason": "Candidate official airline offers page; require matched old/current prices and direct links."
+      "disabled_reason": "GitHub Actions received a page stating that access is temporarily restricted by the site owner."
     },
     {
       "name": "Tutu — скидка на железнодорожные билеты",
@@ -1543,8 +1540,7 @@
       "url": "https://www.tutu.ru/poezda/content/pl/p5/",
       "store": "Tutu",
       "enabled": false,
-      "diagnostic": true,
-      "disabled_reason": "Candidate official rail-ticket discount page; parser must extract a concrete, current offer."
+      "disabled_reason": "The production promotion parser extracted 0 actionable offer cards from this page."
     },
     {
       "name": "Островок — промокоды и акции на отели",
@@ -1552,8 +1548,7 @@
       "url": "https://ostrovok.ru/promo/",
       "store": "Островок",
       "enabled": false,
-      "diagnostic": true,
-      "disabled_reason": "Candidate official hotel promo page; validate public offer cards and images."
+      "disabled_reason": "HTTP 404 from GitHub Actions for the candidate promo URL."
     },
     {
       "name": "Яндекс Путешествия — промокоды",
@@ -1561,8 +1556,7 @@
       "url": "https://travel.yandex.ru/promo/",
       "store": "Яндекс Путешествия",
       "enabled": false,
-      "diagnostic": true,
-      "disabled_reason": "Candidate official travel promo page; validate access and specific offer cards without bypassing controls."
+      "disabled_reason": "GitHub Actions received a bot-verification page; no attempt to bypass the control."
     },
     {
       "name": "Победа — акции и промокоды на авиабилеты",
@@ -1570,8 +1564,7 @@
       "url": "https://www.flypobeda.ru/promotions",
       "store": "Победа",
       "enabled": false,
-      "diagnostic": true,
-      "disabled_reason": "Candidate official airline promotions page; validate direct public offers."
+      "disabled_reason": "HTTP 404 from GitHub Actions for the candidate promotions URL."
     },
     {
       "name": "РЖД — тарифы и скидки на билеты",
@@ -1579,8 +1572,7 @@
       "url": "https://www.rzd.ru/ru/9835",
       "store": "РЖД",
       "enabled": false,
-      "diagnostic": true,
-      "disabled_reason": "Candidate official rail ticket promotions page; validate public offer cards and current conditions."
+      "disabled_reason": "The public-page diagnostic request timed out; no reliable offer cards were verified."
     }
   ]
 }
