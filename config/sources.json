@@ -130,7 +130,8 @@
       "type": "html",
       "url": "https://www.okmarket.ru/",
       "store": "О’КЕЙ",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "Checked the public homepage from GitHub Actions; request returned HTTP 403. Keep disabled until the source offers a supported feed or stable public access."
     },
     {
       "name": "ПромКод.ру — промокоды и распродажи",
@@ -181,7 +182,8 @@
       "type": "html_promos",
       "url": "https://promocodes.yandex.ru/",
       "store": "Промокоды Яндекса",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "GitHub Actions scan returned 0 extractable offers; current page markup is not supported by the parser."
     },
     {
       "name": "PromoKong — промокоды и купоны",
@@ -202,21 +204,24 @@
       "type": "html_promos",
       "url": "https://smartsalee.ru/",
       "store": "SmartSalee",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "GitHub Actions scan returned 0 extractable offers; current page markup is not supported by the parser."
     },
     {
       "name": "МегаФон — официальные акции",
       "type": "html_promos",
       "url": "https://shop.megafon.ru/actions",
       "store": "МегаФон",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "Official actions page returned HTTP 403 from GitHub Actions. No access controls are being bypassed."
     },
     {
       "name": "DNS — официальные предложения",
       "type": "html_promos",
       "url": "https://www.dns-shop.ru/actions/",
       "store": "DNS",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "Official offer page returned HTTP 401 from GitHub Actions. No access controls are being bypassed."
     }
   ]
 }
