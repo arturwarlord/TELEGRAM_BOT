@@ -13,14 +13,16 @@
       "type": "html_promos",
       "url": "https://promko.net/ru",
       "store": "PROMKO.NET",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "Page returns 200 but current parser extracts no valid coupon cards; re-test if parser is improved."
     },
     {
       "name": "Халявщики — каталог скидок",
       "type": "html_promos",
       "url": "https://hl.ru/shops",
       "store": "hl.ru",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "Page returns 200 but current parser extracts no valid offers from this listing URL."
     },
     {
       "name": "БериКод — промокоды",
@@ -41,70 +43,80 @@
       "type": "html_promos",
       "url": "https://www.slata.ru/promotions/",
       "store": "Слата",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "Page returns 200 but current parser extracts no valid promotional cards from this page."
     },
     {
       "name": "Перекрёсток — товары со скидками",
       "type": "html",
       "url": "https://www.perekrestok.ru/cat/promo/1",
       "store": "Перекрёсток",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "Public GitHub Actions request currently returns HTTP 403. Not bypassing access controls."
     },
     {
       "name": "METRO Онлайн — товары со скидками",
       "type": "html",
       "url": "https://online.metro-cc.ru/category/virtual",
       "store": "METRO Онлайн",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "Public page redirects (HTTP 307) in the automation runner; source needs a stable public endpoint."
     },
     {
       "name": "Спортмастер — каталог распродажи",
       "type": "html",
       "url": "https://www.sportmaster.ru/catalog/sale/all/",
       "store": "Спортмастер",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "Public GitHub Actions request currently returns HTTP 401. Not bypassing access controls."
     },
     {
       "name": "Ozon — скидки и распродажа",
       "type": "html",
       "url": "https://www.ozon.ru/category/skidki-i-rasprodazha/",
       "store": "Ozon",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "Public page redirects (HTTP 307) in the automation runner; use approved public feeds/API if available."
     },
     {
       "name": "Ozon Fresh — скидки на продукты",
       "type": "html",
       "url": "https://www.ozon.ru/highlight/skidki-i-aktsii-1128802/?miniapp=supermarket",
       "store": "Ozon Fresh",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "Public page redirects (HTTP 307) in the automation runner; use approved public feeds/API if available."
     },
     {
       "name": "Лента — акции и скидки",
       "type": "html_promos",
       "url": "https://lenta.com/action/",
       "store": "Лента",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "Public GitHub Actions request currently returns HTTP 401. Not bypassing access controls."
     },
     {
       "name": "Ситилинк — акции на электронику",
       "type": "html_promos",
       "url": "https://www.citilink.ru/actions/",
       "store": "Ситилинк",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "Public request currently returns HTTP 429 (rate limited); recheck later without retry storms."
     },
     {
       "name": "Золотое Яблоко — акции",
       "type": "html_promos",
       "url": "https://goldapple.ru/offers",
       "store": "Золотое Яблоко",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "Page returns an anti-bot checking page instead of public offers. Not bypassing it."
     },
     {
       "name": "Читай-город — акции на книги и товары",
       "type": "html_promos",
       "url": "https://www.chitai-gorod.ru/promotions",
       "store": "Читай-город",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "Public GitHub Actions request currently returns HTTP 403. Not bypassing access controls."
     },
     {
       "name": "Четыре Лапы — акции для животных",
@@ -118,7 +130,8 @@
       "type": "html_promos",
       "url": "https://www.okmarket.ru/products/",
       "store": "О’КЕЙ",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "Public GitHub Actions request currently returns HTTP 403. Not bypassing access controls."
     },
     {
       "name": "ПромКод.ру — промокоды и распродажи",
@@ -132,6 +145,21 @@
       "type": "html",
       "url": "https://www.pepper.ru/",
       "store": "Pepper.ru",
+      "enabled": false,
+      "disabled_reason": "Page returns an anti-bot 'are you a robot?' page. Not bypassing it."
+    },
+    {
+      "name": "Кому Купон — скидки по 16 категориям",
+      "type": "html_promos",
+      "url": "https://promokodi.komukupon.ru/categories/",
+      "store": "Кому Купон",
+      "enabled": true
+    },
+    {
+      "name": "Promocodex — каталог скидок и промокодов",
+      "type": "html_promos",
+      "url": "https://promocodex.ru/stores.html",
+      "store": "Promocodex",
       "enabled": true
     }
   ]
