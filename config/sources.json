@@ -992,56 +992,38 @@
       "note": "Travel-specific promo candidate. Only card titles/descriptions matching travel keywords are accepted; known-expired offers are rejected."
     },
     {
-      "name": "Самокатус — промокоды на путешествия",
+      "name": "Samokatus — промокоды на авиабилеты, отели и туры",
       "type": "html_promos",
       "url": "https://samokatus.ru/promocodes",
-      "store": "Самокатус",
+      "store": "Samokatus",
       "enabled": false,
       "fallback_to_source_page": true,
       "required_title_keywords": [
         "авиабилет",
-        "авиа",
-        "авиасейл",
-        "aviasales",
-        "самолет",
-        "самолёт",
-        "победа",
-        "поезд",
-        "жд билет",
-        "сапсан",
-        "трансфер",
+        "билет",
         "отел",
-        "проживан",
-        "брониров",
-        "путевк",
         "тур",
         "путешеств",
-        "отпуск",
-        "отдых",
-        "поездк",
-        "trip.com",
-        "trip com",
-        "ozon travel",
-        "ozon.travel",
-        "озон тревел",
-        "авито путешеств",
-        "яндекс путешеств",
-        "суточно",
-        "островок",
-        "отелло",
-        "тари тур",
-        "s7 airlines",
-        "tez tour",
-        "teztour",
-        "level.travel",
-        "travelata",
-        "kiwitaxi",
-        "intui.travel",
+        "путевк",
+        "бронир",
+        "трансфер",
         "жиль",
-        "билет на самолет"
+        "travelata",
+        "level.travel",
+        "ostrovok",
+        "суточно"
       ],
       "note": "Travel-specific promo candidate. Only card titles/descriptions matching travel keywords are accepted; known-expired offers are rejected.",
-      "disabled_reason": "Latest scan returned 0 actionable offer cards; kept off until the page markup becomes parseable."
+      "disabled_reason": "Current travel promo roundup surfaced in public search; verify that individual offers parse without unsafe redirect links.",
+      "diagnostic": true,
+      "excluded_offer_keywords": [
+        "кредит",
+        "займ",
+        "казино",
+        "букмекер",
+        "ставки",
+        "лотерея"
+      ]
     },
     {
       "name": "Тревелинка — промокоды на туры",
@@ -1573,6 +1555,36 @@
       "store": "РЖД",
       "enabled": false,
       "disabled_reason": "The public-page diagnostic request timed out; no reliable offer cards were verified."
+    },
+    {
+      "name": "Выберу — промокоды на путешествия и отпуск",
+      "type": "html_promos",
+      "url": "https://promokod.vbr.ru/puteshestviya/",
+      "store": "Выберу.Промокоды",
+      "enabled": false,
+      "diagnostic": true,
+      "fallback_to_source_page": true,
+      "required_title_keywords": [
+        "авиабилет",
+        "билет",
+        "отел",
+        "тур",
+        "путешеств",
+        "путевк",
+        "бронир",
+        "трансфер",
+        "жиль",
+        "авиа"
+      ],
+      "excluded_offer_keywords": [
+        "кредит",
+        "займ",
+        "казино",
+        "букмекер",
+        "ставки",
+        "лотерея"
+      ],
+      "disabled_reason": "Current travel-specific promo roundup surfaced in public search; verify source-card links and images in read-only diagnostics before enabling."
     }
   ]
 }
