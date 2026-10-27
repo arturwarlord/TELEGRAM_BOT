@@ -265,7 +265,7 @@ def _extract_promo_expiry(text: str, *, today: date | None = None) -> str | None
             return (reference_date + timedelta(days=amount * multiplier)).isoformat()
         except (OverflowError, ValueError):
             return None
-    match = re.search(r"\b(?:до|по)\s+(\d{1,2})[./](\d{1,2})[./](\d{2,4})\b", text, flags=re.IGNORECASE)
+    match = re.search(r"\b(?:до|по)\s*:?\s*(\d{1,2})[./](\d{1,2})[./](\d{2,4})\b", text, flags=re.IGNORECASE)
     if match:
         day, month, year = (int(match.group(i)) for i in (1, 2, 3))
         if year < 100:
@@ -281,7 +281,7 @@ def _extract_promo_expiry(text: str, *, today: date | None = None) -> str | None
         "сентября": 9, "октября": 10, "ноября": 11, "декабря": 12,
     }
     match = re.search(
-        r"\b(?:до|по)\s+(?:(\d{1,2})\s+)?(января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)(?:\s+(\d{4}))?\b",
+        r"\b(?:до|по)\s*:?\s*(?:(\d{1,2})\s+)?(января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)(?:\s+(\d{4}))?\b",
         text,
         flags=re.IGNORECASE,
     )
@@ -478,6 +478,15 @@ def parse_html_promotions(payload: bytes, source: dict[str, Any], max_items: int
             continue
 
         description = _extract_offer_description(text)
+        required_keywords = source.get("required_title_keywords")
+        if isinstance(required_keywords, list) and required_keywords:
+            searchable_offer_text = f"{title} {description}".casefold()
+            if not any(
+                str(keyword).strip().casefold() in searchable_offer_text
+                for keyword in required_keywords
+                if str(keyword).strip()
+            ):
+                continue
         # A percent picked up from a broad parent node is not enough on its own.
         # Re-check against the selected offer title and trimmed card copy so an
         # unrelated "up to 80%" from a neighbouring card cannot become this deal's claim.

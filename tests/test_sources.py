@@ -375,6 +375,46 @@ class FeedParserTests(unittest.TestCase):
         self.assertEqual(deals[0].reported_discount_percent, 10)
         self.assertIsNone(deals[0].affiliate_url)
 
+    def test_html_promotions_filter_unrelated_ads_from_travel_pages(self):
+        payload = """
+        <html><body>
+          <article class="card">
+            <h3>ВК реклама промокод 2026 на первую рекламную кампанию со скидкой 40%</h3>
+            <img src="https://img.example.test/ads.jpg" alt="Реклама">
+            <p>На запуск рекламного кабинета для новых пользователей.</p>
+            <a href="https://ads.example.test/redirect">Открыть акцию</a>
+          </article>
+          <article class="card">
+            <h3>Промокод Победа на авиабилеты — скидка 10%</h3>
+            <img src="https://img.example.test/pobeda.jpg" alt="Авиабилеты">
+            <p>Код действует на тарифы Максимум и Выгодный.</p>
+            <a href="https://airline.example.test/redirect?erid=abc">Открыть акцию</a>
+          </article>
+        </body></html>
+        """.encode("utf-8")
+        source = {
+            "name": "test-travel-coupons",
+            "type": "html_promos",
+            "url": "https://berikod.example.test/travel/",
+            "store": "Travel",
+            "enabled": True,
+            "fallback_to_source_page": True,
+            "required_title_keywords": ["авиабилет", "отел", "путешеств", "тур", "поезд"],
+        }
+        deals = parse_feed(payload, source)
+        self.assertEqual(len(deals), 1)
+        self.assertIn("Победа", deals[0].title)
+
+    def test_promo_expiry_parser_accepts_colon_after_do(self):
+        self.assertEqual(
+            _extract_promo_expiry("Акция активна до: 31.10.2026", today=date(2026, 10, 27)),
+            "2026-10-31",
+        )
+        self.assertEqual(
+            _extract_promo_expiry("Промокод активен до: 3 ноября 2026", today=date(2026, 10, 27)),
+            "2026-11-03",
+        )
+
     def test_html_promo_description_excludes_tracking_and_erid_footer(self):
         payload = """
         <html><body>
