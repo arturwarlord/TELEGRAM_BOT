@@ -42,6 +42,97 @@
       "url": "https://www.slata.ru/promotions/",
       "store": "Слата",
       "enabled": true
+    },
+    {
+      "name": "Перекрёсток — товары со скидками",
+      "type": "html",
+      "url": "https://www.perekrestok.ru/cat/promo/1",
+      "store": "Перекрёсток",
+      "enabled": true
+    },
+    {
+      "name": "METRO Онлайн — товары со скидками",
+      "type": "html",
+      "url": "https://online.metro-cc.ru/category/virtual",
+      "store": "METRO Онлайн",
+      "enabled": true
+    },
+    {
+      "name": "Спортмастер — каталог распродажи",
+      "type": "html",
+      "url": "https://www.sportmaster.ru/catalog/sale/all/",
+      "store": "Спортмастер",
+      "enabled": true
+    },
+    {
+      "name": "Ozon — скидки и распродажа",
+      "type": "html",
+      "url": "https://www.ozon.ru/category/skidki-i-rasprodazha/",
+      "store": "Ozon",
+      "enabled": true
+    },
+    {
+      "name": "Ozon Fresh — скидки на продукты",
+      "type": "html",
+      "url": "https://www.ozon.ru/highlight/skidki-i-aktsii-1128802/?miniapp=supermarket",
+      "store": "Ozon Fresh",
+      "enabled": true
+    },
+    {
+      "name": "Лента — акции и скидки",
+      "type": "html_promos",
+      "url": "https://lenta.com/action/",
+      "store": "Лента",
+      "enabled": true
+    },
+    {
+      "name": "Ситилинк — акции на электронику",
+      "type": "html_promos",
+      "url": "https://www.citilink.ru/actions/",
+      "store": "Ситилинк",
+      "enabled": true
+    },
+    {
+      "name": "Золотое Яблоко — акции",
+      "type": "html_promos",
+      "url": "https://goldapple.ru/offers",
+      "store": "Золотое Яблоко",
+      "enabled": true
+    },
+    {
+      "name": "Читай-город — акции на книги и товары",
+      "type": "html_promos",
+      "url": "https://www.chitai-gorod.ru/promotions",
+      "store": "Читай-город",
+      "enabled": true
+    },
+    {
+      "name": "Четыре Лапы — акции для животных",
+      "type": "html_promos",
+      "url": "https://4lapy.ru/shares/",
+      "store": "Четыре Лапы",
+      "enabled": true
+    },
+    {
+      "name": "О’КЕЙ — каталоги и акции",
+      "type": "html_promos",
+      "url": "https://www.okmarket.ru/products/",
+      "store": "О’КЕЙ",
+      "enabled": true
+    },
+    {
+      "name": "ПромКод.ру — промокоды и распродажи",
+      "type": "html_promos",
+      "url": "https://www.promkod.ru/",
+      "store": "ПромКод.ру",
+      "enabled": true
+    },
+    {
+      "name": "Pepper.ru — публичные скидки",
+      "type": "html",
+      "url": "https://www.pepper.ru/",
+      "store": "Pepper.ru",
+      "enabled": true
     }
   ]
 }
