@@ -102,5 +102,29 @@ class MainDeduplicationTests(unittest.TestCase):
         self.assertGreater(coded_rank, vague_rank)
 
 
+    def test_specific_offer_page_ranks_above_generic_store_index(self):
+        detailed = self.make_coupon(
+            title="Пятёрочка Доставка — 55% на повторный заказ",
+            product_url="https://berikod.ru/promo/pyaterochka-55/",
+            promo_code="PYAT55",
+            reported_discount_percent=55,
+            discount_is_maximum=False,
+        )
+        generic = self.make_coupon(
+            title="Пятёрочка Доставка",
+            product_url="https://promofact.ru/store/pyaterochka",
+            promo_code=None,
+            reported_discount_percent=55,
+            discount_is_maximum=False,
+        )
+        detailed_rank = _rank_evaluated_deal(
+            (detailed, DealDecision(True, "eligible coupon", 55.0, None, 66.0))
+        )
+        generic_rank = _rank_evaluated_deal(
+            (generic, DealDecision(True, "eligible coupon", 55.0, None, 66.0))
+        )
+        self.assertGreater(detailed_rank, generic_rank)
+
+
 if __name__ == "__main__":
     unittest.main()
