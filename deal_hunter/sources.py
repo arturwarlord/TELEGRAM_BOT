@@ -248,8 +248,9 @@ def _extract_promo_code(node: _HtmlNode, text: str) -> str | None:
     return None
 
 
-def _extract_promo_expiry(text: str) -> str | None:
-    match = re.search(r"\bдо\s+(\d{1,2})[./](\d{1,2})[./](\d{2,4})\b", text, flags=re.IGNORECASE)
+def _extract_promo_expiry(text: str, *, today: date | None = None) -> str | None:
+    """Normalize a stated expiry date, including year rollover for dates without a year."""
+    match = re.search(r"\\bдо\\s+(\\d{1,2})[./](\\d{1,2})[./](\\d{2,4})\\b", text, flags=re.IGNORECASE)
     if match:
         day, month, year = (int(match.group(i)) for i in (1, 2, 3))
         if year < 100:
@@ -265,20 +266,32 @@ def _extract_promo_expiry(text: str) -> str | None:
         "сентября": 9, "октября": 10, "ноября": 11, "декабря": 12,
     }
     match = re.search(
-        r"\bдо\s+(?:(\d{1,2})\s+)?(января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)(?:\s+(\d{4}))?\b",
+        r"\\bдо\\s+(?:(\\d{1,2})\\s+)?(января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)(?:\\s+(\\d{4}))?\\b",
         text,
         flags=re.IGNORECASE,
     )
     if not match:
         return None
+
     day = int(match.group(1) or "1")
     month = month_numbers[match.group(2).lower()]
-    year = int(match.group(3) or datetime.now(timezone.utc).year)
+    reference_date = today or datetime.now(timezone.utc).date()
+    explicit_year = match.group(3)
+    year = int(explicit_year or reference_date.year)
     try:
-        return date(year, month, day).isoformat()
+        expiry = date(year, month, day)
+        # For a month-only/day-month expiry, a date many months behind today
+        # usually refers to the next occurrence (e.g. "до 5 января" in October).
+        # Do not roll over a date that expired recently (e.g. "до 20 октября").
+        if (
+            explicit_year is None
+            and expiry < reference_date
+            and reference_date.month - month >= 6
+        ):
+            expiry = date(year + 1, month, day)
+        return expiry.isoformat()
     except ValueError:
         return None
-
 
 def _extract_offer_description(text: str) -> str:
     """Keep offer conditions but strip CTA/tracking/legal footer noise from card copy."""
