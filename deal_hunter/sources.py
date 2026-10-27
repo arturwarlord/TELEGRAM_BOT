@@ -352,6 +352,7 @@ def parse_html_promotions(payload: bytes, source: dict[str, Any], max_items: int
                 "/category/", "/categories/", "/profile/", "/account/", "/personal/",
                 "/login/", "/signin/", "/cart/", "/checkout/", "/okgo/", "/redirect/",
                 "/out/", "/click/", "/clickout/", "/tracking/", "/track/",
+                "/api/click-product/", "/go/", "/blog/",
             )):
                 continue
             if any(key in query for key in (

@@ -373,5 +373,31 @@ class FeedParserTests(unittest.TestCase):
         self.assertTrue(deals[0].discount_is_maximum)
         self.assertIn("#promo-1461", deals[0].product_url)
 
+
+    def test_html_promotions_rejects_internal_tracking_and_blog_redirects(self):
+        blocked_paths = [
+            "/api/click-product/621375",
+            "/go/cmpwkdo9u004t3clh0m0i3acn",
+            "/blog/rasprodazha-11-11-how-to-check",
+        ]
+        for path in blocked_paths:
+            with self.subTest(path=path):
+                payload = f"""
+                <html><body>
+                  <article class="coupon-card">
+                    <a href="{path}">Скидка 35% на выбранные товары</a>
+                    <img src="/images/offer.jpg" alt="Скидка">
+                    <span>Скидка 35%</span>
+                  </article>
+                </body></html>
+                """.encode()
+                source = {
+                    "name": "test-tracking-rejection",
+                    "type": "html_promos",
+                    "url": "https://coupons.example.test/",
+                    "enabled": True,
+                }
+                self.assertEqual(parse_feed(payload, source), [])
+
 if __name__ == "__main__":
     unittest.main()

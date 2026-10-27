@@ -169,7 +169,8 @@
       "type": "html_promos",
       "url": "https://socialkod.ru/",
       "store": "SocialKod",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "After the new quality filter, available cards are primarily internal /api/click-product tracking links. Those links are now blocked for no-affiliate publishing; keep source disabled until direct public offer pages are exposed."
     },
     {
       "name": "О Скидках — каталог промокодов",
@@ -238,7 +239,8 @@
       "type": "html_promos",
       "url": "https://discovia.ru/",
       "store": "Discovia",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "The production parser found a blog article and an internal /go/ redirect rather than a safe specific offer. Those paths are now blocked."
     },
     {
       "name": "PromoKong — бесплатная доставка",
@@ -253,7 +255,8 @@
       "type": "html_promos",
       "url": "https://www.fontanka.ru/kupony/shop/",
       "store": "Фонтанка — промокоды",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "The public coupon directory was reachable but the production parser extracted 0 usable offer cards."
     }
   ]
 }
