@@ -300,7 +300,8 @@
       "type": "html_promos",
       "url": "https://kuponom.ru/",
       "store": "КУПОНом",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "The public page returned 0 extractable offer cards in the automated diagnostic."
     }
   ]
 }

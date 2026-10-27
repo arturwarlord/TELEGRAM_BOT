@@ -398,7 +398,7 @@ def parse_html_promotions(payload: bytes, source: dict[str, Any], max_items: int
         )
         is_generic_store_title = bool(re.search(
             r"(?:^\s*все\s+(?:промокоды|купоны)\b|"
-            r"\b\d+\s+(?:купон\w*|товар\w*)\b|"
+            r"\b\d+\s+(?:купон\w*|промокод\w*|предложени\w*|товар\w*|акци\w*)\b|"
             r"^\s*от\s+\w+|↗\s*$)",
             title,
             flags=re.IGNORECASE,
@@ -407,11 +407,14 @@ def parse_html_promotions(payload: bytes, source: dict[str, Any], max_items: int
             marker in offer_path
             for marker in ("/promo/", "/promocodes/", "/coupon/", "/discount/", "/deal/", "/deals/", "/action/", "/shares/")
         )
-        has_offer_anchor = bool(re.search(
-            r"(?:promo|offer|coupon|deal|discount|action|stock)[-_]?\d+",
-            offer_fragment,
-            flags=re.IGNORECASE,
-        ))
+        has_offer_anchor = bool(
+            re.search(
+                r"(?:promo|offer|coupon|deal|discount|action|stock)[-_]?\d+",
+                offer_fragment,
+                flags=re.IGNORECASE,
+            )
+            or re.search(r"(?:coupon_id|offer_id|promo_id|action_id)=\d+", parsed_offer_link.query, flags=re.IGNORECASE)
+        )
         # Store directories can contain unrelated codes/percentages from neighbouring
         # cards. Only keep a generic store-title when its link identifies an individual
         # promo/offer (including anchors such as #promo-1461).

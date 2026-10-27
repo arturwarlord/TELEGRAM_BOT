@@ -399,5 +399,46 @@ class FeedParserTests(unittest.TestCase):
                 }
                 self.assertEqual(parse_feed(payload, source), [])
 
+
+    def test_rejects_generic_doncoupon_store_page_with_promocode_count(self):
+        payload = """
+        <html><body>
+          <article class="coupon-card">
+            <a href="/ru-ru/store/letual/coupons">Лэтуаль letu.ru 9 промокодов 9 промокодов</a>
+            <img src="/images/letual.jpg" alt="Лэтуаль">
+            <span>Промокоды магазина</span>
+          </article>
+        </body></html>
+        """.encode()
+        source = {
+            "name": "test-doncoupon",
+            "type": "html_promos",
+            "url": "https://coupons.example.test/",
+            "enabled": True,
+        }
+        self.assertEqual(parse_feed(payload, source), [])
+
+    def test_keeps_doncoupon_individual_coupon_query(self):
+        payload = """
+        <html><body>
+          <article class="coupon-card">
+            <a href="/ru-ru/store/befree/coupons?coupon_id=3670">Распродажа мужской коллекции — скидки до 80%</a>
+            <img src="/images/befree.jpg" alt="Распродажа">
+            <span>Скидки до 80% на мужскую коллекцию</span>
+          </article>
+        </body></html>
+        """.encode()
+        source = {
+            "name": "test-doncoupon-offer",
+            "type": "html_promos",
+            "url": "https://coupons.example.test/",
+            "enabled": True,
+        }
+        deals = parse_feed(payload, source)
+        self.assertEqual(len(deals), 1)
+        self.assertEqual(deals[0].reported_discount_percent, 80)
+        self.assertTrue(deals[0].discount_is_maximum)
+        self.assertIn("coupon_id=3670", deals[0].product_url)
+
 if __name__ == "__main__":
     unittest.main()
