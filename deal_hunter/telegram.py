@@ -179,7 +179,8 @@ class TelegramPublisher:
     ) -> int | None:
         if not decision.eligible:
             raise ValueError(f"Refusing to publish an ineligible deal: {decision.reason}")
-        # Direct-link mode deliberately ignores all partner/tracking URLs.
+        # Non-affiliate mode deliberately ignores tracking URLs. The public offer URL
+        # may be a merchant page or a coupon/catalog detail page, depending on source.
         target_url = deal.product_url if allow_direct_link else deal.affiliate_url
         if not is_http_url(target_url):
             reason = "a valid direct offer URL" if allow_direct_link else "an approved affiliate URL"
