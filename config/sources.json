@@ -1397,7 +1397,18 @@
       "store": "Picodi",
       "enabled": false,
       "disabled_reason": "Read-only candidate: the current parser finds no usable offer cards; inspect visible card links/images before considering activation.",
-      "diagnostic": true
+      "diagnostic": true,
+      "fallback_to_source_page": true,
+      "excluded_offer_keywords": [
+        "кредит",
+        "займ",
+        "микрозайм",
+        "микрокредит",
+        "мфо",
+        "казино",
+        "букмекер",
+        "ставки"
+      ]
     },
     {
       "name": "GoodCoupon — актуальные промокоды и скидки",
