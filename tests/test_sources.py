@@ -286,6 +286,12 @@ class FeedParserTests(unittest.TestCase):
         current_year = datetime.now(timezone.utc).year
         self.assertEqual(deal.expires_at, f"{current_year}-10-31")
 
+    def test_expiry_parser_recognizes_end_of_range_after_po(self):
+        self.assertEqual(
+            _extract_promo_expiry("Акция с 1 октября по 31 октября INABA", today=date(2026, 10, 27)),
+            "2026-10-31",
+        )
+
     def test_expiry_without_year_rolls_over_to_next_year_when_month_is_far_behind(self):
         self.assertEqual(
             _extract_promo_expiry("Промокод действует до 5 января", today=date(2026, 10, 27)),
