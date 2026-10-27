@@ -292,6 +292,16 @@ class FeedParserTests(unittest.TestCase):
             "2026-10-31",
         )
 
+    def test_relative_promo_expiry_is_normalized(self):
+        self.assertEqual(
+            _extract_promo_expiry("Промокод активен ещё 2 дня", today=date(2026, 10, 27)),
+            "2026-10-29",
+        )
+        self.assertEqual(
+            _extract_promo_expiry("Предложение действует 1 неделю", today=date(2026, 10, 27)),
+            "2026-11-03",
+        )
+
     def test_expiry_without_year_rolls_over_to_next_year_when_month_is_far_behind(self):
         self.assertEqual(
             _extract_promo_expiry("Промокод действует до 5 января", today=date(2026, 10, 27)),
@@ -338,6 +348,32 @@ class FeedParserTests(unittest.TestCase):
             "link": "https://evil.example/collect", "departure_at": "2099-01-15T10:30:00Z",
         }]}).encode("utf-8")
         self.assertEqual(parse_aviasales_payload(payload, {"name": "test", "type": "aviasales_api"}), [])
+
+    def test_html_promotions_can_link_travel_offer_to_listing_not_external_redirect(self):
+        payload = """
+        <html><body>
+          <article class="travel-card">
+            <h3>Промокод Победа на авиабилеты — скидка 10%</h3>
+            <img src="https://img.example.test/pobeda.jpg" alt="Авиабилеты Победа">
+            <p>Код действует на тарифы Максимум и Выгодный.</p>
+            <a href="https://airline.example.test/redirect?erid=abc">Открыть акцию</a>
+          </article>
+        </body></html>
+        """.encode("utf-8")
+        source = {
+            "name": "БериКод — тест путешествий",
+            "type": "html_promos",
+            "url": "https://berikod.example.test/travel/",
+            "store": "БериКод — путешествия",
+            "enabled": True,
+            "fallback_to_source_page": True,
+        }
+        deals = parse_feed(payload, source)
+        self.assertEqual(len(deals), 1)
+        self.assertEqual(deals[0].product_url, "https://berikod.example.test/travel/")
+        self.assertIn("Победа", deals[0].title)
+        self.assertEqual(deals[0].reported_discount_percent, 10)
+        self.assertIsNone(deals[0].affiliate_url)
 
     def test_html_promo_description_excludes_tracking_and_erid_footer(self):
         payload = """

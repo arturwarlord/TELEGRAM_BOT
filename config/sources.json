@@ -585,7 +585,8 @@
       "url": "https://berikod.ru/travel/",
       "store": "БериКод — путешествия",
       "enabled": true,
-      "note": "Travel category with specific current ticket, hotel and tour promos. Filter known-expired offers before publication."
+      "note": "Travel category with specific current ticket, hotel and tour promos. Filter known-expired offers before publication.",
+      "fallback_to_source_page": true
     },
     {
       "name": "БериКод — скидки на авиабилеты и транспорт",
@@ -593,7 +594,8 @@
       "url": "https://berikod.ru/travel/ticket/",
       "store": "БериКод — билеты",
       "enabled": true,
-      "note": "Travel ticket and transport coupon page; offers are filtered by stated expiry."
+      "note": "Travel ticket and transport coupon page; offers are filtered by stated expiry.",
+      "fallback_to_source_page": true
     },
     {
       "name": "БериКод — промокоды на бронирование и отели",
@@ -601,7 +603,8 @@
       "url": "https://berikod.ru/travel/booking/",
       "store": "БериКод — бронирование",
       "enabled": true,
-      "note": "Travel booking and hotel coupon page; offers are filtered by stated expiry."
+      "note": "Travel booking and hotel coupon page; offers are filtered by stated expiry.",
+      "fallback_to_source_page": true
     }
   ]
 }

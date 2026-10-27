@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import os
 import re
-from datetime import date
+from datetime import date, timedelta
 import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
@@ -251,6 +251,20 @@ def _extract_promo_code(node: _HtmlNode, text: str) -> str | None:
 
 def _extract_promo_expiry(text: str, *, today: date | None = None) -> str | None:
     """Normalize a stated expiry date, including year rollover for dates without a year."""
+    reference_date = today or datetime.now(timezone.utc).date()
+    relative = re.search(
+        r"\b(?:активен|активна|активно|действует)\s+(?:ещ[её]\s+)?(\d+)\s+(день|дня|дней|неделю|недели|недель|месяц|месяца|месяцев)\b",
+        text,
+        flags=re.IGNORECASE,
+    )
+    if relative:
+        amount = int(relative.group(1))
+        unit = relative.group(2).lower()
+        multiplier = 7 if unit.startswith("недел") else (30 if unit.startswith("месяц") else 1)
+        try:
+            return (reference_date + timedelta(days=amount * multiplier)).isoformat()
+        except (OverflowError, ValueError):
+            return None
     match = re.search(r"\b(?:до|по)\s+(\d{1,2})[./](\d{1,2})[./](\d{2,4})\b", text, flags=re.IGNORECASE)
     if match:
         day, month, year = (int(match.group(i)) for i in (1, 2, 3))
@@ -276,7 +290,6 @@ def _extract_promo_expiry(text: str, *, today: date | None = None) -> str | None
 
     day = int(match.group(1) or "1")
     month = month_numbers[match.group(2).lower()]
-    reference_date = today or datetime.now(timezone.utc).date()
     explicit_year = match.group(3)
     year = int(explicit_year or reference_date.year)
     try:
@@ -379,6 +392,30 @@ def parse_html_promotions(payload: bytes, source: dict[str, Any], max_items: int
             links.append((href, label))
 
         images = _html_images(node, base_url)
+        if not links and source.get("fallback_to_source_page") is True:
+            # Some coupon directories send every "open offer" button to an
+            # external shop redirect. In explicitly opted-in sources, keep the
+            # visible offer and link to the public listing, not the redirect.
+            headings = [
+                clean_text(_html_text(child), 300)
+                for child in _html_walk(node)
+                if child.tag in {"h2", "h3", "h4", "h5"}
+            ]
+            headings = [
+                heading for heading in headings
+                if len(heading) >= 8
+                and re.search(r"(?:промокод|скидк|авиабилет|билет|тур|отел|путевк|бронир|распродаж)", heading, re.IGNORECASE)
+            ]
+            if len(headings) == 1 and images:
+                heading = headings[0]
+                heading_percent, heading_is_maximum = _extract_reported_percent(heading)
+                if heading_percent is not None or code is not None:
+                    node_id = node.attrs.get("id", "").strip()
+                    listing_url = base_url + ("#" + node_id if re.fullmatch(r"[A-Za-z0-9_-]+", node_id) else "")
+                    links = [(listing_url, heading)]
+                    if heading_percent is not None:
+                        reported_percent = heading_percent
+                        is_maximum = heading_is_maximum
         if not links or not images:
             continue
 
