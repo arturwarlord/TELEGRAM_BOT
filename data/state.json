@@ -16,6 +16,22 @@
       "published_at": "2026-10-27T13:51:37+00:00",
       "telegram_message_id": 4,
       "affiliate_url": null
+    },
+    "ec0df9029a56ffb28c6cabf3": {
+      "title": "Сосиски Вязанка Сливушка сливочные 450г",
+      "store": "Магнит",
+      "price": 169.99,
+      "published_at": "2026-10-27T20:54:37.522048+00:00",
+      "telegram_message_id": 5,
+      "affiliate_url": null
+    },
+    "59f5d7040a7cdf5d99d09af2": {
+      "title": "Кофе в зернах Noir Egoiste 1кг",
+      "store": "Магнит",
+      "price": 2099.99,
+      "published_at": "2026-10-27T20:54:40.590145+00:00",
+      "telegram_message_id": 6,
+      "affiliate_url": null
     }
   },
   "recent_posts": [
@@ -28,6 +44,16 @@
       "key": "2d9c36da4c2bf4d5de7977d9",
       "published_at": "2026-10-27T13:51:37+00:00",
       "telegram_message_id": 4
+    },
+    {
+      "key": "ec0df9029a56ffb28c6cabf3",
+      "published_at": "2026-10-27T20:54:37.522048+00:00",
+      "telegram_message_id": 5
+    },
+    {
+      "key": "59f5d7040a7cdf5d99d09af2",
+      "published_at": "2026-10-27T20:54:40.590145+00:00",
+      "telegram_message_id": 6
     }
   ]
 }
