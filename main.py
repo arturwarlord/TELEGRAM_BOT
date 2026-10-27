@@ -203,12 +203,12 @@ def main() -> int:
 
     print("===== DEAL HUNTER =====")
     print(f"Mode: {'PUBLISH' if publishing else 'DRY-RUN / PREVIEW'}")
-    print(f"Link mode: {'DIRECT STORE LINKS (NO AFFILIATE)' if allow_direct_links else 'AFFILIATE LINKS REQUIRED FOR PUBLISHING'}")
+    print(f"Link mode: {'PUBLIC OFFER LINKS (NO AFFILIATE)' if allow_direct_links else 'AFFILIATE LINKS REQUIRED FOR PUBLISHING'}")
     partner_api_enabled = bool(os.getenv("TAKPRODAM_API_TOKEN", "").strip())
     print(f"Configured public feed/page sources: {len(sources)}")
     print(f"Takprodam partner API: {'configured' if partner_api_enabled else 'not configured'}")
     print(
-        "Safety: direct store/promo links are used; the channel receives no commission."
+        "Safety: public offer pages are used without affiliate tracking; the channel receives no commission."
         if allow_direct_links
         else "Safety: partner link and product image are required before publishing."
     )
