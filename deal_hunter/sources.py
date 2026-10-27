@@ -250,7 +250,7 @@ def _extract_promo_code(node: _HtmlNode, text: str) -> str | None:
 
 def _extract_promo_expiry(text: str, *, today: date | None = None) -> str | None:
     """Normalize a stated expiry date, including year rollover for dates without a year."""
-    match = re.search(r"\\bдо\\s+(\\d{1,2})[./](\\d{1,2})[./](\\d{2,4})\\b", text, flags=re.IGNORECASE)
+    match = re.search(r"\bдо\s+(\d{1,2})[./](\d{1,2})[./](\d{2,4})\b", text, flags=re.IGNORECASE)
     if match:
         day, month, year = (int(match.group(i)) for i in (1, 2, 3))
         if year < 100:
@@ -266,7 +266,7 @@ def _extract_promo_expiry(text: str, *, today: date | None = None) -> str | None
         "сентября": 9, "октября": 10, "ноября": 11, "декабря": 12,
     }
     match = re.search(
-        r"\\bдо\\s+(?:(\\d{1,2})\\s+)?(января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)(?:\\s+(\\d{4}))?\\b",
+        r"\bдо\s+(?:(\d{1,2})\s+)?(января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)(?:\s+(\d{4}))?\b",
         text,
         flags=re.IGNORECASE,
     )
