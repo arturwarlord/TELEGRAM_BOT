@@ -332,6 +332,27 @@
       "store": "Магнит",
       "enabled": false,
       "disabled_reason": "The official promo landing page is reachable but the current parser extracts 0 usable deal cards; the product catalogue is the supported Magnit source."
+    },
+    {
+      "name": "Детский мир — товары распродажи",
+      "type": "html",
+      "url": "https://www.detmir.ru/catalog/index/name/rasprodazha_dm_rf/",
+      "store": "Детский мир",
+      "enabled": true
+    },
+    {
+      "name": "Четыре Лапы — товары недели со скидкой",
+      "type": "html",
+      "url": "https://4lapy.ru/shares/tovar-nedeli/",
+      "store": "Четыре Лапы",
+      "enabled": true
+    },
+    {
+      "name": "Лемана ПРО — товары и акции",
+      "type": "html",
+      "url": "https://lemanapro.ru/promo/",
+      "store": "Лемана ПРО",
+      "enabled": true
     }
   ]
 }
