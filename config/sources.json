@@ -257,6 +257,27 @@
       "store": "Фонтанка — промокоды",
       "enabled": false,
       "disabled_reason": "The public coupon directory was reachable but the production parser extracted 0 usable offer cards."
+    },
+    {
+      "name": "GetCashback — промокоды и купоны",
+      "type": "html_promos",
+      "url": "https://getcashback.ru/promocodes/",
+      "store": "GetCashback",
+      "enabled": true
+    },
+    {
+      "name": "BonusOK — каталог купонов магазинов",
+      "type": "html_promos",
+      "url": "https://bonusok.ru/magaziny/",
+      "store": "BonusOK",
+      "enabled": true
+    },
+    {
+      "name": "Skidomania — каталог промокодов",
+      "type": "html_promos",
+      "url": "https://skidomania.ru/for-shoppers",
+      "store": "Skidomania",
+      "enabled": true
     }
   ]
 }
