@@ -796,6 +796,7 @@ def parse_html_catalog(payload: bytes, source: dict[str, Any], max_items: int = 
     renders prices only after login/location selection, it will simply produce no deals.
     """
     base_url = str(source.get("url") or "").strip()
+    base_parts = urlsplit(base_url)
     parser = _HtmlTreeParser()
     parser.feed(payload.decode("utf-8-sig", errors="replace"))
     parser.close()
@@ -814,15 +815,36 @@ def parse_html_catalog(payload: bytes, source: dict[str, Any], max_items: int = 
         if current_price is None or old_price is None:
             continue
 
+        # A broad listing container can contain prices from unrelated products.
+        # If it also advertises an explicit percentage, verify that the calculated
+        # price difference is consistent before accepting the pair.
+        stated_percent, stated_is_maximum = _extract_reported_percent(text)
+        if stated_percent is not None:
+            implied_percent = (old_price - current_price) / old_price * 100.0
+            if stated_is_maximum and implied_percent > stated_percent + 8.0:
+                continue
+            if not stated_is_maximum and abs(implied_percent - stated_percent) > 12.0:
+                continue
+
         links = _html_links(node, base_url)
         images = _html_images(node, base_url)
         if not links or not images:
             continue
         # Prefer a plausible product link with a product name, not navigation or category.
+        # Links back to the listing itself are not product detail pages, even if they
+        # add a query string or fragment. This prevents a sale landing page's combined
+        # prices from being mistaken for one giant discounted product.
+        def is_listing_page_link(href: str) -> bool:
+            target = urlsplit(href)
+            return (
+                (target.netloc or "").casefold() == (base_parts.netloc or "").casefold()
+                and target.path.rstrip("/") == base_parts.path.rstrip("/")
+            )
+
         candidates = [
             (href, label) for href, label in links
             if not _is_generic_link_label(label)
-            and href.rstrip("/") != base_url.rstrip("/")
+            and not is_listing_page_link(href)
             and not re.search(r"/(promotions?|actions?|offers?|personaloffers|sp|catalog)(/|$)", urlsplit(href).path, re.I)
         ]
         if not candidates:

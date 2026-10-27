@@ -502,5 +502,55 @@ class FeedParserTests(unittest.TestCase):
         self.assertEqual(deals[0].price, 79.99)
         self.assertEqual(deals[0].old_price, 239.99)
 
+
+    def test_html_catalog_rejects_container_prices_that_conflict_with_max_discount(self):
+        payload = """
+        <html><body>
+          <main>
+            <div class="sale-list">
+              <span>Скидка до 20% на товары недели</span>
+              <div class="product-card">
+                <a href="/product/miska">
+                  <img src="/images/miska.jpg" alt="Миска для животных">
+                </a>
+                <a href="/product/miska">Миска для животных -86%</a>
+                <span>819 ₽ 5 697 ₽</span>
+              </div>
+            </div>
+          </main>
+        </body></html>
+        """.encode("utf-8")
+        source = {
+            "name": "test-bad-container",
+            "type": "html",
+            "url": "https://store.example.test/sale/",
+            "store": "Тестовый магазин",
+            "enabled": True,
+        }
+        self.assertEqual(parse_feed(payload, source), [])
+
+    def test_html_catalog_rejects_listing_page_links_even_with_query(self):
+        payload = """
+        <html><body>
+          <main>
+            <div class="sale-card">
+              <a href="/catalog/sale/?page=1">
+                Распродажа -99%
+                <img src="/images/sale.jpg" alt="Распродажа">
+              </a>
+              <span>-99% 1,90 ₽ 200 879 ₽</span>
+            </div>
+          </main>
+        </body></html>
+        """.encode("utf-8")
+        source = {
+            "name": "test-listing-page",
+            "type": "html",
+            "url": "https://store.example.test/catalog/sale/",
+            "store": "Тестовый магазин",
+            "enabled": True,
+        }
+        self.assertEqual(parse_feed(payload, source), [])
+
 if __name__ == "__main__":
     unittest.main()

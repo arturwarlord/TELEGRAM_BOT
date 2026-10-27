@@ -338,20 +338,44 @@
       "type": "html",
       "url": "https://www.detmir.ru/catalog/index/name/rasprodazha_dm_rf/",
       "store": "Детский мир",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "Diagnostic parsing of this sale landing page produced a single implausible 100% offer from combined page prices; keep disabled until product cards are isolated."
     },
     {
       "name": "Четыре Лапы — товары недели со скидкой",
       "type": "html",
       "url": "https://4lapy.ru/shares/tovar-nedeli/",
       "store": "Четыре Лапы",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "The weekly-deals page combines prices from multiple products in broad containers. The current parser produced implausible price pairs; keep disabled until the site's product-card structure is parsed specifically."
     },
     {
       "name": "Лемана ПРО — товары и акции",
       "type": "html",
       "url": "https://lemanapro.ru/promo/",
       "store": "Лемана ПРО",
+      "enabled": false,
+      "disabled_reason": "The official promo page returned HTTP 403 from GitHub Actions. No access controls are being bypassed."
+    },
+    {
+      "name": "Азбука Вкуса — товары со скидками",
+      "type": "html",
+      "url": "https://av.ru/discount",
+      "store": "Азбука Вкуса",
+      "enabled": true
+    },
+    {
+      "name": "Верный — каталог товаров",
+      "type": "html",
+      "url": "https://www.verno-info.ru/products",
+      "store": "Верный",
+      "enabled": true
+    },
+    {
+      "name": "Ашан — каталог товаров и скидок",
+      "type": "html",
+      "url": "https://www.auchan.ru/",
+      "store": "Ашан",
       "enabled": true
     }
   ]
