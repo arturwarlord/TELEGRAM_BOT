@@ -245,6 +245,14 @@
       "type": "html_promos",
       "url": "https://promokong.ru/besplatnaya-dostavka",
       "store": "PromoKong — бесплатная доставка",
+      "enabled": false,
+      "disabled_reason": "Public page is reachable but the production parser extracts 0 usable offers from this category page."
+    },
+    {
+      "name": "Фонтанка — каталог промокодов магазинов",
+      "type": "html_promos",
+      "url": "https://www.fontanka.ru/kupony/shop/",
+      "store": "Фонтанка — промокоды",
       "enabled": true
     }
   ]
