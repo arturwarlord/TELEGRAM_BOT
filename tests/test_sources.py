@@ -508,12 +508,12 @@ class FeedParserTests(unittest.TestCase):
         <html><body>
           <main>
             <div class="sale-list">
-              <span>Скидка до 20% на товары недели</span>
               <div class="product-card">
                 <a href="/product/miska">
                   <img src="/images/miska.jpg" alt="Миска для животных">
                 </a>
-                <a href="/product/miska">Миска для животных -86%</a>
+                <a href="/product/miska">Миска для животных</a>
+                <span>Скидка до 20% · -20%</span>
                 <span>819 ₽ 5 697 ₽</span>
               </div>
             </div>
