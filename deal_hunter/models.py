@@ -102,6 +102,7 @@ class Deal:
     legal_text: str = ""
     reported_discount_percent: float | None = None
     discount_is_maximum: bool = False
+    offer_type: str | None = None
 
     @property
     def savings(self) -> float | None:

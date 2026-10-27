@@ -35,6 +35,9 @@ def inspect_source(source: dict) -> None:
     name = str(source.get("name") or "unnamed")
     url = str(source.get("url") or "")
     print(f"\n===== {name} =====", flush=True)
+    if source.get("type") == "aviasales_api":
+        print("[API SOURCE] Requires AVIASALES_API_TOKEN; actual ticket-price API is checked by the Deal Hunter scan.")
+        return
     request = urllib.request.Request(
         url,
         headers={

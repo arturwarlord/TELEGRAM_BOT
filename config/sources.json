@@ -380,6 +380,192 @@
       "store": "Ашан",
       "enabled": false,
       "disabled_reason": "The official homepage returned HTTP 401 from GitHub Actions. No access controls are being bypassed."
+    },
+    {
+      "name": "Aviasales API — билеты из Москва",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "MOW",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Санкт-Петербург",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "LED",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Казань",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "KZN",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Екатеринбург",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "SVX",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Новосибирск",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "OVB",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Сочи",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "AER",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Ташкент",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "TAS",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Алматы",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "ALA",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Баку",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "GYD",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Travelata — горящие туры",
+      "type": "html_promos",
+      "url": "https://travelata.ru/tury",
+      "store": "Travelata",
+      "enabled": true,
+      "note": "Keep enabled only if production diagnostics returns specific current offer cards."
+    },
+    {
+      "name": "Tourdom — спецпредложения и обзор цен",
+      "type": "html_promos",
+      "url": "https://www.tourdom.ru/",
+      "store": "Tourdom",
+      "enabled": true,
+      "note": "Keep enabled only if production diagnostics returns specific current offer cards."
+    },
+    {
+      "name": "Coral Travel — акции и спецпредложения",
+      "type": "html_promos",
+      "url": "https://www.coral.ru/poleznaya-informatsiya/offers/",
+      "store": "Coral Travel",
+      "enabled": true,
+      "note": "Keep enabled only if production diagnostics returns specific current offer cards."
+    },
+    {
+      "name": "Level.Travel — туры и скидки",
+      "type": "html_promos",
+      "url": "https://level.travel/",
+      "store": "Level.Travel",
+      "enabled": true,
+      "note": "Keep enabled only if production diagnostics returns specific current offer cards."
+    },
+    {
+      "name": "OnlineTours — туры и акции",
+      "type": "html_promos",
+      "url": "https://www.onlinetours.ru/",
+      "store": "OnlineTours",
+      "enabled": true,
+      "note": "Keep enabled only if production diagnostics returns specific current offer cards."
+    },
+    {
+      "name": "FUN&SUN — туры и спецпредложения",
+      "type": "html_promos",
+      "url": "https://fstravel.com/",
+      "store": "FUN&SUN",
+      "enabled": true,
+      "note": "Keep enabled only if production diagnostics returns specific current offer cards."
+    },
+    {
+      "name": "Anex Tour — туры и акции",
+      "type": "html_promos",
+      "url": "https://anextour.com/",
+      "store": "Anex Tour",
+      "enabled": true,
+      "note": "Keep enabled only if production diagnostics returns specific current offer cards."
+    },
+    {
+      "name": "TEZ TOUR — туры и акции",
+      "type": "html_promos",
+      "url": "https://www.tez-tour.com/",
+      "store": "TEZ TOUR",
+      "enabled": true,
+      "note": "Keep enabled only if production diagnostics returns specific current offer cards."
+    },
+    {
+      "name": "Pegas Touristik — туры и предложения",
+      "type": "html_promos",
+      "url": "https://pegast.ru/",
+      "store": "Pegas Touristik",
+      "enabled": true,
+      "note": "Keep enabled only if production diagnostics returns specific current offer cards."
+    },
+    {
+      "name": "Sunmar — туры и акции",
+      "type": "html_promos",
+      "url": "https://www.sunmar.ru/",
+      "store": "Sunmar",
+      "enabled": true,
+      "note": "Keep enabled only if production diagnostics returns specific current offer cards."
+    },
+    {
+      "name": "Интурист — туры и предложения",
+      "type": "html_promos",
+      "url": "https://intourist.ru/",
+      "store": "Интурист",
+      "enabled": true,
+      "note": "Keep enabled only if production diagnostics returns specific current offer cards."
+    },
+    {
+      "name": "Tutu — путешествия и предложения",
+      "type": "html_promos",
+      "url": "https://www.tutu.ru/",
+      "store": "Tutu",
+      "enabled": true,
+      "note": "Keep enabled only if production diagnostics returns specific current offer cards."
     }
   ]
 }

@@ -114,7 +114,23 @@ def format_caption(deal: Deal, decision: DealDecision, ad_notice: str) -> str:
         if len(deal.title) > title_limit:
             title += "…"
 
-        if coupon_only:
+        if deal.offer_type == "flight":
+            parts = [
+                "✈️ <b>ВЫГОДНЫЕ АВИАБИЛЕТЫ</b>", "",
+                f"<b>{html.escape(title)}</b>", "",
+                f"💳 Цена в предложении: <b>{_rubles(deal.price)}</b>",
+            ]
+            if include_description and deal.description:
+                description = deal.description[:320].strip()
+                if description:
+                    parts.extend(["", html.escape(description)])
+            if include_expiry and deal.expires_at:
+                parts.append(f"⏱ Срок цены в источнике: {html.escape(deal.expires_at[:60])}")
+            parts.extend([
+                "", "Цена и наличие могут измениться — проверьте итоговую стоимость на Aviasales.",
+                f"🔎 Источник: {html.escape(deal.store[:80])}",
+            ])
+        elif coupon_only:
             if discount is not None and deal.discount_is_maximum:
                 headline = f"🎟 <b>АКЦИЯ: скидка до {discount:.0f}%</b>"
             elif discount is not None:
@@ -191,7 +207,7 @@ class TelegramPublisher:
             raise ValueError("A post disclosure/notice is required before publication")
 
         caption = format_caption(deal, decision, ad_notice)
-        button_text = "🛍 Открыть предложение" if allow_direct_link else "🔥 Забрать скидку"
+        button_text = "✈️ Проверить билет" if deal.offer_type == "flight" else ("🛍 Открыть предложение" if allow_direct_link else "🔥 Забрать скидку")
 
         # Download the image in the Actions runner and upload its bytes. This avoids
         # Telegram's remote-image fetch failing on hotlink protection or CDN rules.

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 from datetime import date
 import urllib.error
@@ -500,6 +501,8 @@ def parse_feed(payload: bytes, source: dict[str, Any], max_items: int = 200) -> 
     feed_type = str(source.get("type", "rss")).lower()
     records: list[Any]
 
+    if feed_type == "aviasales_api":
+        return parse_aviasales_payload(payload, source, max_items=max_items)
     if feed_type == "html":
         return parse_html_catalog(payload, source, max_items=max_items)
     if feed_type in {"html_promos", "html-coupons"}:
@@ -540,6 +543,88 @@ def parse_feed(payload: bytes, source: dict[str, Any], max_items: int = 200) -> 
     return deals
 
 
+
+def parse_aviasales_payload(payload: bytes, source: dict[str, Any], max_items: int = 200) -> list[Deal]:
+    """Parse Aviasales special offers without inventing an old price or discount percent."""
+    decoded = json.loads(payload.decode("utf-8-sig"))
+    if not isinstance(decoded, dict) or decoded.get("success") is not True:
+        detail = decoded.get("error") if isinstance(decoded, dict) else "unexpected response"
+        raise ValueError(f"Aviasales API did not return success=true: {detail or 'unknown API error'}")
+    raw_records = decoded.get("data")
+    if not isinstance(raw_records, list):
+        return []
+    currency = clean_text(decoded.get("currency") or "RUB", 12).upper()
+    if currency not in {"RUB", "RUR", "₽"}:
+        return []
+
+    deals: list[Deal] = []
+    seen: set[str] = set()
+    today = datetime.now(timezone.utc).date()
+    for item in raw_records[:max(1, max_items)]:
+        if not isinstance(item, dict):
+            continue
+        price = parse_price(item.get("price"))
+        if price is None:
+            continue
+        departure = clean_text(item.get("departure_at"), 80)
+        if departure:
+            try:
+                departure_date = datetime.fromisoformat(departure.replace("Z", "+00:00")).date()
+                if departure_date < today:
+                    continue
+            except ValueError:
+                pass
+        api_link = clean_text(item.get("link"), 1200)
+        if not api_link:
+            continue
+        if api_link.startswith(("https://", "http://")):
+            parsed_link = urlsplit(api_link)
+            if (parsed_link.hostname or "").lower() not in {"aviasales.ru", "www.aviasales.ru"}:
+                continue
+            product_url = api_link
+        else:
+            product_url = "https://www.aviasales.ru/search/" + api_link.lstrip("/")
+
+        origin_name = clean_text(item.get("origin_name") or item.get("origin") or source.get("origin"), 100)
+        destination_name = clean_text(item.get("destination_name") or item.get("destination") or source.get("destination"), 100)
+        title = clean_text(item.get("title") or item.get("mini_title"), 240)
+        if not title or title.casefold() in {"hot tickets", "flight deals", "горячие билеты", "спецпредложения"}:
+            title = "Авиабилеты: " + (origin_name or "вылет") + " → " + (destination_name or "направление")
+        elif origin_name and destination_name and not any(word in title.casefold() for word in (origin_name.casefold(), destination_name.casefold())):
+            title = f"{title}: {origin_name} → {destination_name}"[:240]
+
+        airline_code = clean_text(item.get("airline"), 8).upper()
+        airline_name = clean_text(item.get("airline_title") or airline_code or "Aviasales", 100)
+        image_url = f"https://pics.avs.io/340/100/{airline_code}.png" if re.fullmatch(r"[A-Z0-9]{2}", airline_code) else None
+        return_at = clean_text(item.get("return_at"), 80)
+        description_parts = []
+        if airline_name:
+            description_parts.append(f"Авиакомпания: {airline_name}")
+        if departure:
+            description_parts.append(f"Вылет: {departure[:10]}")
+        if return_at:
+            description_parts.append(f"Обратно: {return_at[:10]}")
+        duration = item.get("duration")
+        if isinstance(duration, (int, float)) and duration > 0:
+            hours, minutes = divmod(int(duration), 60)
+            duration_text = f"{hours} ч {minutes} мин" if hours else f"{minutes} мин"
+            description_parts.append(f"Время в пути: {duration_text}")
+        description_parts.append("Цена ориентировочная: перед покупкой проверьте актуальную стоимость на Aviasales.")
+        expiry = clean_text(item.get("expires_at"), 80) or None
+        external_id = clean_text(item.get("search_id") or item.get("signature"), 180) or None
+        deal = Deal(
+            title=title, product_url=product_url, store="Aviasales",
+            source=str(source.get("name") or "Aviasales Data API"), price=price,
+            old_price=None, affiliate_url=None, image_url=image_url, currency="RUB",
+            description=" · ".join(description_parts), expires_at=expiry,
+            external_id=external_id, offer_type="flight",
+        )
+        if deal.key not in seen:
+            deals.append(deal)
+            seen.add(deal.key)
+    return deals
+
+
 def fetch_source(
     source: dict[str, Any],
     timeout: int = 20,
@@ -551,6 +636,32 @@ def fetch_source(
         raise ValueError(f"Source '{source.get('name', 'unnamed')}' has an invalid URL")
     if source.get("enabled") is not True:
         return []
+
+    if str(source.get("type", "")).lower() == "aviasales_api":
+        token = os.getenv("AVIASALES_API_TOKEN", "").strip()
+        if not token:
+            raise RuntimeError("AVIASALES_API_TOKEN secret is missing")
+        parsed_source_url = urlsplit(url)
+        if parsed_source_url.hostname != "api.travelpayouts.com":
+            raise ValueError("Aviasales API source must use api.travelpayouts.com")
+        params = {"locale": "ru", "currency": "rub", "market": str(source.get("market") or "ru")}
+        for key in ("origin", "destination", "airline"):
+            value = str(source.get(key) or "").strip()
+            if value:
+                params[key] = value.upper()
+        api_url = url.split("?", 1)[0] + "?" + urlencode(params)
+        request = urllib.request.Request(api_url, headers={
+            "User-Agent": "DealHunterBot/0.1 (+public deal page reader)",
+            "Accept": "application/json", "X-Access-Token": token,
+        })
+        try:
+            with urllib.request.urlopen(request, timeout=timeout) as response:
+                payload = response.read(max_bytes + 1)
+        except (urllib.error.URLError, TimeoutError) as exc:
+            raise RuntimeError(f"Could not fetch Aviasales API source '{source.get('name', 'unnamed')}': {exc}") from exc
+        if len(payload) > max_bytes:
+            raise ValueError(f"Aviasales API response exceeded the {max_bytes}-byte limit")
+        return parse_aviasales_payload(payload, source, max_items=max_items)
 
     request = urllib.request.Request(
         url,
@@ -569,7 +680,7 @@ def fetch_source(
     return parse_feed(payload, source, max_items=max_items)
 
 from html.parser import HTMLParser
-from urllib.parse import urljoin, urlsplit
+from urllib.parse import urlencode, urljoin, urlsplit
 
 
 class _HtmlNode:

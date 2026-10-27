@@ -66,6 +66,16 @@ class DealScoringTests(unittest.TestCase):
 
 
 
+    def test_accepts_flight_ticket_without_fabricating_discount(self):
+        deal = self.make_deal(price=14500, old_price=None, affiliate_url=None,
+                              reported_discount_percent=None, offer_type="flight")
+        decision = evaluate_deal(deal, require_affiliate=False, require_image=True)
+        self.assertTrue(decision.eligible)
+        self.assertEqual(decision.reason, "eligible flight ticket")
+        self.assertIsNone(decision.discount_percent)
+        self.assertIsNone(decision.savings)
+        self.assertGreater(decision.score, 0)
+
     def test_accepts_explicit_coupon_without_fabricating_prices(self):
         deal = self.make_deal(
             price=None,

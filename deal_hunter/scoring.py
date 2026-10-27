@@ -57,6 +57,17 @@ def evaluate_deal(
     if expiry and expiry < current_time.astimezone(timezone.utc):
         return DealDecision(False, "offer expired")
 
+    if deal.offer_type == "flight":
+        if deal.price is None or deal.price <= 0:
+            return DealDecision(False, "flight offer has no valid price")
+        if require_affiliate and not is_http_url(deal.affiliate_url):
+            return DealDecision(False, "missing approved affiliate URL")
+        if require_image and not is_http_url(deal.image_url):
+            return DealDecision(False, "missing airline image URL")
+        # These are special fares; rank by ticket price without inventing a discount.
+        score = max(1.0, 100.0 - min(deal.price, 49_500.0) / 500.0)
+        return DealDecision(True, "eligible flight ticket", None, None, score)
+
     has_price_pair = deal.price is not None and deal.old_price is not None
     if not has_price_pair and (deal.price is not None or deal.old_price is not None):
         # Keep the specific diagnostic for an incomplete price comparison unless

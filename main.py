@@ -109,7 +109,7 @@ def choose_best_duplicates(deals: list[Deal]) -> list[Deal]:
     coupon_groups: dict[tuple[str, int | None], list[Deal]] = {}
     non_coupon: list[Deal] = []
     for deal in unique:
-        is_coupon_only = deal.price is None or deal.old_price is None
+        is_coupon_only = (deal.price is None or deal.old_price is None) and deal.offer_type != "flight"
         brand_key = _coupon_brand_key(deal)
         if not is_coupon_only or not brand_key:
             non_coupon.append(deal)
@@ -147,6 +147,8 @@ def choose_best_duplicates(deals: list[Deal]) -> list[Deal]:
 def _rank_evaluated_deal(pair: tuple[Deal, DealDecision]) -> float:
     """Prefer actionable deals over broad 'up to' headlines and loyalty-point teasers."""
     deal, decision = pair
+    if deal.offer_type == "flight":
+        return decision.score
     score = decision.score
     has_price_pair = deal.price is not None and deal.old_price is not None
 
@@ -240,6 +242,9 @@ def main() -> int:
 
     for source in sources:
         name = str(source.get("name") or "unnamed")
+        if source.get("type") == "aviasales_api" and not os.getenv("AVIASALES_API_TOKEN", "").strip():
+            print(f"[NEEDS TOKEN] {name}: add the AVIASALES_API_TOKEN GitHub Actions secret to activate flight prices.")
+            continue
         try:
             items = fetch_source(source, timeout=timeout, max_bytes=max_bytes, max_items=max_items)
             successful_sources += 1
@@ -286,7 +291,11 @@ def main() -> int:
             has_link = "yes" if deal.affiliate_url else "NO"
             has_image = "yes" if deal.image_url else "NO"
             commission_text = f"{deal.commission:g}" if deal.commission is not None else "n/a"
-            if deal.price is not None and deal.old_price is not None and decision.discount_percent is not None:
+            if deal.offer_type == "flight":
+                offer_summary = f"✈️ ticket {format_rub(deal.price)}"
+                if deal.description:
+                    offer_summary += " | " + deal.description[:120]
+            elif deal.price is not None and deal.old_price is not None and decision.discount_percent is not None:
                 offer_summary = (
                     f"-{decision.discount_percent:.1f}% | {format_rub(deal.price)} instead of "
                     f"{format_rub(deal.old_price)} | saved {format_rub(decision.savings)}"

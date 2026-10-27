@@ -5,7 +5,7 @@ import unittest
 from datetime import date
 from pathlib import Path
 
-from deal_hunter.sources import _extract_promo_expiry, parse_feed
+from deal_hunter.sources import _extract_promo_expiry, parse_aviasales_payload, parse_feed
 
 
 FIXTURE = Path(__file__).parent / "fixtures" / "sample_feed.xml"
@@ -303,6 +303,41 @@ class FeedParserTests(unittest.TestCase):
             _extract_promo_expiry("Акция действует до 20 октября", today=date(2026, 10, 27)),
             "2026-10-20",
         )
+
+    def test_parses_aviasales_special_offer_as_ticket_without_fabricating_discount(self):
+        payload = json.dumps({
+            "success": True, "currency": "rub",
+            "data": [{
+                "title": "Билет из Москвы в Стамбул", "mini_title": "Горячие билеты",
+                "airline": "SU", "airline_title": "Аэрофлот",
+                "origin": "MOW", "origin_name": "Москва",
+                "destination": "IST", "destination_name": "Стамбул",
+                "price": 14500, "departure_at": "2099-01-15T10:30:00+03:00",
+                "return_at": "2099-01-22T19:00:00+03:00", "duration": 250,
+                "link": "/MOW1501IST1", "search_id": "ticket-search-1",
+            }], "error": None,
+        }).encode("utf-8")
+        deals = parse_aviasales_payload(payload, {
+            "name": "Aviasales — тест", "type": "aviasales_api",
+            "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+            "origin": "MOW", "enabled": True,
+        })
+        self.assertEqual(len(deals), 1)
+        deal = deals[0]
+        self.assertEqual(deal.offer_type, "flight")
+        self.assertEqual(deal.price, 14500)
+        self.assertIsNone(deal.old_price)
+        self.assertIsNone(deal.discount_percent)
+        self.assertEqual(deal.product_url, "https://www.aviasales.ru/search/MOW1501IST1")
+        self.assertEqual(deal.image_url, "https://pics.avs.io/340/100/SU.png")
+        self.assertIn("Вылет: 2099-01-15", deal.description)
+
+    def test_aviasales_parser_rejects_non_aviasales_absolute_links(self):
+        payload = json.dumps({"success": True, "currency": "rub", "data": [{
+            "title": "Ticket", "airline": "SU", "price": 14500,
+            "link": "https://evil.example/collect", "departure_at": "2099-01-15T10:30:00Z",
+        }]}).encode("utf-8")
+        self.assertEqual(parse_aviasales_payload(payload, {"name": "test", "type": "aviasales_api"}), [])
 
     def test_html_promo_description_excludes_tracking_and_erid_footer(self):
         payload = """
