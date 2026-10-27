@@ -127,11 +127,10 @@
     },
     {
       "name": "О’КЕЙ — каталоги и акции",
-      "type": "html_promos",
-      "url": "https://www.okmarket.ru/products/",
+      "type": "html",
+      "url": "https://www.okmarket.ru/",
       "store": "О’КЕЙ",
-      "enabled": false,
-      "disabled_reason": "Public GitHub Actions request currently returns HTTP 403. Not bypassing access controls."
+      "enabled": true
     },
     {
       "name": "ПромКод.ру — промокоды и распродажи",
@@ -168,6 +167,55 @@
       "type": "html_promos",
       "url": "https://socialkod.ru/",
       "store": "SocialKod",
+      "enabled": true
+    },
+    {
+      "name": "О Скидках — каталог промокодов",
+      "type": "html_promos",
+      "url": "https://oskidkah.ru/",
+      "store": "О Скидках",
+      "enabled": true
+    },
+    {
+      "name": "Промокоды Яндекса — магазин и сервисы",
+      "type": "html_promos",
+      "url": "https://promocodes.yandex.ru/",
+      "store": "Промокоды Яндекса",
+      "enabled": true
+    },
+    {
+      "name": "PromoKong — промокоды и купоны",
+      "type": "html_promos",
+      "url": "https://promokong.ru/",
+      "store": "PromoKong",
+      "enabled": true
+    },
+    {
+      "name": "Промокоды на — каталог скидок",
+      "type": "html_promos",
+      "url": "https://promokodi-na.ru/",
+      "store": "Промокоды на",
+      "enabled": true
+    },
+    {
+      "name": "SmartSalee — скидки на товары и услуги",
+      "type": "html_promos",
+      "url": "https://smartsalee.ru/",
+      "store": "SmartSalee",
+      "enabled": true
+    },
+    {
+      "name": "МегаФон — официальные акции",
+      "type": "html_promos",
+      "url": "https://shop.megafon.ru/actions",
+      "store": "МегаФон",
+      "enabled": true
+    },
+    {
+      "name": "DNS — официальные предложения",
+      "type": "html_promos",
+      "url": "https://www.dns-shop.ru/actions/",
+      "store": "DNS",
       "enabled": true
     }
   ]
