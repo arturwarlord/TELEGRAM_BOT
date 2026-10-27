@@ -144,6 +144,29 @@ def choose_best_duplicates(deals: list[Deal]) -> list[Deal]:
     return non_coupon + deduped_coupons
 
 
+def _rank_evaluated_deal(pair: tuple[Deal, DealDecision]) -> float:
+    """Prefer actionable deals over broad 'up to' headlines and loyalty-point teasers."""
+    deal, decision = pair
+    score = decision.score
+    has_price_pair = deal.price is not None and deal.old_price is not None
+
+    if has_price_pair:
+        score += 35.0
+    if deal.promo_code:
+        score += 15.0
+    if deal.discount_is_maximum:
+        score -= 25.0
+    if not has_price_pair and not deal.promo_code:
+        score -= 12.0
+
+    title = deal.title.casefold()
+    if any(word in title for word in ("балл", "бонус", "кэшбэк", "кешбэк", "вау")) and not has_price_pair:
+        score -= 25.0
+    if deal.expires_at:
+        score += 3.0
+    return score
+
+
 def main() -> int:
     source_config_path = Path(os.getenv("SOURCE_CONFIG_PATH", "config/sources.json"))
     if not source_config_path.is_absolute():
@@ -244,7 +267,7 @@ def main() -> int:
         else:
             rejection_reasons[decision.reason] += 1
 
-    evaluated.sort(key=lambda pair: pair[1].score, reverse=True)
+    evaluated.sort(key=_rank_evaluated_deal, reverse=True)
     print(f"Deals passing price/expiry filters: {len(evaluated)}")
     if rejection_reasons:
         reasons = ", ".join(f"{reason}: {count}" for reason, count in rejection_reasons.most_common(8))
