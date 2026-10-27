@@ -5,7 +5,7 @@ import unittest
 from datetime import date
 from pathlib import Path
 
-from deal_hunter.sources import _extract_promo_expiry, parse_aviasales_payload, parse_feed
+from deal_hunter.sources import _decode_html_payload, _extract_promo_expiry, parse_aviasales_payload, parse_feed
 
 
 FIXTURE = Path(__file__).parent / "fixtures" / "sample_feed.xml"
@@ -75,6 +75,28 @@ class FeedParserTests(unittest.TestCase):
         self.assertEqual(deals, [])
 
 
+
+    def test_html_promotions_support_windows_1251_pages(self):
+        html = '''
+        <html><head><meta charset="windows-1251"></head><body>
+          <article>
+            <h3><a href="/promo/hotel">Скидка 25% на отель</a></h3>
+            <img src="/images/hotel.jpg" alt="Отель">
+            <p>Скидка 25% на бронирование отеля.</p>
+          </article>
+        </body></html>
+        '''
+        payload = html.encode("cp1251")
+        self.assertIn("Скидка 25%", _decode_html_payload(payload))
+        deals = parse_feed(payload, {
+            "name": "test-windows-1251",
+            "type": "html_promos",
+            "url": "https://coupon.example.test/catalog",
+            "store": "Test Coupon",
+            "enabled": True,
+        })
+        self.assertTrue(any("Скидка 25% на отель" in deal.title for deal in deals))
+        self.assertTrue(any(deal.image_url and deal.product_url.endswith("/promo/hotel") for deal in deals))
 
     def test_parses_public_html_retailer_card_with_old_and_current_prices(self):
         payload = """
