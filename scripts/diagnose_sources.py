@@ -159,6 +159,21 @@ def inspect_source(source: dict) -> None:
                 print(f"    first_link={links[0][0][:180]!r} label={links[0][1][:100]!r}")
             if images:
                 print(f"    first_image={images[0][:180]!r}")
+            ancestor = node.parent
+            depth = 1
+            while ancestor is not None and depth <= 3:
+                ancestor_text = text_by_id.get(id(ancestor), "")
+                ancestor_links = _html_links(ancestor, url)
+                ancestor_images = _html_images(ancestor, url)
+                print(
+                    f"    [ANCESTOR {depth}] tag={ancestor.tag} id={ancestor.attrs.get('id', '')!r} "
+                    f"class={ancestor.attrs.get('class', '')[:100]!r} "
+                    f"text={ancestor_text[:180]!r} links={len(ancestor_links)} images={len(ancestor_images)}"
+                )
+                if ancestor_links:
+                    print(f"      ancestor_link={ancestor_links[0][0][:180]!r} label={ancestor_links[0][1][:100]!r}")
+                ancestor = ancestor.parent
+                depth += 1
 
 
 def main() -> int:
