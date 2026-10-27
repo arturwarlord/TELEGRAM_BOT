@@ -155,7 +155,7 @@ def _rank_evaluated_deal(pair: tuple[Deal, DealDecision]) -> float:
     if deal.promo_code:
         score += 12.0
     if deal.discount_is_maximum:
-        score -= 45.0
+        score -= 70.0
     if not has_price_pair and not deal.promo_code:
         score -= 12.0
 
