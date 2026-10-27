@@ -67,8 +67,8 @@ jobs:
           python-version: "3.11"
       - name: Scan configured feeds
         run: python main.py
-      - name: Persist publication state
-        if: success() && env.PUBLISH_ENABLED == 'true' && env.DRY_RUN == 'false'
+      - name: Persist publication state, including partial publish successes
+        if: always() && env.PUBLISH_ENABLED == 'true' && env.DRY_RUN == 'false'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
