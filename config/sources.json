@@ -1395,9 +1395,7 @@
       "type": "html_promos",
       "url": "https://www.picodi.com/ru/top",
       "store": "Picodi",
-      "enabled": false,
-      "disabled_reason": "Read-only candidate: the current parser finds no usable offer cards; inspect visible card links/images before considering activation.",
-      "diagnostic": true,
+      "enabled": true,
       "fallback_to_source_page": true,
       "excluded_offer_keywords": [
         "кредит",
@@ -1407,7 +1405,12 @@
         "мфо",
         "казино",
         "букмекер",
-        "ставки"
+        "ставки",
+        "лотерея",
+        "loan",
+        "credit",
+        "casino",
+        "betting"
       ]
     },
     {
