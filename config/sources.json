@@ -1412,8 +1412,7 @@
       "url": "https://goodcoupon.ru/promokod-category/puteshestvia-turizm",
       "store": "GoodCoupon путешествия",
       "enabled": false,
-      "diagnostic": true,
-      "disabled_reason": "Candidate: travel category; run read-only diagnostics first, then enable if specific current offers parse cleanly."
+      "disabled_reason": "Latest runner response is a KillBot verification page; no access-control bypass attempted."
     },
     {
       "name": "Промокодик — каталог промокодов и скидок",
@@ -1436,8 +1435,7 @@
       "url": "https://www.kuponika.ru/coupons/otdyh-vse-vklyucheno/",
       "store": "Купоника",
       "enabled": false,
-      "diagnostic": true,
-      "disabled_reason": "Candidate: validate product-card prices and link quality with read-only diagnostics before enabling."
+      "disabled_reason": "Windows-1251 charset decoding is now supported, but the production parser still extracts 0 actionable cards; keep off until a specific-card parser is added."
     },
     {
       "name": "Авиасейлс — дешёвые выходные (публичная страница)",
@@ -1445,8 +1443,69 @@
       "url": "https://aviasales.ru/weekends",
       "store": "Aviasales",
       "enabled": false,
+      "disabled_reason": "The public page is readable but yields 0 structured offer cards to the production parser; current Aviasales Data API is the intended ticket source."
+    },
+    {
+      "name": "Т-Путешествия — промокоды на отели",
+      "type": "html_promos",
+      "url": "https://www.tbank.ru/travel/promo/hotels/",
+      "store": "Т-Путешествия",
+      "enabled": false,
       "diagnostic": true,
-      "disabled_reason": "Candidate: validate public page parsing; API-based ticket prices remain the preferred route."
+      "required_title_keywords": [
+        "скидк",
+        "промокод",
+        "отел"
+      ],
+      "disabled_reason": "Candidate official travel promotion page; keep disabled until read-only diagnostics confirms specific current offer cards."
+    },
+    {
+      "name": "Т-Путешествия — блог промокодов для поездок",
+      "type": "html_promos",
+      "url": "https://www.tbank.ru/travel/blog/promocode-travel/",
+      "store": "Т-Путешествия",
+      "enabled": false,
+      "diagnostic": true,
+      "required_title_keywords": [
+        "промокод",
+        "скидк",
+        "билет",
+        "отел",
+        "тур"
+      ],
+      "disabled_reason": "Candidate official travel promo article; enable only after the production parser extracts current, actionable offers."
+    },
+    {
+      "name": "Т-Путешествия — авиабилеты",
+      "type": "html_promos",
+      "url": "https://www.tbank.ru/travel/flights/",
+      "store": "Т-Путешествия",
+      "enabled": false,
+      "diagnostic": true,
+      "required_title_keywords": [
+        "скидк",
+        "промокод",
+        "авиа",
+        "билет"
+      ],
+      "disabled_reason": "Candidate official flights page; check whether it exposes concrete offers rather than dynamic search UI."
+    },
+    {
+      "name": "Т-Путешествия — все виды поездок",
+      "type": "html_promos",
+      "url": "https://www.tbank.ru/travel/",
+      "store": "Т-Путешествия",
+      "enabled": false,
+      "diagnostic": true,
+      "required_title_keywords": [
+        "скидк",
+        "промокод",
+        "авиа",
+        "билет",
+        "отел",
+        "тур"
+      ],
+      "disabled_reason": "Candidate official travel homepage; enable only if current offers and direct public offer links are extracted."
     }
   ]
 }
