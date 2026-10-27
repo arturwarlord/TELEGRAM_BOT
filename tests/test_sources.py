@@ -427,6 +427,35 @@ class FeedParserTests(unittest.TestCase):
         self.assertEqual(len(deals), 1)
         self.assertIn("Победа", deals[0].title)
 
+    def test_html_promotions_fallback_filters_excluded_offer_keywords(self):
+        payload = '''
+        <html><body>
+          <article id="card-travel">
+            <h3>Путешествие: скидка 20% на отель</h3>
+            <img src="https://img.example.test/travel.jpg" alt="Отель">
+            <p>Промо на бронирование отеля в поездке.</p>
+          </article>
+          <article id="card-loan">
+            <h3>Кредит онлайн: скидка 30% на проценты</h3>
+            <img src="https://img.example.test/loan.jpg" alt="Кредит">
+            <p>Специальное предложение по кредиту.</p>
+          </article>
+        </body></html>
+        '''.encode("utf-8")
+        source = {
+            "name": "test-picodi-style-source",
+            "type": "html_promos",
+            "url": "https://coupon.example.test/top",
+            "store": "Test",
+            "enabled": True,
+            "fallback_to_source_page": True,
+            "excluded_offer_keywords": ["кредит", "займ"],
+        }
+        deals = parse_feed(payload, source)
+        self.assertEqual(len(deals), 1)
+        self.assertIn("Путешествие", deals[0].title)
+        self.assertTrue(deals[0].product_url.endswith("#card-travel"))
+
     def test_promo_expiry_parser_accepts_colon_after_do(self):
         self.assertEqual(
             _extract_promo_expiry("Акция активна до: 31.10.2026", today=date(2026, 10, 27)),
