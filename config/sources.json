@@ -49,18 +49,16 @@
     {
       "name": "Перекрёсток — товары со скидками",
       "type": "html",
-      "url": "https://www.perekrestok.ru/cat/promo/1",
+      "url": "https://www.perekrestok.ru/promotions",
       "store": "Перекрёсток",
-      "enabled": false,
-      "disabled_reason": "Public GitHub Actions request currently returns HTTP 403. Not bypassing access controls."
+      "enabled": true
     },
     {
       "name": "METRO Онлайн — товары со скидками",
       "type": "html",
-      "url": "https://online.metro-cc.ru/category/virtual",
+      "url": "https://online.metro-cc.ru/category",
       "store": "METRO Онлайн",
-      "enabled": false,
-      "disabled_reason": "Public page redirects (HTTP 307) in the automation runner; source needs a stable public endpoint."
+      "enabled": true
     },
     {
       "name": "Спортмастер — каталог распродажи",
@@ -88,11 +86,10 @@
     },
     {
       "name": "Лента — акции и скидки",
-      "type": "html_promos",
-      "url": "https://lenta.com/action/",
+      "type": "html",
+      "url": "https://lenta.com/catalog/osobenno-vygodno-1893/",
       "store": "Лента",
-      "enabled": false,
-      "disabled_reason": "Public GitHub Actions request currently returns HTTP 401. Not bypassing access controls."
+      "enabled": true
     },
     {
       "name": "Ситилинк — акции на электронику",
@@ -128,10 +125,9 @@
     {
       "name": "О’КЕЙ — каталоги и акции",
       "type": "html",
-      "url": "https://www.okmarket.ru/",
+      "url": "https://www.okmarket.ru/catalogs/filter/price-from-6-to-25999/",
       "store": "О’КЕЙ",
-      "enabled": false,
-      "disabled_reason": "Checked the public homepage from GitHub Actions; request returned HTTP 403. Keep disabled until the source offers a supported feed or stable public access."
+      "enabled": true
     },
     {
       "name": "ПромКод.ру — промокоды и распродажи",
@@ -317,6 +313,20 @@
       "store": "Купер",
       "enabled": false,
       "disabled_reason": "The public category catalogue returned HTTP 403 from GitHub Actions. No access controls are being bypassed."
+    },
+    {
+      "name": "Магнит — каталог товаров со скидками",
+      "type": "html",
+      "url": "https://magnit.ru/",
+      "store": "Магнит",
+      "enabled": true
+    },
+    {
+      "name": "Магнит — официальные промокоды",
+      "type": "html_promos",
+      "url": "https://promo.magnit.ru/",
+      "store": "Магнит",
+      "enabled": true
     }
   ]
 }
