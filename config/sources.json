@@ -737,7 +737,7 @@
       "type": "html_promos",
       "url": "https://promokodoff.ru/travel/",
       "store": "ПромокодОфф — путешествия",
-      "enabled": true,
+      "enabled": false,
       "fallback_to_source_page": true,
       "required_title_keywords": [
         "авиабилет",
@@ -781,14 +781,15 @@
         "жиль",
         "билет на самолет"
       ],
-      "note": "Travel-specific promo candidate. Only card titles/descriptions matching travel keywords are accepted; known-expired offers are rejected."
+      "note": "Travel-specific promo candidate. Only card titles/descriptions matching travel keywords are accepted; known-expired offers are rejected.",
+      "disabled_reason": "HTTP 403 from GitHub Actions on the latest read-only diagnostics; kept off until a stable public page is available."
     },
     {
       "name": "ПромокодОфф — промокоды на туры",
       "type": "html_promos",
       "url": "https://promokodoff.ru/travel/tours/",
       "store": "ПромокодОфф — туры",
-      "enabled": true,
+      "enabled": false,
       "fallback_to_source_page": true,
       "required_title_keywords": [
         "авиабилет",
@@ -832,14 +833,15 @@
         "жиль",
         "билет на самолет"
       ],
-      "note": "Travel-specific promo candidate. Only card titles/descriptions matching travel keywords are accepted; known-expired offers are rejected."
+      "note": "Travel-specific promo candidate. Only card titles/descriptions matching travel keywords are accepted; known-expired offers are rejected.",
+      "disabled_reason": "HTTP 403 from GitHub Actions on the latest read-only diagnostics; kept off until a stable public page is available."
     },
     {
       "name": "ПромокодОфф — отели и апартаменты",
       "type": "html_promos",
       "url": "https://promokodoff.ru/travel/apartamenty/",
       "store": "ПромокодОфф — отели",
-      "enabled": true,
+      "enabled": false,
       "fallback_to_source_page": true,
       "required_title_keywords": [
         "авиабилет",
@@ -883,14 +885,15 @@
         "жиль",
         "билет на самолет"
       ],
-      "note": "Travel-specific promo candidate. Only card titles/descriptions matching travel keywords are accepted; known-expired offers are rejected."
+      "note": "Travel-specific promo candidate. Only card titles/descriptions matching travel keywords are accepted; known-expired offers are rejected.",
+      "disabled_reason": "HTTP 403 from GitHub Actions on the latest read-only diagnostics; kept off until a stable public page is available."
     },
     {
       "name": "Выберу — скидки на путешествия",
       "type": "html_promos",
       "url": "https://promokod.vbr.ru/skidki/otpusk-i-puteshestviya/",
       "store": "Выберу — путешествия",
-      "enabled": true,
+      "enabled": false,
       "fallback_to_source_page": true,
       "required_title_keywords": [
         "авиабилет",
@@ -934,7 +937,8 @@
         "жиль",
         "билет на самолет"
       ],
-      "note": "Travel-specific promo candidate. Only card titles/descriptions matching travel keywords are accepted; known-expired offers are rejected."
+      "note": "Travel-specific promo candidate. Only card titles/descriptions matching travel keywords are accepted; known-expired offers are rejected.",
+      "disabled_reason": "Latest scan returned 0 actionable offer cards; kept off until the page markup becomes parseable."
     },
     {
       "name": "Тут-Билеты — промокоды на путешествия",
@@ -992,7 +996,7 @@
       "type": "html_promos",
       "url": "https://samokatus.ru/promocodes",
       "store": "Самокатус",
-      "enabled": true,
+      "enabled": false,
       "fallback_to_source_page": true,
       "required_title_keywords": [
         "авиабилет",
@@ -1036,7 +1040,8 @@
         "жиль",
         "билет на самолет"
       ],
-      "note": "Travel-specific promo candidate. Only card titles/descriptions matching travel keywords are accepted; known-expired offers are rejected."
+      "note": "Travel-specific promo candidate. Only card titles/descriptions matching travel keywords are accepted; known-expired offers are rejected.",
+      "disabled_reason": "Latest scan returned 0 actionable offer cards; kept off until the page markup becomes parseable."
     },
     {
       "name": "Тревелинка — промокоды на туры",
@@ -1094,7 +1099,7 @@
       "type": "html_promos",
       "url": "https://promokod.7days.ru/promokod-t-puteshestviya",
       "store": "7days — Т-Путешествия",
-      "enabled": true,
+      "enabled": false,
       "fallback_to_source_page": true,
       "required_title_keywords": [
         "авиабилет",
@@ -1138,14 +1143,15 @@
         "жиль",
         "билет на самолет"
       ],
-      "note": "Travel-specific promo candidate. Only card titles/descriptions matching travel keywords are accepted; known-expired offers are rejected."
+      "note": "Travel-specific promo candidate. Only card titles/descriptions matching travel keywords are accepted; known-expired offers are rejected.",
+      "disabled_reason": "Latest scan returned 0 actionable offer cards; the page lists offers in a table format not currently supported by the parser."
     },
     {
       "name": "GetCashback — промокоды Aviasales",
       "type": "html_promos",
       "url": "https://getcashback.ru/promocodes/aviasales/",
       "store": "GetCashback — Aviasales",
-      "enabled": true,
+      "enabled": false,
       "fallback_to_source_page": true,
       "required_title_keywords": [
         "авиабилет",
@@ -1189,14 +1195,15 @@
         "жиль",
         "билет на самолет"
       ],
-      "note": "Travel-specific promo candidate. Only card titles/descriptions matching travel keywords are accepted; known-expired offers are rejected."
+      "note": "Travel-specific promo candidate. Only card titles/descriptions matching travel keywords are accepted; known-expired offers are rejected.",
+      "disabled_reason": "Latest scan returned 0 actionable offer cards; disabled to avoid empty scans until parser-specific support is added."
     },
     {
       "name": "Яндекс Путешествия — официальные акции",
       "type": "html_promos",
       "url": "https://special.travel.yandex.ru/promo/offers/",
       "store": "Яндекс Путешествия",
-      "enabled": true,
+      "enabled": false,
       "fallback_to_source_page": true,
       "required_title_keywords": [
         "авиабилет",
@@ -1240,7 +1247,8 @@
         "жиль",
         "билет на самолет"
       ],
-      "note": "Travel-specific promo candidate. Only card titles/descriptions matching travel keywords are accepted; known-expired offers are rejected."
+      "note": "Travel-specific promo candidate. Only card titles/descriptions matching travel keywords are accepted; known-expired offers are rejected.",
+      "disabled_reason": "GitHub Actions received a bot-verification page instead of current offers; not attempting to bypass access controls."
     },
     {
       "name": "Aviasales API — билеты из Краснодара",
@@ -1388,8 +1396,7 @@
       "url": "https://www.picodi.com/ru/top",
       "store": "Picodi",
       "enabled": false,
-      "diagnostic": true,
-      "disabled_reason": "Candidate: run read-only diagnostics first; enable only if the parser finds specific offers with safe same-domain links and images."
+      "disabled_reason": "Production parser extracted 0 actionable offer cards in the latest diagnostic; parser-specific support is needed."
     },
     {
       "name": "GoodCoupon — актуальные промокоды и скидки",
@@ -1397,8 +1404,7 @@
       "url": "https://goodcoupon.ru/",
       "store": "GoodCoupon",
       "enabled": false,
-      "diagnostic": true,
-      "disabled_reason": "Candidate: run read-only diagnostics first; enable only if the parser finds specific offers with safe same-domain links and images."
+      "disabled_reason": "GitHub Actions received a KillBot verification page; not attempting to bypass access controls."
     },
     {
       "name": "GoodCoupon — туры, билеты и путешествия",
@@ -1414,9 +1420,7 @@
       "type": "html_promos",
       "url": "https://promokodik.ru/",
       "store": "Промокодик",
-      "enabled": false,
-      "diagnostic": true,
-      "disabled_reason": "Candidate: run read-only diagnostics first; enable only if specific offers parse cleanly."
+      "enabled": true
     },
     {
       "name": "Промокодо — промокоды и распродажи",
@@ -1424,8 +1428,25 @@
       "url": "https://www.promokodo.ru/",
       "store": "Промокодо",
       "enabled": false,
+      "disabled_reason": "HTTP 403 from GitHub Actions; no access controls are bypassed."
+    },
+    {
+      "name": "Купоника — скидки на отдых и путешествия",
+      "type": "html",
+      "url": "https://www.kuponika.ru/coupons/otdyh-vse-vklyucheno/",
+      "store": "Купоника",
+      "enabled": false,
       "diagnostic": true,
-      "disabled_reason": "Candidate: run read-only diagnostics first; enable only if specific offers parse cleanly."
+      "disabled_reason": "Candidate: validate product-card prices and link quality with read-only diagnostics before enabling."
+    },
+    {
+      "name": "Авиасейлс — дешёвые выходные (публичная страница)",
+      "type": "html",
+      "url": "https://aviasales.ru/weekends",
+      "store": "Aviasales",
+      "enabled": false,
+      "diagnostic": true,
+      "disabled_reason": "Candidate: validate public page parsing; API-based ticket prices remain the preferred route."
     }
   ]
 }
