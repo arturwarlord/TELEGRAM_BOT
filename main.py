@@ -153,7 +153,7 @@ def _rank_evaluated_deal(pair: tuple[Deal, DealDecision]) -> float:
     if has_price_pair:
         score += 35.0
     if deal.promo_code:
-        score += 15.0
+        score += 12.0
     if deal.discount_is_maximum:
         score -= 45.0
     if not has_price_pair and not deal.promo_code:
@@ -163,9 +163,9 @@ def _rank_evaluated_deal(pair: tuple[Deal, DealDecision]) -> float:
     # Keep the button on the source's public page; don't invent a merchant link.
     canonical = canonical_url(deal.product_url).casefold()
     if any(marker in canonical for marker in ("/store/", "/shop/", "/magazin/")):
-        score -= 12.0
+        score -= 15.0
     if any(marker in canonical for marker in ("/promo/", "/promocodes/", "/coupon/", "/deals/", "/shares/", "/promokody/")):
-        score += 8.0
+        score += 12.0
 
     title = deal.title.casefold()
     if any(word in title for word in ("балл", "бонус", "кэшбэк", "кешбэк", "вау")) and not has_price_pair:
