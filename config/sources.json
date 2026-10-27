@@ -572,12 +572,13 @@
     },
     {
       "name": "Tutu — путешествия и предложения",
-      "type": "html_promos",
+      "type": "html",
       "url": "https://www.tutu.ru/",
       "store": "Tutu",
       "enabled": false,
       "note": "Keep enabled only if production diagnostics returns specific current offer cards.",
-      "disabled_reason": "Parser extracted an irrelevant generic page about commuter trains rather than a specific travel discount; disabled to prevent misleading posts."
+      "disabled_reason": "Candidate official homepage; inspect current ticket-price cards with the retailer price-pair parser before activation.",
+      "diagnostic": true
     },
     {
       "name": "БериКод — промокоды на путешествия и туры",
@@ -1517,6 +1518,69 @@
         "тур"
       ],
       "disabled_reason": "GitHub Actions rejected the HTTPS certificate chain during diagnostics; SSL verification is kept enabled and the source remains disabled."
+    },
+    {
+      "name": "S7 Airlines — цены на авиабилеты и акции",
+      "type": "html",
+      "url": "https://www.s7.ru/ru/",
+      "store": "S7 Airlines",
+      "enabled": false,
+      "diagnostic": true,
+      "disabled_reason": "Candidate official airline page; require matched old/current prices and direct product links."
+    },
+    {
+      "name": "Аэрофлот — специальные предложения",
+      "type": "html",
+      "url": "https://www.aeroflot.ru/ru-ru/offers/specials",
+      "store": "Аэрофлот",
+      "enabled": false,
+      "diagnostic": true,
+      "disabled_reason": "Candidate official airline offers page; require matched old/current prices and direct links."
+    },
+    {
+      "name": "Tutu — скидка на железнодорожные билеты",
+      "type": "html_promos",
+      "url": "https://www.tutu.ru/poezda/content/pl/p5/",
+      "store": "Tutu",
+      "enabled": false,
+      "diagnostic": true,
+      "disabled_reason": "Candidate official rail-ticket discount page; parser must extract a concrete, current offer."
+    },
+    {
+      "name": "Островок — промокоды и акции на отели",
+      "type": "html_promos",
+      "url": "https://ostrovok.ru/promo/",
+      "store": "Островок",
+      "enabled": false,
+      "diagnostic": true,
+      "disabled_reason": "Candidate official hotel promo page; validate public offer cards and images."
+    },
+    {
+      "name": "Яндекс Путешествия — промокоды",
+      "type": "html_promos",
+      "url": "https://travel.yandex.ru/promo/",
+      "store": "Яндекс Путешествия",
+      "enabled": false,
+      "diagnostic": true,
+      "disabled_reason": "Candidate official travel promo page; validate access and specific offer cards without bypassing controls."
+    },
+    {
+      "name": "Победа — акции и промокоды на авиабилеты",
+      "type": "html_promos",
+      "url": "https://www.flypobeda.ru/promotions",
+      "store": "Победа",
+      "enabled": false,
+      "diagnostic": true,
+      "disabled_reason": "Candidate official airline promotions page; validate direct public offers."
+    },
+    {
+      "name": "РЖД — тарифы и скидки на билеты",
+      "type": "html_promos",
+      "url": "https://www.rzd.ru/ru/9835",
+      "store": "РЖД",
+      "enabled": false,
+      "diagnostic": true,
+      "disabled_reason": "Candidate official rail ticket promotions page; validate public offer cards and current conditions."
     }
   ]
 }
