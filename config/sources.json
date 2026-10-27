@@ -263,7 +263,8 @@
       "type": "html_promos",
       "url": "https://getcashback.ru/promocodes/",
       "store": "GetCashback",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "Public page is reachable, but the current HTML parser extracts 0 actionable offer cards. Keep disabled until parser-specific support is implemented."
     },
     {
       "name": "BonusOK — каталог купонов магазинов",
@@ -277,6 +278,28 @@
       "type": "html_promos",
       "url": "https://skidomania.ru/for-shoppers",
       "store": "Skidomania",
+      "enabled": false,
+      "disabled_reason": "Public page is reachable, but the current HTML parser extracts 0 actionable offer cards. Keep disabled until parser-specific support is implemented."
+    },
+    {
+      "name": "DonCoupon — промокоды и скидки",
+      "type": "html_promos",
+      "url": "https://doncoupon.ru/",
+      "store": "DonCoupon",
+      "enabled": true
+    },
+    {
+      "name": "CouponMagic — акции и промокоды",
+      "type": "html_promos",
+      "url": "https://couponmagic.ru/",
+      "store": "CouponMagic",
+      "enabled": true
+    },
+    {
+      "name": "КУПОНом — каталог купонов",
+      "type": "html_promos",
+      "url": "https://kuponom.ru/",
+      "store": "КУПОНом",
       "enabled": true
     }
   ]
