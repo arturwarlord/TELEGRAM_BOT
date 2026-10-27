@@ -332,7 +332,7 @@ def parse_html_promotions(payload: bytes, source: dict[str, Any], max_items: int
     """
     base_url = str(source.get("url") or "").strip()
     parser = _HtmlTreeParser()
-    parser.feed(payload.decode("utf-8-sig", errors="replace"))
+    parser.feed(_decode_html_payload(payload))
     parser.close()
     nodes = list(_html_walk(parser.root))
 
@@ -958,6 +958,23 @@ def _parse_jsonld_products(parser: _HtmlTreeParser, source: dict[str, Any], base
         visit(data)
     return deals
 
+
+def _decode_html_payload(payload: bytes) -> str:
+    """Decode HTML using its declared charset, with safe UTF-8/Windows-1251 fallbacks."""
+    sample = payload[:8192].decode("ascii", errors="ignore")
+    match = re.search(
+        r"""<meta\b[^>]*(?:charset\s*=\s*[\"']?\s*([a-zA-Z0-9_-]+)|content\s*=\s*[\"'][^\"']*charset\s*=\s*([a-zA-Z0-9_-]+))""",
+        sample,
+        flags=re.IGNORECASE,
+    )
+    declared = next((value for value in match.groups() if value), None) if match else None
+    encodings = ([declared] if declared else []) + ["utf-8-sig", "utf-8", "windows-1251"]
+    for encoding in encodings:
+        try:
+            return payload.decode(encoding)
+        except (LookupError, UnicodeDecodeError):
+            continue
+    return payload.decode("utf-8", errors="replace")
 
 def parse_html_catalog(payload: bytes, source: dict[str, Any], max_items: int = 200) -> list[Deal]:
     """Extract only explicit old/current price pairs from a public store catalogue page.
