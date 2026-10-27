@@ -39,10 +39,10 @@ jobs:
     needs: tests
     runs-on: ubuntu-latest
     env:
-      # Scheduled runs publish direct public offer links by default, with strict 2/run and 8/day caps.
-      # Pause scheduled publication safely by setting the Actions Variable DRY_RUN=true.
-      PUBLISH_ENABLED: ${{ (github.event_name == 'workflow_dispatch' && inputs.publish == true) || github.event_name == 'schedule' }}
-      DRY_RUN: ${{ (github.event_name == 'workflow_dispatch' && inputs.publish != true) || (github.event_name == 'schedule' && vars.DRY_RUN == 'true') }}
+      # Scheduled runs publish direct links; one explicitly named push can seed the first batch.
+      # Any ordinary push stays dry-run. Pause scheduled publishing with Actions Variable DRY_RUN=true.
+      PUBLISH_ENABLED: ${{ (github.event_name == 'workflow_dispatch' && inputs.publish == true) || github.event_name == 'schedule' || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'launch one-time direct posts:')) }}
+      DRY_RUN: ${{ (github.event_name == 'workflow_dispatch' && inputs.publish != true) || (github.event_name == 'schedule' && vars.DRY_RUN == 'true') || (github.event_name == 'push' && !startsWith(github.event.head_commit.message, 'launch one-time direct posts:')) }}
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ vars.TELEGRAM_CHAT_ID }}
       AD_NOTICE: ${{ vars.AD_NOTICE }}
