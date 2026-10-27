@@ -1,4 +1,33 @@
 {
   "version": 1,
-  "published": {}
+  "published": {
+    "9d6572b8570c2b13464cd96f": {
+      "title": "Золотое Яблоко",
+      "store": "ПромоФакт",
+      "price": null,
+      "published_at": "2026-10-27T13:51:37+00:00",
+      "telegram_message_id": 3,
+      "affiliate_url": null
+    },
+    "2d9c36da4c2bf4d5de7977d9": {
+      "title": "Netprint",
+      "store": "ПромоФакт",
+      "price": null,
+      "published_at": "2026-10-27T13:51:37+00:00",
+      "telegram_message_id": 4,
+      "affiliate_url": null
+    }
+  },
+  "recent_posts": [
+    {
+      "key": "9d6572b8570c2b13464cd96f",
+      "published_at": "2026-10-27T13:51:37+00:00",
+      "telegram_message_id": 3
+    },
+    {
+      "key": "2d9c36da4c2bf4d5de7977d9",
+      "published_at": "2026-10-27T13:51:37+00:00",
+      "telegram_message_id": 4
+    }
+  ]
 }
