@@ -542,8 +542,8 @@ def fetch_source(
     request = urllib.request.Request(
         url,
         headers={
-            "User-Agent": "DealHunterBot/0.1 (+RSS/XML/JSON partner feed reader)",
-            "Accept": "application/rss+xml, application/atom+xml, application/xml, text/xml, application/json;q=0.9, */*;q=0.8",
+            "User-Agent": "DealHunterBot/0.1 (+public deal page reader)",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         },
     )
     try:
