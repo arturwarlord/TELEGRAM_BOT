@@ -19,6 +19,7 @@ from deal_hunter.sources import (  # noqa: E402
     _html_text,
     _html_walk,
     _html_price_pair,
+    _decode_html_payload,
     parse_feed,
 )
 from deal_hunter.models import clean_text  # noqa: E402
@@ -64,7 +65,7 @@ def inspect_source(source: dict) -> None:
 
     print(f"[FETCH OK] status={status}; bytes={len(payload)}; content_type={content_type}", flush=True)
     parser = _HtmlTreeParser()
-    parser.feed(payload.decode("utf-8-sig", errors="replace"))
+    parser.feed(_decode_html_payload(payload))
     parser.close()
 
     title = ""
