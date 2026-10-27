@@ -478,6 +478,15 @@ def parse_html_promotions(payload: bytes, source: dict[str, Any], max_items: int
             continue
 
         description = _extract_offer_description(text)
+        excluded_keywords = source.get("excluded_offer_keywords")
+        if isinstance(excluded_keywords, list) and excluded_keywords:
+            searchable_offer_text = f"{title} {description}".casefold()
+            if any(
+                str(keyword).strip().casefold() in searchable_offer_text
+                for keyword in excluded_keywords
+                if str(keyword).strip()
+            ):
+                continue
         required_keywords = source.get("required_title_keywords")
         if isinstance(required_keywords, list) and required_keywords:
             searchable_offer_text = f"{title} {description}".casefold()
