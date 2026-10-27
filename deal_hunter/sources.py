@@ -844,9 +844,9 @@ def parse_html_catalog(payload: bytes, source: dict[str, Any], max_items: int = 
         # anchor text can include prices, discount badges, ratings and cart text.
         # When that happens, prefer the product image's descriptive alt label.
         title_has_card_noise = bool(re.search(
-            r"(?:₽|руб(?:лей|ля|ль)?\\.?|\\bфинальная цена\\b|\\bцена за 1\\b|"
-            r"\\b\\d[\\d,.]*\\s*%|\\b\\d+(?:[.,]\\d+)?\\s*(?:отзыв\\w*|оцен\\w*)|"
-            r"\\bв корзину\\b|\\bтовара достаточно\\b|\\bбыстрый просмотр\\b)",
+            r"(?:₽|руб(?:лей|ля|ль)?\.?|\bфинальная цена\b|\bцена за 1\b|"
+            r"\b\d[\d,.]*\s*%|\b\d+(?:[.,]\d+)?\s*(?:отзыв\w*|оцен\w*)|"
+            r"\bв корзину\b|\bтовара достаточно\b|\bбыстрый просмотр\b)",
             title,
             flags=re.IGNORECASE,
         ))
