@@ -1396,7 +1396,8 @@
       "url": "https://www.picodi.com/ru/top",
       "store": "Picodi",
       "enabled": false,
-      "disabled_reason": "Production parser extracted 0 actionable offer cards in the latest diagnostic; parser-specific support is needed."
+      "disabled_reason": "Read-only candidate: the current parser finds no usable offer cards; inspect visible card links/images before considering activation.",
+      "diagnostic": true
     },
     {
       "name": "GoodCoupon — актуальные промокоды и скидки",
@@ -1451,13 +1452,12 @@
       "url": "https://www.tbank.ru/travel/promo/hotels/",
       "store": "Т-Путешествия",
       "enabled": false,
-      "diagnostic": true,
       "required_title_keywords": [
         "скидк",
         "промокод",
         "отел"
       ],
-      "disabled_reason": "Candidate official travel promotion page; keep disabled until read-only diagnostics confirms specific current offer cards."
+      "disabled_reason": "GitHub Actions rejected the HTTPS certificate chain during diagnostics; SSL verification is kept enabled and the source remains disabled."
     },
     {
       "name": "Т-Путешествия — блог промокодов для поездок",
@@ -1465,7 +1465,6 @@
       "url": "https://www.tbank.ru/travel/blog/promocode-travel/",
       "store": "Т-Путешествия",
       "enabled": false,
-      "diagnostic": true,
       "required_title_keywords": [
         "промокод",
         "скидк",
@@ -1473,7 +1472,7 @@
         "отел",
         "тур"
       ],
-      "disabled_reason": "Candidate official travel promo article; enable only after the production parser extracts current, actionable offers."
+      "disabled_reason": "GitHub Actions rejected the HTTPS certificate chain during diagnostics; SSL verification is kept enabled and the source remains disabled."
     },
     {
       "name": "Т-Путешествия — авиабилеты",
@@ -1481,14 +1480,13 @@
       "url": "https://www.tbank.ru/travel/flights/",
       "store": "Т-Путешествия",
       "enabled": false,
-      "diagnostic": true,
       "required_title_keywords": [
         "скидк",
         "промокод",
         "авиа",
         "билет"
       ],
-      "disabled_reason": "Candidate official flights page; check whether it exposes concrete offers rather than dynamic search UI."
+      "disabled_reason": "GitHub Actions rejected the HTTPS certificate chain during diagnostics; SSL verification is kept enabled and the source remains disabled."
     },
     {
       "name": "Т-Путешествия — все виды поездок",
@@ -1496,7 +1494,6 @@
       "url": "https://www.tbank.ru/travel/",
       "store": "Т-Путешествия",
       "enabled": false,
-      "diagnostic": true,
       "required_title_keywords": [
         "скидк",
         "промокод",
@@ -1505,7 +1502,7 @@
         "отел",
         "тур"
       ],
-      "disabled_reason": "Candidate official travel homepage; enable only if current offers and direct public offer links are extracted."
+      "disabled_reason": "GitHub Actions rejected the HTTPS certificate chain during diagnostics; SSL verification is kept enabled and the source remains disabled."
     }
   ]
 }
