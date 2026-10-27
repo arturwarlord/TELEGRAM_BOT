@@ -396,9 +396,9 @@ def parse_html_promotions(payload: bytes, source: dict[str, Any], max_items: int
             for marker in ("/store/", "/shop/", "/shops/", "/magazin/", "/promokody/")
         )
         is_generic_store_title = bool(re.search(
-            r"(?:^\\s*все\\s+(?:промокоды|купоны)\\b|"
-            r"\\b\\d+\\s+(?:купон\\w*|товар\\w*)\\b|"
-            r"^\\s*от\\s+\\w+|↗\\s*$)",
+            r"(?:^\s*все\s+(?:промокоды|купоны)\b|"
+            r"\b\d+\s+(?:купон\w*|товар\w*)\b|"
+            r"^\s*от\s+\w+|↗\s*$)",
             title,
             flags=re.IGNORECASE,
         ))
@@ -407,7 +407,7 @@ def parse_html_promotions(payload: bytes, source: dict[str, Any], max_items: int
             for marker in ("/promo/", "/promocodes/", "/coupon/", "/discount/", "/deal/", "/deals/", "/action/", "/shares/")
         )
         has_offer_anchor = bool(re.search(
-            r"(?:promo|offer|coupon|deal|discount|action|stock)[-_]?\\d+",
+            r"(?:promo|offer|coupon|deal|discount|action|stock)[-_]?\d+",
             offer_fragment,
             flags=re.IGNORECASE,
         ))
