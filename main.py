@@ -159,6 +159,14 @@ def _rank_evaluated_deal(pair: tuple[Deal, DealDecision]) -> float:
     if not has_price_pair and not deal.promo_code:
         score -= 12.0
 
+    # A source's store index is less actionable than a specific offer page.
+    # Keep the button on the source's public page; don't invent a merchant link.
+    canonical = canonical_url(deal.product_url).casefold()
+    if any(marker in canonical for marker in ("/store/", "/shop/", "/magazin/")):
+        score -= 12.0
+    if any(marker in canonical for marker in ("/promo/", "/promocodes/", "/coupon/", "/deals/", "/shares/", "/promokody/")):
+        score += 8.0
+
     title = deal.title.casefold()
     if any(word in title for word in ("балл", "бонус", "кэшбэк", "кешбэк", "вау")) and not has_price_pair:
         score -= 25.0
