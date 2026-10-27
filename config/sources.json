@@ -153,13 +153,21 @@
       "type": "html_promos",
       "url": "https://promokodi.komukupon.ru/categories/",
       "store": "Кому Купон",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "Public page is reachable but the current parser extracts no card with its required image/direct same-domain offer link; keep for later parser-specific support."
     },
     {
       "name": "Promocodex — каталог скидок и промокодов",
       "type": "html_promos",
       "url": "https://promocodex.ru/stores.html",
       "store": "Promocodex",
+      "enabled": true
+    },
+    {
+      "name": "SocialKod — скидки, товары и промокоды",
+      "type": "html_promos",
+      "url": "https://socialkod.ru/magazin",
+      "store": "SocialKod",
       "enabled": true
     }
   ]
