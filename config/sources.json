@@ -197,7 +197,8 @@
       "type": "html_promos",
       "url": "https://promokodi-na.ru/",
       "store": "Промокоды на",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "The production scan extracted only one generic store-index card with an abbreviated title and no usable code or specific offer terms; keep disabled until the parser can extract actionable offer cards."
     },
     {
       "name": "SmartSalee — скидки на товары и услуги",
