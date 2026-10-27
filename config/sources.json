@@ -138,7 +138,8 @@
       "type": "html_promos",
       "url": "https://www.promkod.ru/",
       "store": "ПромКод.ру",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "After generic-store-listing quality guard, the homepage yielded 0 actionable offer cards. Re-enable only with a dedicated offer feed or detail-page parser."
     },
     {
       "name": "Pepper.ru — публичные скидки",
@@ -190,7 +191,8 @@
       "type": "html_promos",
       "url": "https://promokong.ru/",
       "store": "PromoKong",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "The homepage yielded 0 actionable offer cards after the generic directory guard. Testing a narrower free-delivery category separately."
     },
     {
       "name": "Промокоды на — каталог скидок",
@@ -223,6 +225,27 @@
       "store": "DNS",
       "enabled": false,
       "disabled_reason": "Official offer page returned HTTP 401 from GitHub Actions. No access controls are being bypassed."
+    },
+    {
+      "name": "Скидометр — актуальные промокоды",
+      "type": "html_promos",
+      "url": "https://skidometr.ru/",
+      "store": "Скидометр",
+      "enabled": true
+    },
+    {
+      "name": "Discovia — каталог скидок",
+      "type": "html_promos",
+      "url": "https://discovia.ru/",
+      "store": "Discovia",
+      "enabled": true
+    },
+    {
+      "name": "PromoKong — бесплатная доставка",
+      "type": "html_promos",
+      "url": "https://promokong.ru/besplatnaya-dostavka",
+      "store": "PromoKong — бесплатная доставка",
+      "enabled": true
     }
   ]
 }
