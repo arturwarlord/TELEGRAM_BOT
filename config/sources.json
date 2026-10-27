@@ -302,6 +302,20 @@
       "store": "КУПОНом",
       "enabled": false,
       "disabled_reason": "The public page returned 0 extractable offer cards in the automated diagnostic."
+    },
+    {
+      "name": "ВкусВилл — товары со скидками",
+      "type": "html",
+      "url": "https://vkusvill.ru/offers/",
+      "store": "ВкусВилл",
+      "enabled": true
+    },
+    {
+      "name": "Купер — каталог товаров и акций",
+      "type": "html",
+      "url": "https://kuper.ru/categories",
+      "store": "Купер",
+      "enabled": true
     }
   ]
 }
