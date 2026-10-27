@@ -362,21 +362,24 @@
       "type": "html",
       "url": "https://av.ru/discount",
       "store": "Азбука Вкуса",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "The public discount page returned HTTP 450 from GitHub Actions. No access controls are being bypassed."
     },
     {
       "name": "Верный — каталог товаров",
       "type": "html",
       "url": "https://www.verno-info.ru/products",
       "store": "Верный",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "The public products page returned HTTP 200 but the current parser extracted 0 item-level price pairs; most catalogues appear to be linked/PDF content."
     },
     {
       "name": "Ашан — каталог товаров и скидок",
       "type": "html",
       "url": "https://www.auchan.ru/",
       "store": "Ашан",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "The official homepage returned HTTP 401 from GitHub Actions. No access controls are being bypassed."
     }
   ]
 }
