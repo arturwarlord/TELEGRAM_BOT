@@ -51,14 +51,16 @@
       "type": "html",
       "url": "https://www.perekrestok.ru/promotions",
       "store": "Перекрёсток",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "The official promotions page returned HTTP 403 from GitHub Actions. No access controls are being bypassed."
     },
     {
       "name": "METRO Онлайн — товары со скидками",
       "type": "html",
       "url": "https://online.metro-cc.ru/category",
       "store": "METRO Онлайн",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "The category endpoint returned HTTP 307 with a redirect loop from GitHub Actions. Keep disabled until a stable public endpoint is identified."
     },
     {
       "name": "Спортмастер — каталог распродажи",
@@ -89,7 +91,8 @@
       "type": "html",
       "url": "https://lenta.com/catalog/osobenno-vygodno-1893/",
       "store": "Лента",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "The official discount catalogue returned HTTP 401 from GitHub Actions. No access controls are being bypassed."
     },
     {
       "name": "Ситилинк — акции на электронику",
@@ -127,7 +130,8 @@
       "type": "html",
       "url": "https://www.okmarket.ru/catalogs/filter/price-from-6-to-25999/",
       "store": "О’КЕЙ",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "The public product catalogue returned HTTP 403 from GitHub Actions. No access controls are being bypassed."
     },
     {
       "name": "ПромКод.ру — промокоды и распродажи",
@@ -326,7 +330,8 @@
       "type": "html_promos",
       "url": "https://promo.magnit.ru/",
       "store": "Магнит",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "The official promo landing page is reachable but the current parser extracts 0 usable deal cards; the product catalogue is the supported Magnit source."
     }
   ]
 }

@@ -829,13 +829,29 @@ def parse_html_catalog(payload: bytes, source: dict[str, Any], max_items: int = 
             continue
         href, title = max(candidates, key=lambda pair: min(len(pair[1]), 300))
         title = clean_text(title, 300)
-        if len(title) < 5:
-            # Sometimes the title is only available as an image alt attribute.
-            title = next(
-                (clean_text(child.attrs.get("alt"), 300) for child in _html_walk(node)
-                 if child.tag == "img" and len(clean_text(child.attrs.get("alt"), 300)) >= 5),
-                "",
-            )
+        image_title = next(
+            (
+                clean_text(child.attrs.get("alt"), 300)
+                for child in _html_walk(node)
+                if child.tag == "img"
+                and len(clean_text(child.attrs.get("alt"), 300)) >= 5
+                and clean_text(child.attrs.get("alt"), 300).casefold()
+                    not in {"image", "картинка", "изображение", "фото", "товар", "product", "product image"}
+            ),
+            "",
+        )
+        # Product-card links on some retailers wrap the full card, so their
+        # anchor text can include prices, discount badges, ratings and cart text.
+        # When that happens, prefer the product image's descriptive alt label.
+        title_has_card_noise = bool(re.search(
+            r"(?:₽|руб(?:лей|ля|ль)?\\.?|\\bфинальная цена\\b|\\bцена за 1\\b|"
+            r"\\b\\d[\\d,.]*\\s*%|\\b\\d+(?:[.,]\\d+)?\\s*(?:отзыв\\w*|оцен\\w*)|"
+            r"\\bв корзину\\b|\\bтовара достаточно\\b|\\bбыстрый просмотр\\b)",
+            title,
+            flags=re.IGNORECASE,
+        ))
+        if image_title and (not title or len(title) < 5 or title_has_card_noise):
+            title = image_title
         if not title or len(title) < 5:
             continue
 

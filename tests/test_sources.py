@@ -472,5 +472,35 @@ class FeedParserTests(unittest.TestCase):
         self.assertEqual(deals[0].price, 182.0)
         self.assertEqual(deals[0].old_price, 202.0)
 
+
+    def test_html_catalog_prefers_image_alt_when_link_contains_price_and_rating(self):
+        payload = """
+        <html><body>
+          <main>
+            <div class="product-card">
+              <a href="/product/123">
+                <img src="/images/cheeseburger.jpg" alt="Чизбургер 210г">
+              </a>
+              <a href="/product/123">
+                Финальная цена 79,99 ₽ -66% 239,99 ₽
+                Чизбургер 210г 4.5 · 11 отзывов В корзину
+              </a>
+            </div>
+          </main>
+        </body></html>
+        """.encode("utf-8")
+        source = {
+            "name": "test-retailer",
+            "type": "html",
+            "url": "https://retailer.example.test/",
+            "store": "Тестовый магазин",
+            "enabled": True,
+        }
+        deals = parse_feed(payload, source)
+        self.assertEqual(len(deals), 1)
+        self.assertEqual(deals[0].title, "Чизбургер 210г")
+        self.assertEqual(deals[0].price, 79.99)
+        self.assertEqual(deals[0].old_price, 239.99)
+
 if __name__ == "__main__":
     unittest.main()
