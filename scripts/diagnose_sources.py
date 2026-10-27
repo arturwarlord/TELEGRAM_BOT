@@ -34,7 +34,8 @@ def _read_config() -> list[dict]:
 def inspect_source(source: dict) -> None:
     name = str(source.get("name") or "unnamed")
     url = str(source.get("url") or "")
-    mode = "ENABLED" if source.get("enabled") is True else "DIAGNOSTIC ONLY — NOT ACTIVE IN THE BOT"\n    print(f"\\n===== {mode}: {name} =====", flush=True)
+    mode = "ENABLED" if source.get("enabled") is True else "DIAGNOSTIC ONLY — NOT ACTIVE IN THE BOT"
+    print(f"\n===== {mode}: {name} =====", flush=True)
     if source.get("type") == "aviasales_api":
         print("[API SOURCE] Requires AVIASALES_API_TOKEN; actual ticket-price API is checked by the Deal Hunter scan.")
         return
@@ -154,7 +155,9 @@ def inspect_source(source: dict) -> None:
 def main() -> int:
     sources = _read_config()
     print("===== PUBLIC DEAL SOURCE DIAGNOSTICS (READ-ONLY) =====")
-    print(f"Source pages checked: {len(sources)}")\n    print(f"Production-enabled sources: {sum(1 for item in sources if item.get('enabled') is True)}")\n    print(f"Diagnostic-only candidates: {sum(1 for item in sources if item.get('enabled') is not True)}")
+    print(f"Source pages checked: {len(sources)}")
+    print(f"Production-enabled sources: {sum(1 for item in sources if item.get('enabled') is True)}")
+    print(f"Diagnostic-only candidates: {sum(1 for item in sources if item.get('enabled') is not True)}")
     print("No Telegram methods are called. This workflow only downloads public pages and inspects visible product/price markup.")
     for source in sources:
         inspect_source(source)
