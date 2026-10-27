@@ -139,6 +139,39 @@ def inspect_source(source: dict) -> None:
         if images:
             print(f"    first_image={images[0][:180]!r}")
 
+    if not deals:
+        semantic_samples = []
+        travel_terms = re.compile(r"промокод|скидк|авиабилет|билет|тур|отел|путевк|брониров|путешеств|трансфер|жиль|руб\\.?|₽|%|travelata|level\\.travel", re.IGNORECASE)
+        for node in reversed(nodes):
+            if node.tag in {"document", "html", "body", "main", "script", "style", "nav", "footer", "header"}:
+                continue
+            text = text_by_id.get(id(node), "")
+            if not (45 <= len(text) <= 700) or not travel_terms.search(text):
+                continue
+            links = _html_links(node, url)
+            images = _html_images(node, url)
+            if not links and not images:
+                continue
+            # Prefer compact blocks that have only a handful of links/images.
+            if len(links) > 8 or len(images) > 6:
+                continue
+            signature = re.sub(r"\\s+", " ", text[:100]).casefold()
+            if any(signature == seen for seen in (entry[3] for entry in semantic_samples)):
+                continue
+            semantic_samples.append((node, text, links, images, signature))
+            if len(semantic_samples) >= 5:
+                break
+        for node, text, links, images, _signature in semantic_samples:
+            print(
+                f"  [OFFER-LIKE SAMPLE] tag={node.tag} id={node.attrs.get('id', '')!r} "
+                f"class={node.attrs.get('class', '')[:100]!r} links={len(links)} images={len(images)} "
+                f"text={text[:220]!r}"
+            )
+            if links:
+                print(f"    sample_link={links[0][0][:180]!r} label={links[0][1][:100]!r}")
+            if images:
+                print(f"    sample_image={images[0][:180]!r}")
+
     if not candidates and not deals:
         money_samples = []
         for node in reversed(nodes):
