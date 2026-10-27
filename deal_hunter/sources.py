@@ -403,14 +403,14 @@ def parse_html_promotions(payload: bytes, source: dict[str, Any], max_items: int
         # or bonus offer. For points/cashback titles, only trust a percentage when
         # the title itself describes a discount; broad parent text is not enough.
         value_terms_in_title = re.search(
-            r"\\b(?:балл\\w*|бонус\\w*|кешбэк|кэшбэк|кеш[- ]?бек|кэш[- ]?бек|cashback|вау)\\b",
+            r"\b(?:балл\w*|бонус\w*|кешбэк|кэшбэк|кеш[- ]?бек|кэш[- ]?бек|cashback|вау)\b",
             title,
             flags=re.IGNORECASE,
         )
         title_explicitly_describes_discount = bool(re.search(
-            r"(?:скидк\\w*[^%\\d]{0,16}\\d{1,2}(?:[.,]\\d+)?\\s*%|"
-            r"[−-]\\s*\\d{1,2}(?:[.,]\\d+)?\\s*%|"
-            r"\\d{1,2}(?:[.,]\\d+)?\\s*%\\s*(?:скидк\\w*|на\\b))",
+            r"(?:скидк\w*[^%\d]{0,16}\d{1,2}(?:[.,]\d+)?\s*%|"
+            r"[−-]\s*\d{1,2}(?:[.,]\d+)?\s*%|"
+            r"\d{1,2}(?:[.,]\d+)?\s*%\s*(?:скидк\w*|на\b))",
             title,
             flags=re.IGNORECASE,
         ))
