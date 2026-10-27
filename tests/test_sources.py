@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import json
 import unittest
+from datetime import date
 from pathlib import Path
 
-from deal_hunter.sources import parse_feed
+from deal_hunter.sources import _extract_promo_expiry, parse_feed
 
 
 FIXTURE = Path(__file__).parent / "fixtures" / "sample_feed.xml"
@@ -284,6 +285,18 @@ class FeedParserTests(unittest.TestCase):
         deal = parse_feed(payload, source)[0]
         current_year = datetime.now(timezone.utc).year
         self.assertEqual(deal.expires_at, f"{current_year}-10-31")
+
+    def test_expiry_without_year_rolls_over_to_next_year_when_month_is_far_behind(self):
+        self.assertEqual(
+            _extract_promo_expiry("Промокод действует до 5 января", today=date(2026, 10, 27)),
+            "2027-01-05",
+        )
+
+    def test_expiry_without_year_keeps_recently_passed_date_in_current_year(self):
+        self.assertEqual(
+            _extract_promo_expiry("Акция действует до 20 октября", today=date(2026, 10, 27)),
+            "2026-10-20",
+        )
 
     def test_html_promo_description_excludes_tracking_and_erid_footer(self):
         payload = """
