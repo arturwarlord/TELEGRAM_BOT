@@ -177,6 +177,8 @@ def _extract_reported_percent(text: str) -> tuple[float | None, bool]:
     """Read a percentage only when the visible text explicitly ties it to an offer."""
     normalized = clean_text(text, 2000)
     patterns = [
+        # Catch formats like SocialKod's "до − 90 %" as a maximum, not an exact offer.
+        (r"\bдо\s*[−-]?\s*(\d{1,2}(?:[.,]\d+)?)\s*%", True),
         (r"скидк\w*\s+до\s*(\d{1,2}(?:[.,]\d+)?)\s*%", True),
         (r"скидк\w*[^%\d]{0,16}(\d{1,2}(?:[.,]\d+)?)\s*%", False),
         (r"[−-]\s*(\d{1,2}(?:[.,]\d+)?)\s*%", False),
