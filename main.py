@@ -144,11 +144,42 @@ def choose_best_duplicates(deals: list[Deal]) -> list[Deal]:
     return non_coupon + deduped_coupons
 
 
+def _flight_origin_priority(deal: Deal) -> float:
+    """Prioritize useful departures for a Russian-language deals channel."""
+    source = deal.source.casefold()
+    prefix = "aviasales api — билеты из "
+    if not source.startswith(prefix):
+        return 0.0
+    origin = source[len(prefix):].strip(" .—–")
+    russian_origins = {
+        "москвы", "санкт-петербурга", "казани", "екатеринбурга", "новосибирска", "сочи",
+        "краснодара", "самары", "нижнего новгорода", "уфы", "калининграда", "владивостока",
+        "иркутска", "красноярска", "хабаровска", "минеральных вод", "челябинска", "волгограда",
+        "оренбурга", "мурманска", "ставрополя", "петропавловска-камчатского", "южно-сахалинска",
+        "саратова", "барнаула", "новокузнецка", "читы", "сургута", "нового уренгоя", "перми",
+        "омска", "якутска", "томска", "тюмени", "кемерова", "архангельска", "сыктывкара",
+        "нижневартовска", "ижевска", "кирова", "пензы", "саранска", "череповца", "пскова",
+        "ростова-на-дону", "воронежа", "тулы", "брянска", "липецка", "тамбова", "курска",
+        "белгорода", "астрахани", "махачкалы", "грозного", "назрани", "владикавказа",
+        "йошкар-олы", "чебоксар", "ульяновска", "кургана", "орска",
+    }
+    cis_origins = {
+        "ташкента", "алматы", "баку", "минска", "еревана", "тбилиси", "самарканда", "бухары",
+        "астаны", "бишкека", "душанбе", "ферганы", "ургенча", "навоев", "андижана", "карши",
+        "термеза", "оша", "шымкента", "актау", "атырау", "актобе", "кызылорды", "туркестана",
+    }
+    if origin in russian_origins:
+        return 15.0
+    if origin in cis_origins:
+        return 8.0
+    return 0.0
+
+
 def _rank_evaluated_deal(pair: tuple[Deal, DealDecision]) -> float:
-    """Prefer actionable deals over broad 'up to' headlines and loyalty-point teasers."""
+    """Prefer actionable deals and relevant flight origins over generic results."""
     deal, decision = pair
     if deal.offer_type == "flight":
-        return decision.score
+        return decision.score + _flight_origin_priority(deal)
     score = decision.score
     has_price_pair = deal.price is not None and deal.old_price is not None
 

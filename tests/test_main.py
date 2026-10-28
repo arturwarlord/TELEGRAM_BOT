@@ -4,7 +4,7 @@ import unittest
 
 from deal_hunter.models import Deal
 from deal_hunter.scoring import DealDecision
-from main import _rank_evaluated_deal, choose_best_duplicates
+from main import _flight_origin_priority, _rank_evaluated_deal, choose_best_duplicates
 
 
 class MainDeduplicationTests(unittest.TestCase):
@@ -101,6 +101,26 @@ class MainDeduplicationTests(unittest.TestCase):
         )
         self.assertGreater(coded_rank, vague_rank)
 
+
+    def test_flight_ranking_prioritizes_russian_and_cis_departures(self):
+        decision = DealDecision(True, "eligible flight ticket", None, None, 70.0)
+        russian = Deal(
+            title="Авиабилеты Москва → Анталья", product_url="https://www.aviasales.ru/search/MOWA",
+            source="Aviasales API — билеты из Москвы", offer_type="flight", price=15000,
+        )
+        cis = Deal(
+            title="Авиабилеты Ташкент → Стамбул", product_url="https://www.aviasales.ru/search/TASIST",
+            source="Aviasales API — билеты из Ташкента", offer_type="flight", price=15000,
+        )
+        foreign = Deal(
+            title="Авиабилеты Франкфурт → Рим", product_url="https://www.aviasales.ru/search/FRAROM",
+            source="Aviasales API — билеты из Франкфурта", offer_type="flight", price=15000,
+        )
+        self.assertGreater(_rank_evaluated_deal((russian, decision)), _rank_evaluated_deal((cis, decision)))
+        self.assertGreater(_rank_evaluated_deal((cis, decision)), _rank_evaluated_deal((foreign, decision)))
+        self.assertEqual(_flight_origin_priority(russian), 15.0)
+        self.assertEqual(_flight_origin_priority(cis), 8.0)
+        self.assertEqual(_flight_origin_priority(foreign), 0.0)
 
     def test_specific_offer_page_ranks_above_generic_store_index(self):
         detailed = self.make_coupon(
