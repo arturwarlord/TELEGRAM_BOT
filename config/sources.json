@@ -4002,23 +4002,23 @@
     },
     {
       "name": "Biglion — купоны и скидки",
-      "type": "html",
+      "type": "html_promos",
       "url": "https://www.biglion.ru/",
       "store": "Biglion",
       "enabled": false,
       "diagnostic": true,
       "category": "coupons",
-      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа."
+      "reason": "Live diagnostic found individual deal cards with direct URLs and images, but the generic html parser extracted 0 deals. Testing the promotion-card parser; keep disabled until diagnostics confirm valid cards."
     },
     {
       "name": "Frendi — скидки и впечатления",
-      "type": "html",
+      "type": "html_promos",
       "url": "https://frendi.ru/",
       "store": "Frendi",
       "enabled": false,
       "diagnostic": true,
       "category": "coupons",
-      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа."
+      "reason": "Live diagnostic found individual deal cards with direct URLs and images, but the generic html parser extracted 0 deals. Testing the promotion-card parser; keep disabled until diagnostics confirm valid cards."
     },
     {
       "name": "Groupon — предложения",
