@@ -76,6 +76,26 @@ class FeedParserTests(unittest.TestCase):
 
 
 
+    def test_html_promotions_extracts_explicit_current_and_old_prices(self):
+        html = """
+        <html><body>
+          <article class="deal">
+            <a href="/deals/quest-50">Скидка 50%. Квест «Припять» (3995 руб. вместо 7990 руб.)</a>
+            <img src="/images/quest.jpg" alt="Квест">
+          </article>
+        </body></html>
+        """
+        deals = parse_feed(html.encode("utf-8"), {
+            "name": "test-coupon-prices",
+            "type": "html_promos",
+            "url": "https://coupon.example.test/",
+            "store": "Test Coupon",
+        })
+        matching = [deal for deal in deals if deal.product_url.endswith("/deals/quest-50")]
+        self.assertTrue(matching)
+        self.assertEqual(matching[0].price, 3995.0)
+        self.assertEqual(matching[0].old_price, 7990.0)
+
     def test_html_promotions_support_windows_1251_pages(self):
         html = '''
         <html><head><meta charset="windows-1251"></head><body>
