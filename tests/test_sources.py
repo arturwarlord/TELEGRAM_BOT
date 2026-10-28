@@ -5,7 +5,7 @@ import unittest
 from datetime import date
 from pathlib import Path
 
-from deal_hunter.sources import _decode_html_payload, _extract_open_graph_image, _extract_promo_expiry, parse_aviasales_payload, parse_feed, parse_html_travel_articles
+from deal_hunter.sources import _decode_html_payload, _extract_open_graph_image, _extract_promo_expiry, parse_aviasales_payload, parse_feed, parse_html_travel_articles, parse_html_tour_cards
 
 
 FIXTURE = Path(__file__).parent / "fixtures" / "sample_feed.xml"
@@ -806,6 +806,52 @@ class FeedParserTests(unittest.TestCase):
         self.assertIsNone(
             _extract_open_graph_image(payload, "https://avianity.ru/specials/sample-fare/"),
         )
+
+
+    def test_tutu_tour_parser_extracts_price_pair_direct_link_and_image(self):
+        payload = """
+        <html><body>
+          <div class="kite-panel kite-panel-container">
+            <a href="/tour/istanbul-123/">
+              <img src="https://cdn.tutu.ru/hotels/istanbul.jpg" alt="Отель">
+            </a>
+            <div class="hotel-name">Galata Hotel Suites</div>
+            <div>Стамбул, Турция · 3 ночи · 2 взрослых · Кешбэк до 7% от 51 195 ₽ 59 310 ₽ - 14%</div>
+          </div>
+        </body></html>
+        """.encode("utf-8")
+        source = {
+            "name": "Tutu test",
+            "type": "html_tour_cards",
+            "url": "https://tours.tutu.ru/hot_tours/",
+            "store": "Туту",
+            "enabled": True,
+        }
+        deals = parse_html_tour_cards(payload, source)
+        self.assertEqual(len(deals), 1)
+        self.assertEqual(deals[0].title, "Galata Hotel Suites")
+        self.assertEqual(deals[0].price, 51195.0)
+        self.assertEqual(deals[0].old_price, 59310.0)
+        self.assertEqual(deals[0].offer_type, "tour")
+        self.assertEqual(deals[0].product_url, "https://tours.tutu.ru/tour/istanbul-123/")
+        self.assertEqual(deals[0].image_url, "https://cdn.tutu.ru/hotels/istanbul.jpg")
+
+    def test_tutu_tour_parser_rejects_mismatched_discount_and_listing_links(self):
+        payload = """
+        <html><body>
+          <div class="kite-panel kite-panel-container">
+            <a href="/hot_tours/"><img src="https://cdn.tutu.ru/hotels/list.jpg"></a>
+            <div class="hotel-name">Hotel Listing</div>
+            <div>от 51 195 ₽ 59 310 ₽ - 60%</div>
+          </div>
+        </body></html>
+        """.encode("utf-8")
+        source = {
+            "name": "Tutu test",
+            "type": "html_tour_cards",
+            "url": "https://tours.tutu.ru/hot_tours/",
+        }
+        self.assertEqual(parse_html_tour_cards(payload, source), [])
 
 if __name__ == "__main__":
     unittest.main()
