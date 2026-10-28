@@ -32,6 +32,22 @@
       "published_at": "2026-10-27T20:54:40.590145+00:00",
       "telegram_message_id": 6,
       "affiliate_url": null
+    },
+    "f583f0d302fa321980cbcc11": {
+      "title": "Макароны Pasteroni Farfalle №170 400г",
+      "store": "Магнит",
+      "price": 78.99,
+      "published_at": "2026-10-28T00:24:43.227469+00:00",
+      "telegram_message_id": 7,
+      "affiliate_url": null
+    },
+    "584a486e73e3231763c78274": {
+      "title": "Фоксфорд",
+      "store": "Скидометр",
+      "price": null,
+      "published_at": "2026-10-28T00:24:45.569547+00:00",
+      "telegram_message_id": 8,
+      "affiliate_url": null
     }
   },
   "recent_posts": [
@@ -54,6 +70,16 @@
       "key": "59f5d7040a7cdf5d99d09af2",
       "published_at": "2026-10-27T20:54:40.590145+00:00",
       "telegram_message_id": 6
+    },
+    {
+      "key": "f583f0d302fa321980cbcc11",
+      "published_at": "2026-10-28T00:24:43.227469+00:00",
+      "telegram_message_id": 7
+    },
+    {
+      "key": "584a486e73e3231763c78274",
+      "published_at": "2026-10-28T00:24:45.569547+00:00",
+      "telegram_message_id": 8
     }
   ]
 }
