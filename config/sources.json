@@ -1357,10 +1357,10 @@
       "type": "aviasales_api",
       "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
       "store": "Aviasales",
-      "origin": "FRU",
+      "origin": "BSZ",
       "market": "ru",
       "enabled": true,
-      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+      "note": "Uses current Bishkek Manas airport IATA code BSZ; requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
     },
     {
       "name": "Aviasales API — билеты из Душанбе",
