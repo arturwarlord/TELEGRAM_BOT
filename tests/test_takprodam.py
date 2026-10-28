@@ -157,7 +157,7 @@ class TakprodamTests(unittest.TestCase):
             mock_request.call_args.kwargs["params"],
             {
                 "source_id": "7",
-                "marketplace": "Ozon",
+                "marketplace": "ozon",
                 "page": 1,
                 "limit": 20,
                 "subid": "telegram_deal_hunter",
