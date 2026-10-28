@@ -499,13 +499,14 @@
       "disabled_reason": "HTTP 403 from GitHub Actions; no access controls are bypassed."
     },
     {
-      "name": "Level.Travel — туры и скидки",
+      "name": "Level.Travel — официальные спецпредложения на туры и отели",
       "type": "html_promos",
-      "url": "https://level.travel/",
+      "url": "https://promo.level.travel/",
       "store": "Level.Travel",
       "enabled": false,
       "note": "Keep enabled only if production diagnostics returns specific current offer cards.",
-      "disabled_reason": "Returned a bot-check page instead of offers; no access controls are bypassed."
+      "diagnostic": true,
+      "reason": "Новый официальный промо-раздел. Прогнать read-only проверку на уникальные промокоды, изображения и прямые ссылки перед включением."
     },
     {
       "name": "OnlineTours — туры и акции",
@@ -2708,6 +2709,96 @@
       "market": "ru",
       "enabled": true,
       "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Level.Travel — кампания «Осень. Перезагрузка»",
+      "type": "html_promos",
+      "url": "https://promo.level.travel/newseason",
+      "store": "Level.Travel",
+      "enabled": false,
+      "diagnostic": true,
+      "reason": "Новый кандидат на источники путёвок/туров; требуется read-only проверка реальных карточек, цены, изображения и ссылок."
+    },
+    {
+      "name": "Большая Страна — туры по России",
+      "type": "html",
+      "url": "https://bolshayastrana.com/",
+      "store": "Большая Страна",
+      "enabled": false,
+      "diagnostic": true,
+      "reason": "Новый кандидат на источники путёвок/туров; требуется read-only проверка реальных карточек, цены, изображения и ссылок."
+    },
+    {
+      "name": "YouTravel — горящие туры",
+      "type": "html",
+      "url": "https://youtravel.me/tours/specials/goryashchie-tury",
+      "store": "YouTravel",
+      "enabled": false,
+      "diagnostic": true,
+      "reason": "Новый кандидат на источники путёвок/туров; требуется read-only проверка реальных карточек, цены, изображения и ссылок."
+    },
+    {
+      "name": "Tourvisor — поиск выгодных туров",
+      "type": "html",
+      "url": "https://www.tourvisor.ru/",
+      "store": "Tourvisor",
+      "enabled": false,
+      "diagnostic": true,
+      "reason": "Новый кандидат на источники путёвок/туров; требуется read-only проверка реальных карточек, цены, изображения и ссылок."
+    },
+    {
+      "name": "Tutu — горящие туры",
+      "type": "html",
+      "url": "https://tours.tutu.ru/hot_tours/",
+      "store": "Tutu",
+      "enabled": false,
+      "diagnostic": true,
+      "reason": "Новый кандидат на источники путёвок/туров; требуется read-only проверка реальных карточек, цены, изображения и ссылок."
+    },
+    {
+      "name": "Слетать.ру — горящие туры",
+      "type": "html",
+      "url": "https://www.sletat.ru/hot-tour/",
+      "store": "Слетать.ру",
+      "enabled": false,
+      "diagnostic": true,
+      "reason": "Новый кандидат на источники путёвок/туров; требуется read-only проверка реальных карточек, цены, изображения и ссылок."
+    },
+    {
+      "name": "Coral Travel — топ-туры",
+      "type": "html",
+      "url": "https://www.coral.ru/top-tours/",
+      "store": "Coral Travel",
+      "enabled": false,
+      "diagnostic": true,
+      "reason": "Новый кандидат на источники путёвок/туров; требуется read-only проверка реальных карточек, цены, изображения и ссылок."
+    },
+    {
+      "name": "Sunmar — горящие туры",
+      "type": "html",
+      "url": "https://www.sunmar.ru/info-actions/goryashie-tury/",
+      "store": "Sunmar",
+      "enabled": false,
+      "diagnostic": true,
+      "reason": "Новый кандидат на источники путёвок/туров; требуется read-only проверка реальных карточек, цены, изображения и ссылок."
+    },
+    {
+      "name": "FUN&SUN — поиск горящих туров",
+      "type": "html",
+      "url": "https://fstravel.com/searchhottours",
+      "store": "FUN&SUN",
+      "enabled": false,
+      "diagnostic": true,
+      "reason": "Новый кандидат на источники путёвок/туров; требуется read-only проверка реальных карточек, цены, изображения и ссылок."
+    },
+    {
+      "name": "OnlineTours — горящие туры",
+      "type": "html",
+      "url": "https://www.onlinetours.ru/goryashchie",
+      "store": "OnlineTours",
+      "enabled": false,
+      "diagnostic": true,
+      "reason": "Новый кандидат на источники путёвок/туров; требуется read-only проверка реальных карточек, цены, изображения и ссылок."
     }
   ]
 }
