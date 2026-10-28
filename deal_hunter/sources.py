@@ -3,11 +3,11 @@ from __future__ import annotations
 import json
 import os
 import re
-from datetime import date, timedelta
+from dataclasses import replace
+from datetime import date, datetime, timedelta, timezone
 import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
-from datetime import date, datetime, timezone
 from typing import Any
 
 from .models import Deal, clean_text, is_http_url, parse_price
@@ -560,6 +560,8 @@ def parse_feed(payload: bytes, source: dict[str, Any], max_items: int = 200) -> 
         return parse_aviasales_payload(payload, source, max_items=max_items)
     if feed_type == "html":
         return parse_html_catalog(payload, source, max_items=max_items)
+    if feed_type == "html_travel_articles":
+        return parse_html_travel_articles(payload, source, max_items=max_items)
     if feed_type in {"html_promos", "html-coupons"}:
         return parse_html_promotions(payload, source, max_items=max_items)
 
@@ -680,6 +682,156 @@ def parse_aviasales_payload(payload: bytes, source: dict[str, Any], max_items: i
     return deals
 
 
+def parse_html_travel_articles(
+    payload: bytes,
+    source: dict[str, Any],
+    max_items: int = 200,
+    *,
+    today: date | None = None,
+) -> list[Deal]:
+    """Parse fresh, dated Avianity fare articles; never infer savings from a single fare."""
+    base_url = str(source.get("url") or "").strip()
+    base_parts = urlsplit(base_url)
+    parser = _HtmlTreeParser()
+    parser.feed(payload.decode("utf-8-sig", errors="replace"))
+    parser.close()
+
+    reference_day = today or datetime.now(timezone.utc).date()
+    max_age_days = max(1, min(int(source.get("max_article_age_days") or 3), 14))
+    deals: list[Deal] = []
+    seen: set[str] = set()
+    price_pattern = re.compile(
+        r"\b(?:за|от)\s*(\d[\d\s\u00a0\u202f]*(?:[.,]\d{1,2})?)\s*(?:₽|руб(?:лей|ля|ль)?\.?)",
+        flags=re.IGNORECASE,
+    )
+    flight_words = re.compile(r"\b(?:авиа|билет|рейс|чартер|авиакомпан|побед[аы]|flyone|red\s*wings|азур|airlines)\w*", re.I)
+    article_date_pattern = re.compile(r"\b(\d{2})[.](\d{2})[.](\d{4})\b")
+
+    for node in _html_walk(parser.root):
+        if node.tag != "article":
+            continue
+        article_text = _html_text(node)
+        if not article_text or len(article_text) > 6000:
+            continue
+        date_match = article_date_pattern.search(article_text)
+        if not date_match:
+            continue
+        try:
+            published = date(int(date_match.group(3)), int(date_match.group(2)), int(date_match.group(1)))
+        except ValueError:
+            continue
+        age_days = (reference_day - published).days
+        if age_days < 0 or age_days > max_age_days:
+            continue
+
+        candidates: list[tuple[str, str, float]] = []
+        for link_node in _html_walk(node):
+            if link_node.tag != "a":
+                continue
+            href = urljoin(base_url, link_node.attrs.get("href", "").strip())
+            parsed = urlsplit(href)
+            if (
+                parsed.scheme.lower() != "https"
+                or (parsed.hostname or "").lower().removeprefix("www.")
+                    != (base_parts.hostname or "").lower().removeprefix("www.")
+                or not parsed.path.startswith("/specials/")
+            ):
+                continue
+            title = clean_text(_html_text(link_node), 300)
+            if not title or not flight_words.search(title):
+                continue
+            match = price_pattern.search(title)
+            if not match:
+                continue
+            price = parse_price(match.group(1))
+            if price is None or price < 500 or price > 2_000_000:
+                continue
+            candidates.append((title, href, price))
+        if not candidates:
+            continue
+
+        title, product_url, price = max(candidates, key=lambda item: len(item[0]))
+        deal = Deal(
+            title=title,
+            product_url=product_url,
+            store=clean_text(source.get("store") or "Авианити", 100),
+            source=clean_text(source.get("name") or "avianity:flight-articles", 120),
+            price=price,
+            old_price=None,
+            affiliate_url=None,
+            image_url=(_html_images(node, base_url) or [None])[0],
+            currency="RUB",
+            description=(
+                f"Источник опубликовал предложение {published.strftime('%d.%m.%Y')}. "
+                "Цена опубликована в статье и может измениться; проверьте даты и наличие перед покупкой."
+            ),
+            expires_at=None,
+            external_id=product_url,
+            offer_type="flight",
+        )
+        if deal.key not in seen:
+            deals.append(deal)
+            seen.add(deal.key)
+            if len(deals) >= max(1, min(max_items, 30)):
+                break
+    return deals
+
+
+def _extract_open_graph_image(payload: bytes, page_url: str) -> str | None:
+    """Find a safe HTTPS preview image on an article page."""
+    parser = _HtmlTreeParser()
+    parser.feed(payload.decode("utf-8-sig", errors="replace"))
+    parser.close()
+    for node in _html_walk(parser.root):
+        if node.tag != "meta":
+            continue
+        key = (node.attrs.get("property") or node.attrs.get("name") or node.attrs.get("itemprop") or "").casefold()
+        if key not in {"og:image", "og:image:url", "twitter:image", "twitter:image:src", "image"}:
+            continue
+        candidate = urljoin(page_url, (node.attrs.get("content") or "").strip())
+        parsed = urlsplit(candidate)
+        if is_http_url(candidate) and parsed.scheme.lower() == "https":
+            return candidate
+    for candidate in _html_images(parser.root, page_url):
+        if urlsplit(candidate).scheme.lower() == "https":
+            return candidate
+    return None
+
+
+def _fetch_article_preview_image(
+    deal: Deal,
+    source: dict[str, Any],
+    timeout: int,
+    max_bytes: int,
+) -> str | None:
+    source_url = str(source.get("url") or "").strip()
+    source_host = (urlsplit(source_url).hostname or "").lower().removeprefix("www.")
+    target = urlsplit(deal.product_url)
+    target_host = (target.hostname or "").lower().removeprefix("www.")
+    # Article enrichment is only permitted on the exact same publisher host.
+    if (
+        target.scheme.lower() != "https"
+        or target_host != source_host
+        or not target.path.startswith("/specials/")
+    ):
+        return None
+    request = urllib.request.Request(
+        deal.product_url,
+        headers={
+            "User-Agent": "DealHunterBot/0.1 (+public deal page reader)",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        },
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            payload = response.read(min(max_bytes, 1_000_000) + 1)
+    except (urllib.error.URLError, TimeoutError, OSError):
+        return None
+    if not payload or len(payload) > min(max_bytes, 1_000_000):
+        return None
+    return _extract_open_graph_image(payload, deal.product_url)
+
+
 def fetch_source(
     source: dict[str, Any],
     timeout: int = 20,
@@ -732,7 +884,20 @@ def fetch_source(
         raise RuntimeError(f"Could not fetch source '{source.get('name', 'unnamed')}': {exc}") from exc
     if len(payload) > max_bytes:
         raise ValueError(f"Source '{source.get('name', 'unnamed')}' exceeded the {max_bytes}-byte limit")
-    return parse_feed(payload, source, max_items=max_items)
+    deals = parse_feed(payload, source, max_items=max_items)
+    if str(source.get("type", "")).lower() == "html_travel_articles":
+        enriched: list[Deal] = []
+        image_limit = max(1, min(int(source.get("article_image_limit") or 12), 20))
+        image_requests = 0
+        for deal in deals:
+            if deal.image_url or image_requests >= image_limit:
+                enriched.append(deal)
+                continue
+            image_requests += 1
+            image = _fetch_article_preview_image(deal, source, timeout, max_bytes)
+            enriched.append(replace(deal, image_url=image) if image else deal)
+        return enriched
+    return deals
 
 from html.parser import HTMLParser
 from urllib.parse import urlencode, urljoin, urlsplit
