@@ -242,7 +242,7 @@ def fetch_promotion_deals(
                 params={
                     **{
                         "source_id": str(source_id),
-                        "marketplace": normalized,
+                        "marketplace": normalized.casefold(),
                         "page": page,
                         "limit": page_limit,
                     },
