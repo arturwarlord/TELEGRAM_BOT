@@ -24,6 +24,62 @@ def _env_int(name: str, default: int) -> int:
         return default
     return value if value > 0 else default
 
+_DIRECT_MARKETPLACE_HOSTS = {
+    "ozon": ("ozon.ru", "ozon.kz", "ozon.by", "ozon.uz"),
+    "wildberries": ("wildberries.ru", "wildberries.by", "wildberries.kz", "wildberries.uz", "wb.ru"),
+    "avito": ("avito.ru",),
+    "aliexpress": ("aliexpress.ru", "aliexpress.com", "aliexpress.kz", "aliexpress.by"),
+}
+
+
+def _marketplace_slug(value: str) -> str | None:
+    normalized = value.casefold().replace("ё", "е")
+    if "wildberries" in normalized or "вайлдберриз" in normalized:
+        return "wildberries"
+    if "aliexpress" in normalized or "алиэкспресс" in normalized:
+        return "aliexpress"
+    if "avito" in normalized or "авито" in normalized:
+        return "avito"
+    if "ozon" in normalized or "озон" in normalized:
+        return "ozon"
+    return None
+
+
+def _direct_marketplace_url(value: object, marketplace: str) -> str | None:
+    """Return a verified HTTPS product URL, unwrapping only explicit marketplace redirects."""
+    slug = _marketplace_slug(marketplace)
+    if slug is None:
+        return None
+    raw_url = str(value or "").strip()
+    for _ in range(3):
+        if not is_http_url(raw_url):
+            return None
+        parsed = urllib.parse.urlsplit(raw_url)
+        if parsed.scheme.lower() != "https":
+            return None
+        host = (parsed.hostname or "").lower().removeprefix("www.")
+        allowed = _DIRECT_MARKETPLACE_HOSTS[slug]
+        if any(host == domain or host.endswith("." + domain) for domain in allowed):
+            tracking_keys = {"erid", "subid", "ref", "refid", "affiliate", "affiliate_id", "click_id", "yclid", "gclid", "fbclid"}
+            query_pairs = [
+                (key, val) for key, val in urllib.parse.parse_qsl(parsed.query, keep_blank_values=True)
+                if key.casefold() not in tracking_keys and not key.casefold().startswith("utm_")
+            ]
+            safe_netloc = parsed.hostname.lower() if parsed.hostname else ""
+            safe_query = urllib.parse.urlencode(query_pairs, doseq=True)
+            return urllib.parse.urlunsplit(("https", safe_netloc, parsed.path or "/", safe_query, ""))
+        if host in {"takprdm.ru", "www.takprdm.ru"}:
+            redirect_targets = [
+                val for key, val in urllib.parse.parse_qsl(parsed.query, keep_blank_values=True)
+                if key.casefold() in {"redirectto", "redirect_to", "target_url"}
+            ]
+            if not redirect_targets:
+                return None
+            raw_url = redirect_targets[0].strip()
+            continue
+        return None
+    return None
+
 
 class NoApprovedSourceError(RuntimeError):
     """The API token works, but no publisher source is approved yet."""
@@ -167,12 +223,15 @@ def parse_promotion_items(
         if not title or not is_http_url(affiliate_url):
             continue
 
-        # Promotion-product records include old price and sale price, but may not
-        # include the ordinary product URL. Use external_link when the API supplies it;
-        # otherwise the tracking link remains the safe dedupe fallback.
-        product_url = str(item.get("external_link") or affiliate_url).strip()
-        if not is_http_url(product_url):
-            product_url = affiliate_url
+        # In the no-affiliate mode only publish a verified marketplace URL.
+        # Takprodam can wrap an external URL in redirectTo and append erid/subid.
+        # Unwrap only known marketplace domains; never fall back to a tracking link.
+        product_url = (
+            _direct_marketplace_url(item.get("external_link"), marketplace)
+            or _direct_marketplace_url(affiliate_url, marketplace)
+        )
+        if not product_url:
+            continue
 
         old_price = parse_price(item.get("price"))
         price = parse_price(item.get("price_discount"))
@@ -226,7 +285,7 @@ def fetch_promotion_deals(
     if not str(source_id).strip():
         raise ValueError("Takprodam publisher source ID is empty")
 
-    markets = marketplaces or ["Ozon", "Wildberries"]
+    markets = marketplaces or ["Ozon", "Wildberries", "Avito", "Aliexpress"]
     page_limit = max(1, min(int(limit), 1000))
     pages = max(1, min(int(max_pages), 10))
     found: list[Deal] = []
@@ -269,7 +328,7 @@ def fetch_configured_takprodam_deals(timeout: int = 25) -> tuple[list[Deal], str
 
     configured_source_id = os.getenv("TAKPRODAM_SOURCE_ID", "").strip() or None
     source_id = resolve_source_id(token, configured_source_id, timeout=timeout)
-    marketplace_setting = os.getenv("TAKPRODAM_MARKETPLACES", "Ozon,Wildberries")
+    marketplace_setting = os.getenv("TAKPRODAM_MARKETPLACES", "Ozon,Wildberries,Avito,Aliexpress")
     marketplaces = [name.strip() for name in marketplace_setting.split(",") if name.strip()]
     limit = _env_int("TAKPRODAM_LIMIT", 1000)
     max_pages = _env_int("TAKPRODAM_MAX_PAGES", 1)
