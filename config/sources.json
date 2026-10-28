@@ -2188,6 +2188,526 @@
       "enabled": false,
       "diagnostic": true,
       "reason": "Новый публичный источник: выполнить read-only диагностику карточек, сроков, изображений и ссылок перед активацией."
+    },
+    {
+      "name": "Aviasales API — билеты из Стамбула",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "IST",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Антальи",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "AYT",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Дубая",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "DXB",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Абу-Даби",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "AUH",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Дохи",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "DOH",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Бангкока",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "BKK",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Пхукета",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "HKT",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Денпасара (Бали)",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "DPS",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Коломбо",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "CMB",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Мале",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "MLE",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Дели",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "DEL",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Мумбаи",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "BOM",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Куала-Лумпура",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "KUL",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Сингапура",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "SIN",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Пекина",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "PEK",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Шанхая",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "PVG",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Гонконга",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "HKG",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Франкфурта",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "FRA",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Берлина",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "BER",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Мюнхена",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "MUC",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Парижа",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "CDG",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Лондона",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "LHR",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Амстердама",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "AMS",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Милана",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "MXP",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Рима",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "FCO",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Барселоны",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "BCN",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Мадрида",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "MAD",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Вены",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "VIE",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Цюриха",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "ZRH",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Праги",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "PRG",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Варшавы",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "WAW",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Белграда",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "BEG",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Будапешта",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "BUD",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Тивата",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "TIV",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Подгорицы",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "TGD",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Тираны",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "TIA",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Афин",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "ATH",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Ларнаки",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "LCA",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Каира",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "CAI",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Эр-Рияда",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "RUH",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Джидды",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "JED",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Касабланки",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "CMN",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Туниса",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "TUN",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Найроби",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "NBO",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Пномпеня",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "PNH",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Манилы",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "MNL",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Токио",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "NRT",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Сеула",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "ICN",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Торонто",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "YYZ",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Нью-Йорка",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "JFK",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Лос-Анджелеса",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "LAX",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
+    },
+    {
+      "name": "Aviasales API — билеты из Майами",
+      "type": "aviasales_api",
+      "url": "https://api.travelpayouts.com/aviasales/v3/get_special_offers",
+      "store": "Aviasales",
+      "origin": "MIA",
+      "market": "ru",
+      "enabled": true,
+      "note": "Requires AVIASALES_API_TOKEN GitHub Actions secret from Travelpayouts."
     }
   ]
 }
