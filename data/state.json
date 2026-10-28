@@ -48,6 +48,22 @@
       "published_at": "2026-10-28T00:24:45.569547+00:00",
       "telegram_message_id": 8,
       "affiliate_url": null
+    },
+    "aecbee65ae50f35340b31ea2": {
+      "title": "Чизбургер 210г",
+      "store": "Магнит",
+      "price": 79.99,
+      "published_at": "2026-10-28T06:11:40.517663+00:00",
+      "telegram_message_id": 9,
+      "affiliate_url": null
+    },
+    "b995e967f72d330eebfae870": {
+      "title": "Тесто дрожжевое сдобное",
+      "store": "Магнит",
+      "price": 90.93,
+      "published_at": "2026-10-28T06:11:43.403811+00:00",
+      "telegram_message_id": 10,
+      "affiliate_url": null
     }
   },
   "recent_posts": [
@@ -80,6 +96,16 @@
       "key": "584a486e73e3231763c78274",
       "published_at": "2026-10-28T00:24:45.569547+00:00",
       "telegram_message_id": 8
+    },
+    {
+      "key": "aecbee65ae50f35340b31ea2",
+      "published_at": "2026-10-28T06:11:40.517663+00:00",
+      "telegram_message_id": 9
+    },
+    {
+      "key": "b995e967f72d330eebfae870",
+      "published_at": "2026-10-28T06:11:43.403811+00:00",
+      "telegram_message_id": 10
     }
   ]
 }
