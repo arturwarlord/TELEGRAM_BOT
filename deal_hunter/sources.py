@@ -562,6 +562,8 @@ def parse_feed(payload: bytes, source: dict[str, Any], max_items: int = 200) -> 
         return parse_html_catalog(payload, source, max_items=max_items)
     if feed_type == "html_travel_articles":
         return parse_html_travel_articles(payload, source, max_items=max_items)
+    if feed_type == "html_tour_cards":
+        return parse_html_tour_cards(payload, source, max_items=max_items)
     if feed_type in {"html_promos", "html-coupons"}:
         return parse_html_promotions(payload, source, max_items=max_items)
 
@@ -679,6 +681,129 @@ def parse_aviasales_payload(payload: bytes, source: dict[str, Any], max_items: i
         if deal.key not in seen:
             deals.append(deal)
             seen.add(deal.key)
+    return deals
+
+
+def parse_html_tour_cards(
+    payload: bytes,
+    source: dict[str, Any],
+    max_items: int = 200,
+) -> list[Deal]:
+    """Parse public Tutu tour cards with a verified direct detail URL, image and price pair."""
+    base_url = str(source.get("url") or "").strip()
+    base_parts = urlsplit(base_url)
+    base_host = (base_parts.hostname or "").lower().removeprefix("www.")
+    base_path = base_parts.path.rstrip("/")
+    parser = _HtmlTreeParser()
+    parser.feed(payload.decode("utf-8-sig", errors="replace"))
+    parser.close()
+
+    deals: list[Deal] = []
+    seen: set[str] = set()
+    for node in _html_walk(parser.root):
+        if node.tag not in {"div", "article", "section"}:
+            continue
+        classes = node.attrs.get("class", "").casefold()
+        if "kite-panel-container" not in classes:
+            continue
+
+        text = clean_text(_html_text(node), 5000).replace("\u2060", "").replace("\ufeff", "")
+        if len(text) < 35 or len(text) > 5000:
+            continue
+        discount_matches = list(re.finditer(r"-\s*(\d{1,2}(?:[.,]\d+)?)\s*%", text))
+        if not discount_matches:
+            continue
+        reported_discount = float(discount_matches[-1].group(1).replace(",", "."))
+        if not 0 < reported_discount < 90:
+            continue
+
+        # Tutu's server-rendered card places the current and previous prices before
+        # its explicit "- N%" label. Compare only price tokens preceding that label.
+        prefix = text[:discount_matches[-1].start()]
+        price_matches = list(re.finditer(_PRICE_TOKEN, prefix, flags=re.IGNORECASE))
+        if len(price_matches) < 2:
+            continue
+        last_two = price_matches[-2:]
+        prices = [parse_price(match.group(1)) for match in last_two]
+        if any(price is None or price <= 0 for price in prices):
+            continue
+        current_price = min(prices)
+        old_price = max(prices)
+        calculated_discount = (old_price - current_price) / old_price * 100
+        # A displayed discount and its price pair must agree within rounding noise.
+        if old_price <= current_price or abs(calculated_discount - reported_discount) > max(3.0, reported_discount * 0.35):
+            continue
+
+        product_url = None
+        for child in _html_walk(node):
+            if child.tag != "a":
+                continue
+            href = urljoin(base_url, child.attrs.get("href", "").strip())
+            parsed = urlsplit(href)
+            host = (parsed.hostname or "").lower().removeprefix("www.")
+            path = parsed.path.rstrip("/")
+            if parsed.scheme.lower() != "https" or host != base_host:
+                continue
+            if not path or path == base_path or path.startswith("/hot_tours"):
+                continue
+            if any(marker in path.casefold() for marker in ("/login", "/logout", "/redirect", "/click", "/tracking", "/out/")):
+                continue
+            product_url = href
+            break
+        if not product_url:
+            continue
+
+        image_url = next(
+            (
+                image for image in _html_images(node, base_url)
+                if urlsplit(image).scheme.lower() == "https"
+            ),
+            None,
+        )
+        if not image_url:
+            continue
+
+        title = ""
+        for child in _html_walk(node):
+            class_value = child.attrs.get("class", "").casefold()
+            candidate = ""
+            if child.tag in {"h1", "h2", "h3", "h4"}:
+                candidate = clean_text(_html_text(child), 180)
+            elif any(token in class_value for token in ("hotel-name", "hotelname", "tour-title", "hotel-title")):
+                candidate = clean_text(_html_text(child), 180)
+            elif child.attrs.get("title"):
+                candidate = clean_text(child.attrs.get("title"), 180)
+            if candidate and len(candidate) >= 4 and not re.search(r"\b(?:₽|руб|кешбэк|выбрать|история цены)\b", candidate, re.I):
+                title = candidate
+                break
+        if not title:
+            before_price = re.split(r"кешбэк|история цены|-\s*\d{1,2}(?:[.,]\d+)?\s*%", text, maxsplit=1, flags=re.I)[0]
+            title = clean_text(re.sub(r"^\s*рекомендуем\s+\d+(?:[.,]\d+)?\s*", "", before_price, flags=re.I), 180)
+            title = re.sub(r"\s+", " ", title).strip(" -–|")
+        if not title or len(title) < 4:
+            continue
+
+        deal = Deal(
+            title=title,
+            product_url=product_url,
+            store=clean_text(source.get("store") or "Туту", 100),
+            source=clean_text(source.get("name") or "Туту — горящие туры", 120),
+            price=current_price,
+            old_price=old_price,
+            affiliate_url=None,
+            image_url=image_url,
+            currency="RUB",
+            description=(text[:850] + " · Цена и наличие нужно подтвердить на странице тура.")[:1000],
+            reported_discount_percent=reported_discount,
+            offer_type="tour",
+            external_id=product_url,
+        )
+        if deal.key in seen:
+            continue
+        deals.append(deal)
+        seen.add(deal.key)
+        if len(deals) >= max(1, min(max_items, 100)):
+            break
     return deals
 
 
