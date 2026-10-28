@@ -2181,13 +2181,13 @@
       "reason": "Новый публичный источник: выполнить read-only диагностику карточек, сроков, изображений и ссылок перед активацией."
     },
     {
-      "name": "Авианити — спецпредложения туров и отелей",
-      "type": "html_promos",
+      "name": "Авианити — свежие акции на авиабилеты",
+      "type": "html_travel_articles",
       "url": "https://avianity.ru/specials/",
       "store": "Авианити",
-      "enabled": false,
-      "diagnostic": true,
-      "reason": "Новый публичный источник: выполнить read-only диагностику карточек, сроков, изображений и ссылок перед активацией."
+      "enabled": true,
+      "article_image_limit": 12,
+      "max_article_age_days": 3
     },
     {
       "name": "Aviasales API — билеты из Стамбула",
