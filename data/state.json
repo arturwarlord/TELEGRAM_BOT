@@ -64,6 +64,22 @@
       "published_at": "2026-10-28T06:11:43.403811+00:00",
       "telegram_message_id": 10,
       "affiliate_url": null
+    },
+    "5e5edbbf1d840f73cda30da8": {
+      "title": "Настольная игра для взрослых Cosmodrome games 500 злобных карт 3.0. Дополнительный набор \"Белый\"",
+      "store": "Ozon · Cosmodrome games",
+      "price": 1842.0,
+      "published_at": "2026-10-28T19:04:57.776655+00:00",
+      "telegram_message_id": 11,
+      "affiliate_url": "https://takprdm.ru/0W9UtG83tmCkZyG29FG/?redirectTo=https%3A%2F%2Fozon.ru%2Fproduct%2F249003865&erid=Y1jgkD6uB6jK1phqkTLTbNKYV13k&subid=telegram_deal_hunter"
+    },
+    "b58d962b5949966cd04f7b2c": {
+      "title": "-80 % Получили: 2493 Получи первым! SMAS-лифтинг, инъекции «Ботокса», RF-лифтинг, мезотерапия, биоревитализация Марксистская SMAS-лифтинг, инъекции «Ботокса», RF-лифтинг, мезотерапия, биоревитализация Бесплатно Подробнее",
+      "store": "КупиКупон",
+      "price": null,
+      "published_at": "2026-10-28T19:05:00.868099+00:00",
+      "telegram_message_id": 12,
+      "affiliate_url": null
     }
   },
   "recent_posts": [
@@ -106,6 +122,16 @@
       "key": "b995e967f72d330eebfae870",
       "published_at": "2026-10-28T06:11:43.403811+00:00",
       "telegram_message_id": 10
+    },
+    {
+      "key": "5e5edbbf1d840f73cda30da8",
+      "published_at": "2026-10-28T19:04:57.776655+00:00",
+      "telegram_message_id": 11
+    },
+    {
+      "key": "b58d962b5949966cd04f7b2c",
+      "published_at": "2026-10-28T19:05:00.868099+00:00",
+      "telegram_message_id": 12
     }
   ]
 }
