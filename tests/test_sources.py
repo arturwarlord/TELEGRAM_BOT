@@ -5,7 +5,7 @@ import unittest
 from datetime import date
 from pathlib import Path
 
-from deal_hunter.sources import _decode_html_payload, _extract_promo_expiry, parse_aviasales_payload, parse_feed
+from deal_hunter.sources import _decode_html_payload, _extract_open_graph_image, _extract_promo_expiry, parse_aviasales_payload, parse_feed, parse_html_travel_articles
 
 
 FIXTURE = Path(__file__).parent / "fixtures" / "sample_feed.xml"
@@ -732,6 +732,80 @@ class FeedParserTests(unittest.TestCase):
             "enabled": True,
         }
         self.assertEqual(parse_feed(payload, source), [])
+
+
+    def test_avianity_parser_extracts_recent_flight_fare_without_fake_discount(self):
+        payload = """
+        <html><body>
+          <article id="post-1">
+            <h2 class="entry-title">
+              <a href="/specials/aktsiya-pobedy-moskva-antalya/">Акция Победы Москва – Анталья за 3 536 руб. на октябрь 2026</a>
+            </h2>
+            <div class="entry-meta">27.10.2026 Авианити Акции авиакомпаний</div>
+          </article>
+        </body></html>
+        """.encode("utf-8")
+        source = {
+            "name": "Avianity test",
+            "type": "html_travel_articles",
+            "url": "https://avianity.ru/specials/",
+            "store": "Авианити",
+            "enabled": True,
+            "max_article_age_days": 3,
+        }
+        deals = parse_html_travel_articles(payload, source, today=date(2026, 10, 28))
+        self.assertEqual(len(deals), 1)
+        self.assertEqual(deals[0].title, "Акция Победы Москва – Анталья за 3 536 руб. на октябрь 2026")
+        self.assertEqual(deals[0].price, 3536.0)
+        self.assertEqual(deals[0].product_url, "https://avianity.ru/specials/aktsiya-pobedy-moskva-antalya/")
+        self.assertEqual(deals[0].offer_type, "flight")
+        self.assertIsNone(deals[0].old_price)
+        self.assertIsNone(deals[0].discount_percent)
+
+    def test_avianity_parser_skips_old_articles_and_unpriced_hotel_promos(self):
+        payload = """
+        <html><body>
+          <article>
+            <h2><a href="/specials/old-fare/">Акция Победы Москва – Сочи за 2 344 руб. на октябрь 2026</a></h2>
+            <div class="entry-meta">20.10.2026</div>
+          </article>
+          <article>
+            <h2><a href="/specials/hotel-promo/">Горящий промокод Яндекс Путешествий: скидка 20% на отели в 2027</a></h2>
+            <div class="entry-meta">27.10.2026</div>
+          </article>
+        </body></html>
+        """.encode("utf-8")
+        source = {
+            "name": "Avianity test",
+            "type": "html_travel_articles",
+            "url": "https://avianity.ru/specials/",
+            "max_article_age_days": 3,
+        }
+        self.assertEqual(
+            parse_html_travel_articles(payload, source, today=date(2026, 10, 28)),
+            [],
+        )
+
+    def test_extracts_https_open_graph_image_for_travel_article(self):
+        payload = """
+        <html><head>
+          <meta property="og:image" content="/wp-content/uploads/fare-preview.jpg">
+        </head><body></body></html>
+        """.encode("utf-8")
+        self.assertEqual(
+            _extract_open_graph_image(payload, "https://avianity.ru/specials/sample-fare/"),
+            "https://avianity.ru/wp-content/uploads/fare-preview.jpg",
+        )
+
+    def test_open_graph_image_rejects_insecure_http_image(self):
+        payload = """
+        <html><head>
+          <meta property="og:image" content="http://images.example.test/fare.jpg">
+        </head></html>
+        """.encode("utf-8")
+        self.assertIsNone(
+            _extract_open_graph_image(payload, "https://avianity.ru/specials/sample-fare/"),
+        )
 
 if __name__ == "__main__":
     unittest.main()
