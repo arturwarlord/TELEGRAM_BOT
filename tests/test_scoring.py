@@ -150,5 +150,33 @@ class DealScoringTests(unittest.TestCase):
         self.assertFalse(decision.eligible)
         self.assertEqual(decision.reason, "offer expired")
 
+
+    def test_accepts_package_tour_with_meaningful_savings_and_image(self):
+        deal = self.make_deal(price=51195, old_price=59310, offer_type="tour")
+        decision = evaluate_deal(
+            deal,
+            min_tour_discount_percent=10,
+            min_tour_savings=1000,
+            require_affiliate=False,
+            require_image=True,
+        )
+        self.assertTrue(decision.eligible)
+        self.assertEqual(decision.reason, "eligible package tour")
+        self.assertAlmostEqual(decision.discount_percent, (59310 - 51195) / 59310 * 100)
+        self.assertEqual(decision.savings, 8115)
+
+    def test_rejects_package_tour_with_small_discount(self):
+        deal = self.make_deal(price=78147, old_price=81892, offer_type="tour")
+        decision = evaluate_deal(deal, require_affiliate=False)
+        self.assertFalse(decision.eligible)
+        self.assertIn("tour discount below threshold", decision.reason)
+
+    def test_rejects_package_tour_without_direct_image(self):
+        deal = self.make_deal(price=51195, old_price=59310, image_url=None, offer_type="tour")
+        decision = evaluate_deal(deal, require_affiliate=False, require_image=True)
+        self.assertFalse(decision.eligible)
+        self.assertEqual(decision.reason, "missing tour image URL")
+
+
 if __name__ == "__main__":
     unittest.main()
