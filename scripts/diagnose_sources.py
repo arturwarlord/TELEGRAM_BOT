@@ -55,8 +55,12 @@ def inspect_source(source: dict) -> None:
     except urllib.error.HTTPError as exc:
         print(f"[HTTP ERROR] status={exc.code}")
         return
-    except (urllib.error.URLError, TimeoutError) as exc:
-        print(f"[FETCH ERROR] {type(exc).__name__}: {getattr(exc, 'reason', 'timeout')}")
+    except Exception as exc:
+        # Public retail sites often close connections, time out, reject automation,
+        # or redirect to malformed challenge URLs. A single source must never abort
+        # the read-only diagnostic of every source after it.
+        reason = getattr(exc, "reason", None) or str(exc) or "request failed"
+        print(f"[FETCH ERROR] {type(exc).__name__}: {reason}")
         return
 
     if len(payload) > 2 * 1024 * 1024:
