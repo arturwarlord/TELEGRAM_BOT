@@ -13,6 +13,18 @@ from .models import Deal, clean_text, is_http_url, parse_price
 API_BASE = "https://api.takprodam.ru/v2/publisher"
 
 
+def _env_int(name: str, default: int) -> int:
+    """Read an optional integer environment variable; blank or malformed values use the default."""
+    raw = os.getenv(name, "").strip()
+    if not raw:
+        return default
+    try:
+        value = int(raw)
+    except (TypeError, ValueError):
+        return default
+    return value if value > 0 else default
+
+
 class NoApprovedSourceError(RuntimeError):
     """The API token works, but no publisher source is approved yet."""
 
@@ -259,8 +271,8 @@ def fetch_configured_takprodam_deals(timeout: int = 25) -> tuple[list[Deal], str
     source_id = resolve_source_id(token, configured_source_id, timeout=timeout)
     marketplace_setting = os.getenv("TAKPRODAM_MARKETPLACES", "Ozon,Wildberries")
     marketplaces = [name.strip() for name in marketplace_setting.split(",") if name.strip()]
-    limit = int(os.getenv("TAKPRODAM_LIMIT", "1000"))
-    max_pages = int(os.getenv("TAKPRODAM_MAX_PAGES", "1"))
+    limit = _env_int("TAKPRODAM_LIMIT", 1000)
+    max_pages = _env_int("TAKPRODAM_MAX_PAGES", 1)
     # A stable subid lets the commissions API attribute this bot's traffic separately.
     # The value can be overridden in GitHub Actions Variables for campaign experiments.
     subid = os.getenv("TAKPRODAM_SUBID", "").strip() or "telegram_deal_hunter"
