@@ -856,6 +856,44 @@ class FeedParserTests(unittest.TestCase):
         self.assertEqual(deals[0].product_url, "https://tours.tutu.ru/tour/istanbul-123/")
         self.assertEqual(deals[0].image_url, "https://cdn.tutu.ru/hotels/istanbul.jpg")
 
+    def test_generic_tour_card_parser_accepts_verified_discounted_tour_card(self):
+        payload = """
+        <html><body>
+          <article class="tour-card">
+            <a href="/tour/altai-summer/"><img src="https://cdn.example.test/altai.jpg" alt="Алтай"></a>
+            <h3 class="tour-title">Тур по Алтаю: 7 дней</h3>
+            <div class="tour-price">49 900 ₽ 62 375 ₽ − 20%</div>
+          </article>
+        </body></html>
+        """.encode()
+        source = {
+            "name": "Test tour provider",
+            "type": "html_tour_cards",
+            "url": "https://tours.example.test/specials/",
+            "store": "Тестовые туры",
+        }
+        deals = parse_html_tour_cards(payload, source)
+        self.assertEqual(len(deals), 1)
+        self.assertEqual(deals[0].title, "Тур по Алтаю: 7 дней")
+        self.assertEqual(deals[0].price, 49900.0)
+        self.assertEqual(deals[0].old_price, 62375.0)
+        self.assertEqual(deals[0].reported_discount_percent, 20.0)
+        self.assertEqual(deals[0].product_url, "https://tours.example.test/tour/altai-summer/")
+        self.assertEqual(deals[0].offer_type, "tour")
+
+    def test_generic_tour_card_parser_rejects_unverified_prices_and_external_links(self):
+        payload = """
+        <html><body>
+          <article class="tour-card">
+            <a href="https://other.example.test/tour/altai/"><img src="https://cdn.example.test/altai.jpg"></a>
+            <h3>Тур по Алтаю</h3>
+            <div>49 900 ₽ 62 375 ₽ − 70%</div>
+          </article>
+        </body></html>
+        """.encode()
+        source = {"name": "Test", "type": "html_tour_cards", "url": "https://tours.example.test/"}
+        self.assertEqual(parse_html_tour_cards(payload, source), [])
+
     def test_tutu_tour_parser_rejects_mismatched_discount_and_listing_links(self):
         payload = """
         <html><body>

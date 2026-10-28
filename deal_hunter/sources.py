@@ -695,49 +695,56 @@ def parse_html_tour_cards(
     source: dict[str, Any],
     max_items: int = 200,
 ) -> list[Deal]:
-    """Parse public Tutu tour cards with a verified direct detail URL, image and price pair."""
+    """Parse public tour cards only when direct links, images and consistent discounts exist."""
     base_url = str(source.get("url") or "").strip()
     base_parts = urlsplit(base_url)
     base_host = (base_parts.hostname or "").lower().removeprefix("www.")
     base_path = base_parts.path.rstrip("/")
+    if base_parts.scheme.lower() != "https" or not base_host:
+        return []
     parser = _HtmlTreeParser()
     parser.feed(payload.decode("utf-8-sig", errors="replace"))
     parser.close()
 
     deals: list[Deal] = []
-    seen: set[str] = set()
+    seen_urls: set[str] = set()
+    # Tutu uses kite-panel-container; other providers use common card/tour/hotel
+    # classes. Ignore page-sized wrappers and only accept compact, self-contained cards.
     for node in _html_walk(parser.root):
-        if node.tag not in {"div", "article", "section"}:
+        if node.tag not in {"div", "article", "section", "li", "a"}:
             continue
         classes = node.attrs.get("class", "").casefold()
-        if "kite-panel-container" not in classes:
+        if not (
+            "kite-panel-container" in classes
+            or re.search(r"(?:^|[\s_-])(?:tour|hotel|offer|package|result|product)[\w-]*(?:card|item|tile)(?:$|[\s_-])", classes)
+            or re.search(r"(?:tour|hotel|offer|package)[\w-]*(?:card|item|tile)", classes)
+        ):
             continue
 
-        text = clean_text(_html_text(node), 5000).replace("\u2060", "").replace("\ufeff", "")
-        if len(text) < 35 or len(text) > 5000:
+        text = clean_text(_html_text(node), 3000).replace("\u2060", "").replace("\ufeff", "")
+        if len(text) < 30 or len(text) > 3000:
             continue
-        discount_matches = list(re.finditer(r"-\s*(\d{1,2}(?:[.,]\d+)?)\s*%", text))
+        discount_matches = list(re.finditer(r"(?:−|-)\s*(\d{1,2}(?:[.,]\d+)?)\s*%", text))
         if not discount_matches:
             continue
         reported_discount = float(discount_matches[-1].group(1).replace(",", "."))
-        if not 0 < reported_discount < 90:
+        if not 1 <= reported_discount < 90:
             continue
 
-        # Tutu's server-rendered card places the current and previous prices before
-        # its explicit "- N%" label. Compare only price tokens preceding that label.
+        # The current and old prices must both appear before the explicit discount,
+        # and the arithmetic must agree with the displayed percentage.
         prefix = text[:discount_matches[-1].start()]
         price_matches = list(re.finditer(_PRICE_TOKEN, prefix, flags=re.IGNORECASE))
         if len(price_matches) < 2:
             continue
-        last_two = price_matches[-2:]
-        prices = [parse_price(match.group(1)) for match in last_two]
+        prices = [parse_price(match.group(1)) for match in price_matches[-2:]]
         if any(price is None or price <= 0 for price in prices):
             continue
-        current_price = min(prices)
-        old_price = max(prices)
+        current_price, old_price = min(prices), max(prices)
+        if old_price <= current_price:
+            continue
         calculated_discount = (old_price - current_price) / old_price * 100
-        # A displayed discount and its price pair must agree within rounding noise.
-        if old_price <= current_price or abs(calculated_discount - reported_discount) > max(3.0, reported_discount * 0.35):
+        if abs(calculated_discount - reported_discount) > max(3.0, reported_discount * 0.35):
             continue
 
         product_url = None
@@ -750,20 +757,21 @@ def parse_html_tour_cards(
             path = parsed.path.rstrip("/")
             if parsed.scheme.lower() != "https" or host != base_host:
                 continue
-            if not path or path == base_path or path.startswith("/hot_tours"):
+            if not path or path == base_path or path == base_path + "/hot_tours":
                 continue
-            if any(marker in path.casefold() for marker in ("/login", "/logout", "/redirect", "/click", "/tracking", "/out/")):
+            if any(marker in path.casefold() for marker in (
+                "/login", "/logout", "/redirect", "/click", "/tracking", "/out/",
+                "/search", "/catalog", "/hot_tours", "/tours/specials",
+            )):
                 continue
             product_url = href
             break
-        if not product_url:
+        if not product_url or product_url in seen_urls:
             continue
 
         image_url = next(
-            (
-                image for image in _html_images(node, base_url)
-                if urlsplit(image).scheme.lower() == "https"
-            ),
+            (image for image in _html_images(node, base_url)
+             if urlsplit(image).scheme.lower() == "https"),
             None,
         )
         if not image_url:
@@ -775,39 +783,47 @@ def parse_html_tour_cards(
             candidate = ""
             if child.tag in {"h1", "h2", "h3", "h4"}:
                 candidate = clean_text(_html_text(child), 180)
-            elif any(token in class_value for token in ("hotel-name", "hotelname", "tour-title", "hotel-title")):
+            elif any(token in class_value for token in (
+                "hotel-name", "hotelname", "tour-title", "hotel-title",
+                "tour-name", "offer-title", "product-title", "card-title",
+            )):
                 candidate = clean_text(_html_text(child), 180)
             elif child.attrs.get("title"):
                 candidate = clean_text(child.attrs.get("title"), 180)
-            if candidate and len(candidate) >= 4 and not re.search(r"\b(?:₽|руб|кешбэк|выбрать|история цены)\b", candidate, re.I):
+            if candidate and len(candidate) >= 4 and not re.search(
+                r"\b(?:₽|руб|кешбэк|выбрать|история цены|\d{1,2}\s*%)\b", candidate, re.I
+            ):
                 title = candidate
                 break
         if not title:
-            before_price = re.split(r"кешбэк|история цены|-\s*\d{1,2}(?:[.,]\d+)?\s*%", text, maxsplit=1, flags=re.I)[0]
-            title = clean_text(re.sub(r"^\s*рекомендуем\s+\d+(?:[.,]\d+)?\s*", "", before_price, flags=re.I), 180)
+            before_price = re.split(
+                r"кешбэк|история цены|(?:−|-)\s*\d{1,2}(?:[.,]\d+)?\s*%",
+                text, maxsplit=1, flags=re.I,
+            )[0]
+            title = clean_text(re.sub(
+                r"^\s*(?:рекомендуем\s+\d+(?:[.,]\d+)?\s*)?", "", before_price, flags=re.I
+            ), 180)
             title = re.sub(r"\s+", " ", title).strip(" -–|")
-        if not title or len(title) < 4:
+        if len(title) < 4 or re.fullmatch(r"[\d\s.,₽руб]+", title, re.I):
             continue
 
         deal = Deal(
             title=title,
             product_url=product_url,
-            store=clean_text(source.get("store") or "Туту", 100),
-            source=clean_text(source.get("name") or "Туту — горящие туры", 120),
+            store=clean_text(source.get("store") or "Туры и путешествия", 100),
+            source=clean_text(source.get("name") or "public-tour-cards", 120),
             price=current_price,
             old_price=old_price,
             affiliate_url=None,
             image_url=image_url,
             currency="RUB",
-            description=(text[:850] + " · Цена и наличие нужно подтвердить на странице тура.")[:1000],
+            description=(text[:700] + " · Цена и наличие нужно подтвердить на странице тура.")[:900],
             reported_discount_percent=reported_discount,
             offer_type="tour",
             external_id=product_url,
         )
-        if deal.key in seen:
-            continue
         deals.append(deal)
-        seen.add(deal.key)
+        seen_urls.add(product_url)
         if len(deals) >= max(1, min(max_items, 100)):
             break
     return deals
