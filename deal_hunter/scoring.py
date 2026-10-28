@@ -39,6 +39,8 @@ def evaluate_deal(
     min_savings: float = 100.0,
     max_discount_percent: float = 90.0,
     min_coupon_discount_percent: float = 10.0,
+    min_tour_discount_percent: float = 10.0,
+    min_tour_savings: float = 1000.0,
     require_affiliate: bool = True,
     require_image: bool = True,
     now: datetime | None = None,
@@ -67,6 +69,28 @@ def evaluate_deal(
         # These are special fares; rank by ticket price without inventing a discount.
         score = max(1.0, 100.0 - min(deal.price, 49_500.0) / 500.0)
         return DealDecision(True, "eligible flight ticket", None, None, score)
+
+    if deal.offer_type == "tour":
+        if deal.price is None or deal.old_price is None:
+            return DealDecision(False, "tour offer requires a current/old price pair")
+        if deal.price <= 0 or deal.old_price <= deal.price:
+            return DealDecision(False, "invalid tour price pair")
+        discount = deal.discount_percent
+        savings = deal.savings
+        if discount is None or savings is None:
+            return DealDecision(False, "could not calculate tour savings")
+        if discount < min_tour_discount_percent:
+            return DealDecision(False, f"tour discount below threshold ({discount:.1f}%)", discount, savings)
+        if savings < min_tour_savings:
+            return DealDecision(False, f"tour savings below threshold ({savings:.0f} RUB)", discount, savings)
+        if discount > max_discount_percent:
+            return DealDecision(False, f"suspicious tour discount ({discount:.1f}%)", discount, savings)
+        if require_affiliate and not is_http_url(deal.affiliate_url):
+            return DealDecision(False, "missing approved affiliate URL", discount, savings)
+        if require_image and not is_http_url(deal.image_url):
+            return DealDecision(False, "missing tour image URL", discount, savings)
+        score = min(100.0, discount * 1.8 + min(savings / 1000.0, 30.0))
+        return DealDecision(True, "eligible package tour", discount, savings, score)
 
     has_price_pair = deal.price is not None and deal.old_price is not None
     if not has_price_pair and (deal.price is not None or deal.old_price is not None):
