@@ -1014,8 +1014,6 @@
         "суточно"
       ],
       "note": "Travel-specific promo candidate. Only card titles/descriptions matching travel keywords are accepted; known-expired offers are rejected.",
-      "disabled_reason": "Current travel promo roundup surfaced in public search; verify that individual offers parse without unsafe redirect links.",
-      "diagnostic": true,
       "excluded_offer_keywords": [
         "кредит",
         "займ",
@@ -1023,7 +1021,8 @@
         "букмекер",
         "ставки",
         "лотерея"
-      ]
+      ],
+      "reason": "Карточки показывают скидки, но действия «Открыть промокод» реализованы через JS и в статическом HTML нет безопасной ссылки на отдельное предложение."
     },
     {
       "name": "Тревелинка — промокоды на туры",
@@ -1557,9 +1556,9 @@
       "disabled_reason": "The public-page diagnostic request timed out; no reliable offer cards were verified."
     },
     {
-      "name": "Выберу — промокоды на путешествия и отпуск",
+      "name": "Выберу — скидки на путешествия и отпуск",
       "type": "html_promos",
-      "url": "https://promokod.vbr.ru/puteshestviya/",
+      "url": "https://promokod.vbr.ru/skidki/otpusk-i-puteshestviya/",
       "store": "Выберу.Промокоды",
       "enabled": false,
       "diagnostic": true,
@@ -1584,7 +1583,7 @@
         "ставки",
         "лотерея"
       ],
-      "disabled_reason": "Current travel-specific promo roundup surfaced in public search; verify source-card links and images in read-only diagnostics before enabling."
+      "reason": "Обновлён публичный URL актуального раздела путешествий; проверить карточки в read-only диагностике перед включением."
     },
     {
       "name": "Aviasales API — билеты из Иркутска",
@@ -2042,8 +2041,7 @@
       "url": "https://promokodus.com/campaigns",
       "store": "Promokodus",
       "enabled": false,
-      "diagnostic": true,
-      "reason": "New candidate: read-only diagnostic required before activation."
+      "reason": "GitHub Actions получил страницу проверки безопасности, а не список промокодов; обход проверки не используется."
     },
     {
       "name": "Promokodus — билеты и путешествия по России",
@@ -2051,8 +2049,7 @@
       "url": "https://promokodus.com/tags/po-rossii",
       "store": "Promokodus",
       "enabled": false,
-      "diagnostic": true,
-      "reason": "New candidate: read-only diagnostic required before activation."
+      "reason": "Парсер извлёк общие каталоги брендов/услуг вместо индивидуальных действующих предложений; требуется специализированный парсер."
     },
     {
       "name": "Сравни — промокоды и скидки",
@@ -2060,17 +2057,14 @@
       "url": "https://www.sravni.ru/promokody/",
       "store": "Сравни",
       "enabled": false,
-      "diagnostic": true,
-      "reason": "New candidate: read-only diagnostic required before activation."
+      "reason": "Диагностика не нашла страницу с пригодными карточками промокодов."
     },
     {
-      "name": "КупиКупон — скидки и купоны",
+      "name": "КупиКупон — локальные скидки и услуги (Москва)",
       "type": "html_promos",
       "url": "https://www.kupikupon.ru/",
       "store": "КупиКупон",
-      "enabled": false,
-      "diagnostic": true,
-      "reason": "New candidate: read-only diagnostic required before activation."
+      "enabled": true
     },
     {
       "name": "М.Видео — акции и скидки",
@@ -2078,8 +2072,7 @@
       "url": "https://www.mvideo.ru/promo",
       "store": "М.Видео",
       "enabled": false,
-      "diagnostic": true,
-      "reason": "New candidate: read-only diagnostic required before activation."
+      "reason": "Диагностика не извлекла товарные карточки с проверяемой парой текущей и старой цены."
     },
     {
       "name": "Эльдорадо — акции и распродажа",
@@ -2087,8 +2080,7 @@
       "url": "https://www.eldorado.ru/promo/",
       "store": "Эльдорадо",
       "enabled": false,
-      "diagnostic": true,
-      "reason": "New candidate: read-only diagnostic required before activation."
+      "reason": "Диагностика не извлекла пригодных карточек акций/товаров."
     },
     {
       "name": "Ламода — распродажа одежды",
@@ -2096,8 +2088,7 @@
       "url": "https://www.lamoda.ru/c/477/clothes-sale/",
       "store": "Lamoda",
       "enabled": false,
-      "diagnostic": true,
-      "reason": "New candidate: read-only diagnostic required before activation."
+      "reason": "Диагностика не извлекла пригодных карточек распродажи с ценами."
     },
     {
       "name": "Подружка — акции и специальные предложения",
@@ -2105,8 +2096,7 @@
       "url": "https://www.podrygka.ru/promo/",
       "store": "Подружка",
       "enabled": false,
-      "diagnostic": true,
-      "reason": "New candidate: read-only diagnostic required before activation."
+      "reason": "Диагностика не извлекла индивидуальных карточек промоакций."
     },
     {
       "name": "Комус — товары со скидками",
@@ -2114,8 +2104,7 @@
       "url": "https://www.komus.ru/catalog/discounts/",
       "store": "Комус",
       "enabled": false,
-      "diagnostic": true,
-      "reason": "New candidate: read-only diagnostic required before activation."
+      "reason": "Диагностика не извлекла товарных карточек с подтверждёнными ценами."
     },
     {
       "name": "Ostin — распродажа одежды",
@@ -2123,8 +2112,7 @@
       "url": "https://www.ostin.com/sale/",
       "store": "Ostin",
       "enabled": false,
-      "diagnostic": true,
-      "reason": "New candidate: read-only diagnostic required before activation."
+      "reason": "Диагностика не извлекла карточек распродажи, пригодных для текущего парсера."
     },
     {
       "name": "Зарина — распродажа одежды",
@@ -2132,8 +2120,7 @@
       "url": "https://zarina.ru/catalog/sale/",
       "store": "Zarina",
       "enabled": false,
-      "diagnostic": true,
-      "reason": "New candidate: read-only diagnostic required before activation."
+      "reason": "Диагностика не извлекла пригодных карточек распродажи."
     },
     {
       "name": "МТС — акции и предложения",
@@ -2141,8 +2128,7 @@
       "url": "https://shop.mts.ru/promotions/",
       "store": "МТС",
       "enabled": false,
-      "diagnostic": true,
-      "reason": "New candidate: read-only diagnostic required before activation."
+      "reason": "Диагностика не извлекла карточек промопредложений."
     },
     {
       "name": "Пятёрочка — официальные акции",
@@ -2150,8 +2136,7 @@
       "url": "https://5ka.ru/",
       "store": "Пятёрочка",
       "enabled": false,
-      "diagnostic": true,
-      "reason": "New candidate: read-only diagnostic required before activation."
+      "reason": "Главная страница не предоставляет пригодных публичных карточек скидок в текущем парсере."
     },
     {
       "name": "SPAR — акции и скидки",
@@ -2159,8 +2144,7 @@
       "url": "https://www.spar.ru/akcii/",
       "store": "SPAR",
       "enabled": false,
-      "diagnostic": true,
-      "reason": "New candidate: read-only diagnostic required before activation."
+      "reason": "Диагностика не извлекла пригодных карточек акций."
     },
     {
       "name": "Travelinka — промокоды на билеты Tutu",
@@ -2168,8 +2152,7 @@
       "url": "https://travelinka.ru/promokody-tutu-skidki-na-bilety-i-oteli/",
       "store": "Travelinka",
       "enabled": false,
-      "diagnostic": true,
-      "reason": "New candidate: read-only diagnostic required before activation."
+      "reason": "Диагностика извлекает перекрёстные промо-страницы (Tutu/Travelata/AirHelp) вместо однозначных актуальных карточек; не включаем, чтобы не публиковать несоответствующий заголовок и предложение."
     },
     {
       "name": "Travelinka — скидки AirHelp для путешествий",
@@ -2177,8 +2160,34 @@
       "url": "https://travelinka.ru/airhelp-promokody-skidki-kupony/",
       "store": "Travelinka",
       "enabled": false,
+      "reason": "Диагностика показывает связанные подборки других брендов, а не однозначные карточки самой страницы; требуется специализированный парсер."
+    },
+    {
+      "name": "Арриво — спецпредложения на путешествия и отели",
+      "type": "html_promos",
+      "url": "https://www.arrivo.ru/promo.html",
+      "store": "Арриво",
+      "enabled": false,
       "diagnostic": true,
-      "reason": "New candidate: read-only diagnostic required before activation."
+      "reason": "Новый публичный источник: выполнить read-only диагностику карточек, сроков, изображений и ссылок перед активацией."
+    },
+    {
+      "name": "ПромокодОфф — авиабилеты, билеты и транспорт",
+      "type": "html_promos",
+      "url": "https://promokodoff.ru/travel/aviabilety/",
+      "store": "ПромокодОфф",
+      "enabled": false,
+      "diagnostic": true,
+      "reason": "Новый публичный источник: выполнить read-only диагностику карточек, сроков, изображений и ссылок перед активацией."
+    },
+    {
+      "name": "Авианити — спецпредложения туров и отелей",
+      "type": "html_promos",
+      "url": "https://avianity.ru/specials/",
+      "store": "Авианити",
+      "enabled": false,
+      "diagnostic": true,
+      "reason": "Новый публичный источник: выполнить read-only диагностику карточек, сроков, изображений и ссылок перед активацией."
     }
   ]
 }
