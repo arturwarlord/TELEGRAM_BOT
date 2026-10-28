@@ -11,5 +11,7 @@
   "max_feed_bytes": 5242880,
   "max_items_per_source": 200,
   "max_posts_per_day": 8,
-  "min_coupon_discount_percent": 10
+  "min_coupon_discount_percent": 10,
+  "min_tour_discount_percent": 10,
+  "min_tour_savings_rub": 1000
 }
