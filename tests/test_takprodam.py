@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import os
 import unittest
 from unittest.mock import patch
 
 from deal_hunter.scoring import evaluate_deal
 from deal_hunter.takprodam import (
     fetch_commissions,
+    fetch_configured_takprodam_deals,
     fetch_promotion_deals,
     parse_promotion_items,
     resolve_source_id,
@@ -30,6 +32,41 @@ class TakprodamTests(unittest.TestCase):
             "tracking_link": "https://track.example.test/abc123",
             "legal_text": "Реклама. Данные рекламодателя из партнёрского API.",
         }
+
+    @patch("deal_hunter.takprodam.fetch_promotion_deals", return_value=[])
+    @patch("deal_hunter.takprodam.resolve_source_id", return_value="24285")
+    def test_blank_optional_api_limits_use_safe_defaults(self, mock_resolve, mock_fetch):
+        environment = {
+            "TAKPRODAM_API_TOKEN": "dummy-token",
+            "TAKPRODAM_SOURCE_ID": "",
+            "TAKPRODAM_MARKETPLACES": "Ozon,Wildberries",
+            "TAKPRODAM_LIMIT": "",
+            "TAKPRODAM_MAX_PAGES": "",
+            "TAKPRODAM_SUBID": "",
+        }
+        with patch.dict(os.environ, environment, clear=True):
+            deals, source_id = fetch_configured_takprodam_deals()
+        self.assertEqual(deals, [])
+        self.assertEqual(source_id, "24285")
+        self.assertEqual(mock_fetch.call_args.kwargs["limit"], 1000)
+        self.assertEqual(mock_fetch.call_args.kwargs["max_pages"], 1)
+        mock_resolve.assert_called_once()
+
+    @patch("deal_hunter.takprodam.fetch_promotion_deals", return_value=[])
+    @patch("deal_hunter.takprodam.resolve_source_id", return_value="24285")
+    def test_malformed_optional_api_limits_use_safe_defaults(self, mock_resolve, mock_fetch):
+        environment = {
+            "TAKPRODAM_API_TOKEN": "dummy-token",
+            "TAKPRODAM_SOURCE_ID": "",
+            "TAKPRODAM_MARKETPLACES": "Ozon",
+            "TAKPRODAM_LIMIT": "invalid",
+            "TAKPRODAM_MAX_PAGES": "-2",
+            "TAKPRODAM_SUBID": "",
+        }
+        with patch.dict(os.environ, environment, clear=True):
+            fetch_configured_takprodam_deals()
+        self.assertEqual(mock_fetch.call_args.kwargs["limit"], 1000)
+        self.assertEqual(mock_fetch.call_args.kwargs["max_pages"], 1)
 
     def test_maps_promotion_product_into_deal(self):
         deals = parse_promotion_items([self.sample_item()], "Ozon")
