@@ -529,11 +529,17 @@ def parse_html_promotions(payload: bytes, source: dict[str, Any], max_items: int
         if reported_percent is None and code is None:
             continue
 
+        # Only infer a price pair when the same offer text explicitly states a
+        # comparison (for example, "3 995 руб. вместо 7 990 руб."). Never infer
+        # prices from a percentage alone.
+        price, old_price = _infer_price_pair(text)
         deal = Deal(
             title=title,
             product_url=href,
             store=str(source.get("store") or source.get("name") or "Промокоды"),
             source=str(source.get("name") or "public-html-promotions"),
+            price=price,
+            old_price=old_price,
             affiliate_url=None,
             image_url=images[0],
             currency=str(source.get("currency") or "RUB").upper(),
