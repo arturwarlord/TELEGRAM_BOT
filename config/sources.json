@@ -4015,10 +4015,10 @@
       "type": "html_promos",
       "url": "https://frendi.ru/",
       "store": "Frendi",
-      "enabled": false,
-      "diagnostic": true,
+      "enabled": true,
+      "diagnostic": false,
       "category": "coupons",
-      "reason": "Live diagnostic found individual deal cards with direct URLs and images, but the generic html parser extracted 0 deals. Testing the promotion-card parser; keep disabled until diagnostics confirm valid cards."
+      "reason": "Enabled after read-only live diagnostic extracted 30 specific offer cards with images and direct offer URLs. Parser now extracts current/old prices only when explicitly stated in the same card text."
     },
     {
       "name": "Groupon — предложения",
