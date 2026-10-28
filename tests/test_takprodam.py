@@ -124,12 +124,30 @@ class TakprodamTests(unittest.TestCase):
     def test_same_product_dedupes_across_promotion_links(self):
         first = self.sample_item()
         second = dict(first)
-        first.pop("external_link", None)
-        second.pop("external_link", None)
         second["tracking_link"] = "https://track.example.test/other-promotion"
         deals = parse_promotion_items([first, second], "Ozon")
         self.assertEqual(len(deals), 2)
+        self.assertEqual(deals[0].product_url, "https://www.ozon.ru/product/example-123/")
         self.assertEqual(deals[0].key, deals[1].key)
+
+    def test_unwraps_takprodam_redirect_to_clean_direct_marketplace_url(self):
+        item = self.sample_item()
+        item["external_link"] = (
+            "https://takprdm.ru/offer?id=secret&redirectTo="
+            "https%3A%2F%2Fwww.ozon.ru%2Fproduct%2Fexample-123%2F%3Futm_source%3Dbot"
+            "&erid=campaign-id&subid=telegram_deal_hunter"
+        )
+        deal = parse_promotion_items([item], "Ozon")[0]
+        self.assertEqual(
+            deal.product_url,
+            "https://www.ozon.ru/product/example-123/",
+        )
+
+    def test_rejects_takprodam_tracking_url_without_verified_direct_destination(self):
+        item = self.sample_item()
+        item.pop("external_link")
+        item["tracking_link"] = "https://takprdm.ru/offer?id=tracking-only"
+        self.assertEqual(parse_promotion_items([item], "Ozon"), [])
 
     @patch("deal_hunter.takprodam._request_json")
     def test_explains_when_channel_source_is_pending_approval(self, mock_request):
@@ -141,6 +159,15 @@ class TakprodamTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "Telegram Channel=verification"):
             resolve_source_id("dummy-token")
 
+
+    @patch("deal_hunter.takprodam._request_json")
+    def test_default_markets_include_supported_marketplaces(self, mock_request):
+        mock_request.return_value = {"items": []}
+        fetch_promotion_deals("dummy-token", "7", limit=20, max_pages=1)
+        self.assertEqual(
+            [call.kwargs["params"]["marketplace"] for call in mock_request.call_args_list],
+            ["ozon", "wildberries", "avito", "aliexpress"],
+        )
 
     @patch("deal_hunter.takprodam._request_json")
     def test_promotion_fetch_passes_subid_for_attribution(self, mock_request):
