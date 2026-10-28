@@ -261,6 +261,8 @@ def main() -> int:
     min_savings = float(settings.get("min_savings_rub", 100))
     max_discount = float(settings.get("max_discount_percent", 90))
     min_coupon_discount = float(settings.get("min_coupon_discount_percent", 10))
+    min_tour_discount = float(settings.get("min_tour_discount_percent", 10))
+    min_tour_savings = float(settings.get("min_tour_savings_rub", 1000))
     require_image = bool(settings.get("require_image_for_publication", True))
 
     evaluated: list[tuple[Deal, DealDecision]] = []
@@ -272,6 +274,8 @@ def main() -> int:
             min_savings=min_savings,
             max_discount_percent=max_discount,
             min_coupon_discount_percent=min_coupon_discount,
+            min_tour_discount_percent=min_tour_discount,
+            min_tour_savings=min_tour_savings,
             require_affiliate=False,
             require_image=False,
         )
@@ -361,6 +365,8 @@ def main() -> int:
             min_savings=min_savings,
             max_discount_percent=max_discount,
             min_coupon_discount_percent=min_coupon_discount,
+            min_tour_discount_percent=min_tour_discount,
+            min_tour_savings=min_tour_savings,
             require_affiliate=not allow_direct_links,
             require_image=require_image,
         )
