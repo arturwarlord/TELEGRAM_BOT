@@ -288,9 +288,9 @@ def main() -> int:
 
     if not publishing:
         for index, (deal, decision) in enumerate(evaluated[:20], start=1):
-            has_link = "yes" if deal.affiliate_url else "NO"
+            has_link = "NO (direct URL mode)" if allow_direct_links else ("yes" if deal.affiliate_url else "NO")
             has_image = "yes" if deal.image_url else "NO"
-            commission_text = f"{deal.commission:g}" if deal.commission is not None else "n/a"
+            commission_text = "not used in direct-link mode" if allow_direct_links else (f"{deal.commission:g}" if deal.commission is not None else "n/a")
             if deal.offer_type == "flight":
                 offer_summary = f"✈️ ticket {format_rub(deal.price)}"
                 if deal.description:
