@@ -4005,10 +4005,10 @@
       "type": "html_promos",
       "url": "https://www.biglion.ru/",
       "store": "Biglion",
-      "enabled": false,
-      "diagnostic": true,
+      "enabled": true,
+      "diagnostic": false,
       "category": "coupons",
-      "reason": "Live diagnostic found individual deal cards with direct URLs and images, but the generic html parser extracted 0 deals. Testing the promotion-card parser; keep disabled until diagnostics confirm valid cards."
+      "reason": "Enabled after read-only live diagnostic: production parser extracted 30 specific deal cards with explicit discount percentages, direct offer URLs and images. Current/old prices are not inferred; downstream coupon-quality and expiry filters still apply."
     },
     {
       "name": "Frendi — скидки и впечатления",
