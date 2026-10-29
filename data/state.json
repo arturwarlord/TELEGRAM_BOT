@@ -80,6 +80,22 @@
       "published_at": "2026-10-28T19:05:00.868099+00:00",
       "telegram_message_id": 12,
       "affiliate_url": null
+    },
+    "9594782af6ee6a3ec1db7123": {
+      "title": "2 часа игры в боулинг в спортинг-клубе «Москва» (1450 руб. вместо 5000 руб.)",
+      "store": "Frendi",
+      "price": 1450.0,
+      "published_at": "2026-10-29T16:52:42.885927+00:00",
+      "telegram_message_id": 13,
+      "affiliate_url": null
+    },
+    "cc2b21a2c3f11586c168349e": {
+      "title": "Настольная игра для детей и взрослых \"Имаджинариум. Персефона\" (дополнительный набор)",
+      "store": "Ozon · Cosmodrome games",
+      "price": 2373.0,
+      "published_at": "2026-10-29T16:52:48.151823+00:00",
+      "telegram_message_id": 14,
+      "affiliate_url": "https://takprdm.ru/0W9UtG83tmCkZwy29FG/?redirectTo=https%3A%2F%2Fozon.ru%2Fproduct%2F149980536&erid=Y1jgkD6uB6jK1phqkTLTbNKYV13k&subid=telegram_deal_hunter"
     }
   },
   "recent_posts": [
@@ -132,6 +148,16 @@
       "key": "b58d962b5949966cd04f7b2c",
       "published_at": "2026-10-28T19:05:00.868099+00:00",
       "telegram_message_id": 12
+    },
+    {
+      "key": "9594782af6ee6a3ec1db7123",
+      "published_at": "2026-10-29T16:52:42.885927+00:00",
+      "telegram_message_id": 13
+    },
+    {
+      "key": "cc2b21a2c3f11586c168349e",
+      "published_at": "2026-10-29T16:52:48.151823+00:00",
+      "telegram_message_id": 14
     }
   ]
 }
