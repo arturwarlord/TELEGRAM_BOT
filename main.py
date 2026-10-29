@@ -325,6 +325,12 @@ def main() -> int:
                     f"missing/invalid discount price pair={partner_diagnostics.get('rejected_missing_or_invalid_discount_price_pair', 0)}; "
                     f"invalid item={partner_diagnostics.get('rejected_invalid_item', 0)}."
                 )
+                print(
+                    "Takprodam field coverage: "
+                    f"price present/parsed={partner_diagnostics.get('source_price_present', 0)}/{partner_diagnostics.get('parsed_price_valid', 0)}; "
+                    f"price_discount present/parsed={partner_diagnostics.get('source_price_discount_present', 0)}/{partner_diagnostics.get('parsed_price_discount_valid', 0)}; "
+                    f"discount_percent present/valid={partner_diagnostics.get('source_discount_percent_present', 0)}/{partner_diagnostics.get('parsed_discount_percent_valid', 0)}."
+                )
             all_deals.extend(partner_deals)
         except NoApprovedSourceError as exc:
             print(f"[WAITING] Takprodam publisher source: {exc}")

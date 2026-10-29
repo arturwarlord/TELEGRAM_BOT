@@ -252,6 +252,21 @@ def parse_promotion_items(
             item.get("discount_percent", item.get("discount_percentage"))
         )
 
+        # Track source field shape separately from parser acceptance. This lets
+        # workflow logs distinguish absent fields from present-but-unparseable values.
+        if item.get("price") not in (None, ""):
+            count("source_price_present")
+        if item.get("price_discount") not in (None, ""):
+            count("source_price_discount_present")
+        if item.get("discount_percent", item.get("discount_percentage")) not in (None, ""):
+            count("source_discount_percent_present")
+        if old_price is not None:
+            count("parsed_price_valid")
+        if discounted_price is not None:
+            count("parsed_price_discount_valid")
+        if reported_discount is not None and 0 < reported_discount <= 90:
+            count("parsed_discount_percent_valid")
+
         # Some promotion products expose a verified discount percentage but omit
         # one or both price fields. Keep those offers as percentage-only deals;
         # never manufacture an "old price" from a percentage. A complete but
