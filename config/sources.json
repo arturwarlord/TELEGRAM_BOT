@@ -4069,6 +4069,54 @@
       "diagnostic": true,
       "category": "coupons",
       "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа."
+    },
+    {
+      "name": "ProCupon — проверенные промокоды и скидки",
+      "type": "html_promos",
+      "url": "https://procupon.ru/",
+      "store": "ProCupon",
+      "enabled": false,
+      "diagnostic": true
+    },
+    {
+      "name": "Kodami — промокоды и акции магазинов",
+      "type": "html_promos",
+      "url": "https://kodami.ru/",
+      "store": "Kodami",
+      "enabled": false,
+      "diagnostic": true
+    },
+    {
+      "name": "Gloria Jeans — распродажа одежды",
+      "type": "html",
+      "url": "https://www.gloria-jeans.ru/",
+      "store": "Gloria Jeans",
+      "enabled": false,
+      "diagnostic": true
+    },
+    {
+      "name": "Т-Банк — промокоды и предложения",
+      "type": "html_promos",
+      "url": "https://www.tbank.ru/promokody/",
+      "store": "Т-Банк",
+      "enabled": false,
+      "diagnostic": true
+    },
+    {
+      "name": "RUSSPASS — предложения для путешествий",
+      "type": "html",
+      "url": "https://russpass.ru/",
+      "store": "RUSSPASS",
+      "enabled": false,
+      "diagnostic": true
+    },
+    {
+      "name": "Остин — официальный каталог одежды",
+      "type": "html",
+      "url": "https://www.ostin.com/",
+      "store": "Ostin",
+      "enabled": false,
+      "diagnostic": true
     }
   ]
 }
