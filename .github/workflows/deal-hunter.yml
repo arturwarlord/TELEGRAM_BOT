@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       publish:
-        description: "Опубликовать подходящие предложения с партнёрскими ссылками"
+        description: "Опубликовать подходящие партнёрские и обычные предложения в Telegram"
         required: true
         type: boolean
         default: false
