@@ -331,6 +331,15 @@ def main() -> int:
                     f"price_discount present/parsed={partner_diagnostics.get('source_price_discount_present', 0)}/{partner_diagnostics.get('parsed_price_discount_valid', 0)}; "
                     f"discount_percent present/valid={partner_diagnostics.get('source_discount_percent_present', 0)}/{partner_diagnostics.get('parsed_discount_percent_valid', 0)}."
                 )
+                print(
+                    "Takprodam price-pair diagnostics: "
+                    f"price > price_discount={partner_diagnostics.get('price_greater_than_price_discount', 0)}; "
+                    f"price < price_discount={partner_diagnostics.get('price_less_than_price_discount', 0)}; "
+                    f"equal={partner_diagnostics.get('price_equal_to_price_discount', 0)}; "
+                    f"discount missing/invalid={partner_diagnostics.get('reported_discount_missing_or_invalid', 0)}; "
+                    f"pair implies 10–90%={partner_diagnostics.get('price_pair_implies_10_to_90_percent', 0)}; "
+                    f"pair implies under 10% or over 90%={partner_diagnostics.get('price_pair_implies_under_10_or_over_90_percent', 0)}."
+                )
             all_deals.extend(partner_deals)
         except NoApprovedSourceError as exc:
             print(f"[WAITING] Takprodam publisher source: {exc}")

@@ -266,6 +266,23 @@ def parse_promotion_items(
             count("parsed_price_discount_valid")
         if reported_discount is not None and 0 < reported_discount <= 90:
             count("parsed_discount_percent_valid")
+        else:
+            count("reported_discount_missing_or_invalid")
+        if old_price is not None and discounted_price is not None:
+            if old_price > discounted_price:
+                count("price_greater_than_price_discount")
+            elif old_price < discounted_price:
+                count("price_less_than_price_discount")
+            else:
+                count("price_equal_to_price_discount")
+            lower = min(old_price, discounted_price)
+            higher = max(old_price, discounted_price)
+            if higher > 0:
+                implied_discount = (higher - lower) / higher * 100
+                if 10 <= implied_discount <= 90:
+                    count("price_pair_implies_10_to_90_percent")
+                elif implied_discount > 0:
+                    count("price_pair_implies_under_10_or_over_90_percent")
 
         # Some promotion products expose a verified discount percentage but omit
         # one or both price fields. Keep those offers as percentage-only deals;
