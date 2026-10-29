@@ -281,8 +281,10 @@ def parse_promotion_items(
                 valid_old_price = None
                 count("accepted_percentage_only_after_price_conflict")
         elif reported_discount is not None and 0 < reported_discount <= 90:
-            # Keep explicit source discount data, but never infer an exact price.
-            price = None
+            # Keep a known discounted price when the old price is missing.
+            # If the discounted price itself is unavailable, publish only the
+            # source-reported percentage and suppress exact price claims.
+            price = discounted_price if old_price is None and discounted_price is not None else None
             valid_old_price = None
             count("accepted_percentage_only")
         else:

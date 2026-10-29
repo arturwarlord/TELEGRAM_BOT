@@ -145,9 +145,10 @@ class TakprodamTests(unittest.TestCase):
         self.assertEqual(deals[0].old_price, 12000)
         self.assertIsNone(deals[0].reported_discount_percent)
 
-    def test_rejects_unavailable_or_invalid_price_pair(self):
+    def test_rejects_unavailable_or_invalid_price_pair_without_explicit_discount(self):
         invalid = self.sample_item()
         invalid["price_discount"] = 13000
+        invalid.pop("discount_percent")
         deals = parse_promotion_items([invalid], "Ozon")
         self.assertEqual(deals, [])
 
