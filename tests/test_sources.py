@@ -76,6 +76,25 @@ class FeedParserTests(unittest.TestCase):
 
 
 
+    def test_html_promotions_recognizes_en_dash_discount_before_coupon_discount(self):
+        html = """
+        <html><body>
+          <article class="deal">
+            <a href="/deals/flowers">–30% -10% промокод «SALE10» — букет цветов</a>
+            <img src="/images/flowers.jpg" alt="Букет цветов">
+          </article>
+        </body></html>
+        """
+        deals = parse_feed(html.encode("utf-8"), {
+            "name": "test-unicode-discount-dash",
+            "type": "html_promos",
+            "url": "https://coupon.example.test/",
+            "store": "Test Coupon",
+        })
+        matching = [deal for deal in deals if deal.product_url.endswith("/deals/flowers")]
+        self.assertTrue(matching)
+        self.assertEqual(matching[0].reported_discount_percent, 30)
+
     def test_html_promotions_extracts_explicit_current_and_old_prices(self):
         html = """
         <html><body>

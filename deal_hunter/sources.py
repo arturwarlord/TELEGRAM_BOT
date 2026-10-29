@@ -179,10 +179,10 @@ def _extract_reported_percent(text: str) -> tuple[float | None, bool]:
     normalized = clean_text(text, 2000)
     patterns = [
         # Catch formats like SocialKod's "до − 90 %" as a maximum, not an exact offer.
-        (r"\bдо\s*[−-]?\s*(\d{1,2}(?:[.,]\d+)?)\s*%", True),
+        (r"\bдо\s*[−–—-]?\s*(\d{1,2}(?:[.,]\d+)?)\s*%", True),
         (r"скидк\w*\s+до\s*(\d{1,2}(?:[.,]\d+)?)\s*%", True),
         (r"скидк\w*[^%\d]{0,16}(\d{1,2}(?:[.,]\d+)?)\s*%", False),
-        (r"[−-]\s*(\d{1,2}(?:[.,]\d+)?)\s*%", False),
+        (r"[−–—-]\s*(\d{1,2}(?:[.,]\d+)?)\s*%", False),
         (r"\(\s*(\d{1,2}(?:[.,]\d+)?)\s*%\s*\)", False),
         (r"(\d{1,2}(?:[.,]\d+)?)\s*%\s*(?:скидк\w*|на\s+(?:все|весь|любые|первый|повторный)\s+\w+)", False),
     ]
@@ -239,7 +239,7 @@ def _extract_promo_code(node: _HtmlNode, text: str) -> str | None:
     if re.search(r"скопировать\s+промокод|получить\s+код|товары\s+с\s+промокодом|используйте\s+код", text, flags=re.IGNORECASE):
         copied_match = re.search(r"скопировать\s+промокод|получить\s+код|товары\s+с\s+промокодом|используйте\s+код", text, flags=re.IGNORECASE)
         max_position = copied_match.start() if copied_match else len(text)
-        percent_match = re.search(r"[−-]?\s*\d{1,2}\s*%", text)
+        percent_match = re.search(r"[−–—-]?\s*\d{1,2}\s*%", text)
         min_position = percent_match.end() if percent_match else 0
         for match in re.finditer(r"(?<![\w])([A-ZА-ЯЁ0-9][A-ZА-ЯЁ0-9_-]{2,23})(?![\w])", text):
             if min_position <= match.start() < max_position:
@@ -518,7 +518,7 @@ def parse_html_promotions(payload: bytes, source: dict[str, Any], max_items: int
         )
         title_explicitly_describes_discount = bool(re.search(
             r"(?:скидк\w*[^%\d]{0,16}\d{1,2}(?:[.,]\d+)?\s*%|"
-            r"[−-]\s*\d{1,2}(?:[.,]\d+)?\s*%|"
+            r"[−–—-]\s*\d{1,2}(?:[.,]\d+)?\s*%|"
             r"\d{1,2}(?:[.,]\d+)?\s*%\s*(?:скидк\w*|на\b))",
             title,
             flags=re.IGNORECASE,
