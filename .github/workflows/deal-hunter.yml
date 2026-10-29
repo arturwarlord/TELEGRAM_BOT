@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       publish:
-        description: "Опубликовать подходящие предложения с прямыми ссылками, без партнёрки"
+        description: "Опубликовать подходящие предложения с партнёрскими ссылками"
         required: true
         type: boolean
         default: false
@@ -40,8 +40,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # Publishing is opt-in only: schedule and ordinary pushes remain dry-run.
-      # To publish, explicitly run workflow_dispatch with publish=true, or use the deliberate one-time commit prefix.
-      PUBLISH_ENABLED: ${{ (github.event_name == 'workflow_dispatch' && inputs.publish == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'launch one-time direct posts:')) }}
+      # To publish, explicitly run workflow_dispatch with publish=true, or use the deliberate one-time partner-post commit prefix.
+      PUBLISH_ENABLED: ${{ (github.event_name == 'workflow_dispatch' && inputs.publish == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'launch one-time partner posts:')) }}
       DRY_RUN: ${{ !((github.event_name == 'workflow_dispatch' && inputs.publish == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'launch one-time direct posts:'))) }}
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ vars.TELEGRAM_CHAT_ID }}
@@ -54,8 +54,8 @@ jobs:
       TAKPRODAM_LIMIT: ${{ vars.TAKPRODAM_LIMIT }}
       TAKPRODAM_MAX_PAGES: ${{ vars.TAKPRODAM_MAX_PAGES }}
       TAKPRODAM_SUBID: ${{ vars.TAKPRODAM_SUBID }}
-      # Keep direct-link mode on while building traffic before partner approval.
-      ALLOW_DIRECT_LINKS: "true"
+      # Partner source is approved. Keep publishing opt-in, but use Takprodam tracking links for eligible partner products.
+      ALLOW_DIRECT_LINKS: "false"
       POST_NOTICE: ${{ vars.POST_NOTICE }}
     steps:
       - name: Checkout
