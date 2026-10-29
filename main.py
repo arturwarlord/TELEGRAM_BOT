@@ -219,27 +219,26 @@ def _deal_channel(deal: Deal) -> str:
 
 
 def select_diverse_deals(evaluated: list[tuple[Deal, DealDecision]], limit: int) -> list[tuple[Deal, DealDecision]]:
-    """Take one best candidate per category, then fill remaining slots by rank."""
+    """Interleave partner, public, and flight offers so one large feed cannot dominate."""
     if limit <= 0 or not evaluated:
         return []
-    channels: dict[str, list[tuple[Deal, DealDecision]]] = {"partner": [], "public": [], "flights": []}
+    channel_order = ("partner", "public", "flights")
+    channels: dict[str, list[tuple[Deal, DealDecision]]] = {channel: [] for channel in channel_order}
     for pair in evaluated:
         channels[_deal_channel(pair[0])].append(pair)
+
     selected: list[tuple[Deal, DealDecision]] = []
-    selected_keys: set[str] = set()
-    for channel in ("partner", "public", "flights"):
-        if channels[channel] and len(selected) < limit:
-            pair = channels[channel][0]
-            selected.append(pair)
-            selected_keys.add(pair[0].key)
-    if len(selected) < limit:
-        for pair in evaluated:
-            if pair[0].key in selected_keys:
-                continue
-            selected.append(pair)
-            selected_keys.add(pair[0].key)
-            if len(selected) >= limit:
-                break
+    # Each channel retains the global ranking order; taking one from each channel
+    # per pass balances the preview and gives the publisher fallback candidates
+    # from more than one category if an earlier offer fails final checks.
+    while len(selected) < limit:
+        added_this_pass = False
+        for channel in channel_order:
+            if channels[channel] and len(selected) < limit:
+                selected.append(channels[channel].pop(0))
+                added_this_pass = True
+        if not added_this_pass:
+            break
     return selected
 
 
