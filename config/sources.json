@@ -323,7 +323,8 @@
       "type": "html",
       "url": "https://magnit.ru/",
       "store": "Магнит",
-      "enabled": true
+      "enabled": false,
+      "disabled_reason": "Latest GitHub Actions scan returned HTTP 403 Forbidden. Keep disabled until a stable, publicly accessible catalogue or approved feed is available; do not bypass access controls."
     },
     {
       "name": "Магнит — официальные промокоды",
