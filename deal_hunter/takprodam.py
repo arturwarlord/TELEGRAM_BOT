@@ -206,21 +206,30 @@ def _float_or_none(value: object) -> float | None:
 def parse_promotion_items(
     items: list[dict[str, Any]],
     marketplace_filter: str | None = None,
+    diagnostics: dict[str, int] | None = None,
 ) -> list[Deal]:
     """Map Takprodam/Admitad promotion-product items to the internal deal model."""
     deals: list[Deal] = []
     target_market = (marketplace_filter or "").strip().lower()
 
+    def count(reason: str) -> None:
+        if diagnostics is not None:
+            diagnostics[reason] = diagnostics.get(reason, 0) + 1
+
     for item in items:
+        count("received")
         if not isinstance(item, dict):
+            count("rejected_invalid_item")
             continue
         marketplace = clean_text(item.get("marketplace_title") or item.get("marketplace") or "Маркетплейс", 100)
         if target_market and target_market not in marketplace.lower():
+            count("rejected_marketplace_mismatch")
             continue
 
         title = clean_text(item.get("title"), 300)
         affiliate_url = str(item.get("tracking_link") or "").strip()
         if not title or not is_http_url(affiliate_url):
+            count("rejected_missing_title_or_tracking_link")
             continue
 
         # Prefer a verified direct marketplace URL for diagnostics and referer.
@@ -240,6 +249,7 @@ def parse_promotion_items(
         old_price = parse_price(item.get("price"))
         price = parse_price(item.get("price_discount"))
         if price is None or old_price is None or old_price <= price:
+            count("rejected_missing_or_invalid_discount_price_pair")
             continue
 
         image_url = str(item.get("image_url") or "").strip()
@@ -270,6 +280,7 @@ def parse_promotion_items(
                 legal_text=clean_text(item.get("legal_text"), 500),
             )
         )
+        count("accepted")
     return deals
 
 
@@ -282,6 +293,7 @@ def fetch_promotion_deals(
     max_pages: int = 1,
     timeout: int = 25,
     subid: str | None = None,
+    diagnostics: dict[str, int] | None = None,
 ) -> list[Deal]:
     """Fetch approved-partner promotion products and their tracking links."""
     if not token.strip():
@@ -319,13 +331,16 @@ def fetch_promotion_deals(
                     f"Takprodam API promotion/product response for {normalized} has no items array"
                 )
             normalized_items = [item for item in items if isinstance(item, dict)]
-            found.extend(parse_promotion_items(normalized_items, normalized))
+            found.extend(parse_promotion_items(normalized_items, normalized, diagnostics=diagnostics))
             if len(normalized_items) < page_limit:
                 break
     return found
 
 
-def fetch_configured_takprodam_deals(timeout: int = 25) -> tuple[list[Deal], str]:
+def fetch_configured_takprodam_deals(
+    timeout: int = 25,
+    diagnostics: dict[str, int] | None = None,
+) -> tuple[list[Deal], str]:
     token = os.getenv("TAKPRODAM_API_TOKEN", "").strip()
     if not token:
         return [], ""
@@ -347,6 +362,7 @@ def fetch_configured_takprodam_deals(timeout: int = 25) -> tuple[list[Deal], str
         max_pages=max_pages,
         timeout=timeout,
         subid=subid,
+        diagnostics=diagnostics,
     )
     return deals, source_id
 

@@ -82,6 +82,29 @@ class TakprodamTests(unittest.TestCase):
         self.assertEqual(deal.commission, 120.0)
         self.assertIn("Реклама", deal.legal_text)
 
+    def test_parser_diagnostics_explain_rejected_promotion_products(self):
+        valid = self.sample_item()
+        missing_prices = dict(valid)
+        missing_prices.pop("price_discount")
+        other_market = dict(valid)
+        other_market["marketplace_title"] = "Wildberries"
+        missing_link = dict(valid)
+        missing_link["tracking_link"] = ""
+        diagnostics = {}
+        deals = parse_promotion_items(
+            [valid, missing_prices, other_market, missing_link],
+            "Ozon",
+            diagnostics=diagnostics,
+        )
+        self.assertEqual(len(deals), 1)
+        self.assertEqual(diagnostics, {
+            "received": 4,
+            "accepted": 1,
+            "rejected_missing_or_invalid_discount_price_pair": 1,
+            "rejected_marketplace_mismatch": 1,
+            "rejected_missing_title_or_tracking_link": 1,
+        })
+
     def test_rejects_unavailable_or_invalid_price_pair(self):
         invalid = self.sample_item()
         invalid["price_discount"] = 13000

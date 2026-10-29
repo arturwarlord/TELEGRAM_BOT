@@ -309,9 +309,22 @@ def main() -> int:
 
     if partner_api_enabled:
         try:
-            partner_deals, partner_source_id = fetch_configured_takprodam_deals(timeout=timeout)
+            partner_diagnostics: dict[str, int] = {}
+            partner_deals, partner_source_id = fetch_configured_takprodam_deals(
+                timeout=timeout,
+                diagnostics=partner_diagnostics,
+            )
             successful_sources += 1
-            print(f"[OK] Takprodam API source {partner_source_id}: {len(partner_deals)} promotion product(s)")
+            print(f"[OK] Takprodam API source {partner_source_id}: {partner_diagnostics.get('received', len(partner_deals))} raw item(s), {len(partner_deals)} mapped deal(s)")
+            if partner_diagnostics:
+                print(
+                    "Takprodam parser diagnostics: "
+                    f"accepted={partner_diagnostics.get('accepted', 0)}; "
+                    f"marketplace mismatch={partner_diagnostics.get('rejected_marketplace_mismatch', 0)}; "
+                    f"missing title/tracking link={partner_diagnostics.get('rejected_missing_title_or_tracking_link', 0)}; "
+                    f"missing/invalid discount price pair={partner_diagnostics.get('rejected_missing_or_invalid_discount_price_pair', 0)}; "
+                    f"invalid item={partner_diagnostics.get('rejected_invalid_item', 0)}."
+                )
             all_deals.extend(partner_deals)
         except NoApprovedSourceError as exc:
             print(f"[WAITING] Takprodam publisher source: {exc}")
