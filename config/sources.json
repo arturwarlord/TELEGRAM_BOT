@@ -4075,16 +4075,18 @@
       "type": "html_promos",
       "url": "https://procupon.ru/",
       "store": "ProCupon",
-      "enabled": false,
-      "diagnostic": true
+      "enabled": true,
+      "diagnostic": false,
+      "reason": "Enabled after read-only live diagnostic: production parser extracted 16 specific promotion cards with direct URLs and images. Coupon claims remain subject to downstream quality and expiry filters; no price is invented."
     },
     {
       "name": "Kodami — промокоды и акции магазинов",
       "type": "html_promos",
       "url": "https://kodami.ru/",
       "store": "Kodami",
-      "enabled": false,
-      "diagnostic": true
+      "enabled": true,
+      "diagnostic": false,
+      "reason": "Enabled after read-only live diagnostic: production parser extracted 4 specific promotion cards with direct URLs and images. Coupon claims remain subject to downstream quality and expiry filters; no price is invented."
     },
     {
       "name": "Gloria Jeans — распродажа одежды",
