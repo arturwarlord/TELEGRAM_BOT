@@ -110,6 +110,9 @@ class TakprodamTests(unittest.TestCase):
             "parsed_price_valid": 2,
             "parsed_price_discount_valid": 1,
             "parsed_discount_percent_valid": 1,
+            "reported_discount_missing_or_invalid": 1,
+            "price_greater_than_price_discount": 1,
+            "price_pair_implies_10_to_90_percent": 1,
         })
 
     def test_accepts_explicit_discount_percent_when_price_pair_is_incomplete(self):
