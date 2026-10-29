@@ -207,7 +207,8 @@ class TelegramPublisher:
             raise ValueError("A post disclosure/notice is required before publication")
 
         caption = format_caption(deal, decision, ad_notice)
-        button_text = "✈️ Проверить билет" if deal.offer_type == "flight" else ("🛍 Открыть предложение" if allow_direct_link else "🔥 Забрать скидку")
+        is_partner_link = not allow_direct_link and bool(deal.affiliate_url)
+        button_text = "✈️ Проверить билет" if deal.offer_type == "flight" else ("🔥 Забрать скидку" if is_partner_link else "🛍 Открыть предложение")
 
         # Download the image in the Actions runner and upload its bytes. This avoids
         # Telegram's remote-image fetch failing on hotlink protection or CDN rules.

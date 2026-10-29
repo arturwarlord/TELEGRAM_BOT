@@ -100,6 +100,24 @@ class TelegramPublisherTests(unittest.TestCase):
 
     @patch("deal_hunter.telegram._download_photo")
     @patch("deal_hunter.telegram.urllib.request.urlopen")
+    def test_partner_mode_uses_tracking_url_when_available(self, mock_urlopen, mock_download):
+        mock_download.return_value = (b"\\xff\\xd8\\xfffake-jpeg", "image/jpeg", "offer.jpg")
+        mock_urlopen.return_value = FakeResponse(
+            json.dumps({"ok": True, "result": {"message_id": 100}}).encode("utf-8")
+        )
+        deal = self.make_deal()
+        decision = DealDecision(True, "eligible", 30.0, 300.0, 66.0)
+
+        TelegramPublisher("dummy-token", "@test_channel").publish(
+            deal, decision, "Партнёрская ссылка: канал может получить вознаграждение."
+        )
+
+        request = mock_urlopen.call_args.args[0]
+        self.assertIn(b"https://affiliate.example.test/click/123", request.data)
+        self.assertNotIn(b"https://offers.example.test/promo/food", request.data)
+
+    @patch("deal_hunter.telegram._download_photo")
+    @patch("deal_hunter.telegram.urllib.request.urlopen")
     def test_direct_mode_does_not_call_telegram_if_image_download_fails(self, mock_urlopen, mock_download):
         mock_download.side_effect = RuntimeError("Could not download offer image (HTTP 403)")
         deal = self.make_deal()
@@ -117,3 +135,4 @@ class TelegramPublisherTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

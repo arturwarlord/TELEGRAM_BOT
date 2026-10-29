@@ -226,24 +226,23 @@ def main() -> int:
     dry_run = env_bool("DRY_RUN", True)
     allow_direct_links = env_bool("ALLOW_DIRECT_LINKS", False)
     publishing = publish_enabled and not dry_run
-    if allow_direct_links:
-        post_notice = os.getenv("DIRECT_POST_NOTICE", "").strip() or (
-            "Ссылка ведёт на публичную страницу предложения; условия, цена и наличие могут зависеть от "
-            "региона, карты лояльности и требований продавца. Канал не получает комиссию с перехода."
-        )
-    else:
-        post_notice = os.getenv("POST_NOTICE", "").strip() or os.getenv("AD_NOTICE", "").strip()
+    partner_notice = os.getenv("POST_NOTICE", "").strip() or os.getenv("AD_NOTICE", "").strip()
+    direct_notice = os.getenv("DIRECT_POST_NOTICE", "").strip() or (
+        "Публичная ссылка на предложение без партнёрского вознаграждения каналу. "
+        "Цена, наличие и условия могут измениться — проверьте их на сайте продавца."
+    )
+    post_notice = direct_notice if allow_direct_links else partner_notice
 
     print("===== DEAL HUNTER =====")
     print(f"Mode: {'PUBLISH' if publishing else 'DRY-RUN / PREVIEW'}")
-    print(f"Link mode: {'PUBLIC OFFER LINKS (NO AFFILIATE)' if allow_direct_links else 'AFFILIATE LINKS REQUIRED FOR PUBLISHING'}")
+    print(f"Link mode: {'PUBLIC LINKS ONLY' if allow_direct_links else 'MIXED: PARTNER LINK WHEN AVAILABLE, OTHERWISE PUBLIC LINK'}")
     partner_api_enabled = bool(os.getenv("TAKPRODAM_API_TOKEN", "").strip())
     print(f"Configured public feed/page sources: {len(sources)}")
     print(f"Takprodam partner API: {'configured' if partner_api_enabled else 'not configured'}")
     print(
-        "Safety: public offer pages are used without affiliate tracking; the channel receives no commission."
+        "Safety: public links only; no affiliate tracking."
         if allow_direct_links
-        else "Safety: partner link and product image are required before publishing."
+        else "Safety: use partner tracking when present; keep ordinary public discount links eligible too."
     )
     if not sources and not partner_api_enabled:
         print(f"No enabled feeds are configured in {source_config_path.relative_to(ROOT) if source_config_path.is_relative_to(ROOT) else source_config_path}.")
@@ -361,10 +360,6 @@ def main() -> int:
     if not os.getenv("TELEGRAM_CHAT_ID", "").strip():
         print("[FATAL] TELEGRAM_CHAT_ID Actions variable is missing.")
         return 2
-    if not post_notice:
-        print("[FATAL] POST_NOTICE is missing (or AD_NOTICE for affiliate mode).")
-        return 2
-
     state = load_state(state_path)
     daily_cap = max(1, int(settings.get("max_posts_per_day", 8)))
     published_last_24h = count_published_within_hours(state, hours=24)
@@ -398,7 +393,9 @@ def main() -> int:
             min_coupon_discount_percent=min_coupon_discount,
             min_tour_discount_percent=min_tour_discount,
             min_tour_savings=min_tour_savings,
-            require_affiliate=not allow_direct_links,
+            # Mixed mode: both partner and ordinary public offers are eligible.
+            # The publisher chooses the correct link for each individual deal.
+            require_affiliate=False,
             require_image=require_image,
         )
         if not decision.eligible:
@@ -414,12 +411,18 @@ def main() -> int:
             publish_skips["already published / no qualifying price drop"] += 1
             continue
 
+        use_direct_link = allow_direct_links or not bool(deal.affiliate_url)
+        deal_notice = direct_notice if use_direct_link else partner_notice
+        if not deal_notice:
+            publish_skips["missing partner disclosure (POST_NOTICE / AD_NOTICE)"] += 1
+            continue
+
         try:
             message_id = publisher.publish(
                 deal,
                 decision,
-                post_notice,
-                allow_direct_link=allow_direct_links,
+                deal_notice,
+                allow_direct_link=use_direct_link,
             )
             mark_published(deal, state, message_id=message_id)
             save_state(state_path, state)
