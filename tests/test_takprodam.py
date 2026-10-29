@@ -143,11 +143,16 @@ class TakprodamTests(unittest.TestCase):
             "https://www.ozon.ru/product/example-123/",
         )
 
-    def test_rejects_takprodam_tracking_url_without_verified_direct_destination(self):
+    def test_accepts_partner_tracking_url_when_direct_product_url_is_unavailable(self):
         item = self.sample_item()
         item.pop("external_link")
         item["tracking_link"] = "https://takprdm.ru/offer?id=tracking-only"
-        self.assertEqual(parse_promotion_items([item], "Ozon"), [])
+        deals = parse_promotion_items([item], "Ozon")
+        self.assertEqual(len(deals), 1)
+        self.assertEqual(deals[0].affiliate_url, "https://takprdm.ru/offer?id=tracking-only")
+        # The tracking URL is only the internal fallback; publishing still uses
+        # affiliate_url unless direct-link mode is explicitly selected.
+        self.assertEqual(deals[0].product_url, "https://takprdm.ru/offer?id=tracking-only")
 
     @patch("deal_hunter.takprodam._request_json")
     def test_explains_when_channel_source_is_pending_approval(self, mock_request):

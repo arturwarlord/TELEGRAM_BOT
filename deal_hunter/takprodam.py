@@ -223,12 +223,16 @@ def parse_promotion_items(
         if not title or not is_http_url(affiliate_url):
             continue
 
-        # In the no-affiliate mode only publish a verified marketplace URL.
-        # Takprodam can wrap an external URL in redirectTo and append erid/subid.
-        # Unwrap only known marketplace domains; never fall back to a tracking link.
+        # Prefer a verified direct marketplace URL for diagnostics and referer.
+        # In mixed mode, however, a valid partner tracking URL is itself a usable
+        # offer destination when the API does not expose a clean merchant URL.
+        # TelegramPublisher publishes affiliate_url for partner offers and only
+        # uses product_url in explicit direct-link mode, so this fallback never
+        # turns a tracking URL into a public/direct link.
         product_url = (
             _direct_marketplace_url(item.get("external_link"), marketplace)
             or _direct_marketplace_url(affiliate_url, marketplace)
+            or affiliate_url
         )
         if not product_url:
             continue
