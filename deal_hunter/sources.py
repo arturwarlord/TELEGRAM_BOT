@@ -332,15 +332,21 @@ def _clean_offer_title(value: str) -> str:
         title,
         flags=re.IGNORECASE,
     )
+    # Some coupon pages prepend a CTA and append a standalone "Бесплатно"
+    # label rather than the "Бесплатно Подробнее" combination.
     title = re.sub(
-        r"\s+(?:подробнее|получить первым!?|получи первым!?)\s*$",
+        r"^(?:получите?|получи)\s+первым!?\s*",
         "",
         title,
         flags=re.IGNORECASE,
     )
-    title = re.sub(r"\s+бесплатно\s+подробнее\s*$", "", title, flags=re.IGNORECASE)
+    title = re.sub(
+        r"(?:\s+(?:подробнее|бесплатно|получить первым!?|получи первым!?))+$",
+        "",
+        title,
+        flags=re.IGNORECASE,
+    )
     return re.sub(r"\s+", " ", title).strip(" \t\n|·")[:240]
-
 
 def parse_html_promotions(payload: bytes, source: dict[str, Any], max_items: int = 200) -> list[Deal]:
     """Parse public HTML offer cards that publish a promo code or an explicit percentage.

@@ -97,6 +97,8 @@ class FeedParserTests(unittest.TestCase):
         self.assertNotIn("Подробнее", matching[0].title)
         self.assertNotIn("Получили", matching[0].title)
         self.assertIn("Квест в Москве", matching[0].title)
+        self.assertNotIn("Бесплатно", matching[0].title)
+        self.assertNotIn("Получить первым", matching[0].title)
 
     def test_html_promotions_recognizes_en_dash_discount_before_coupon_discount(self):
         html = """
