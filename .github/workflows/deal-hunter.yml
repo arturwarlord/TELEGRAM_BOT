@@ -40,9 +40,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # Publishing is opt-in only: schedule and ordinary pushes remain dry-run.
-      # To publish, explicitly run workflow_dispatch with publish=true, or use the deliberate one-time partner-post commit prefix.
-      PUBLISH_ENABLED: ${{ (github.event_name == 'workflow_dispatch' && inputs.publish == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'launch one-time partner posts:')) }}
-      DRY_RUN: ${{ !((github.event_name == 'workflow_dispatch' && inputs.publish == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'launch one-time direct posts:'))) }}
+      # Manual publish=true enables mixed partner/public offers. One-time commit prefixes are deliberate opt-ins.
+      PUBLISH_ENABLED: ${{ (github.event_name == 'workflow_dispatch' && inputs.publish == true) || (github.event_name == 'push' && (startsWith(github.event.head_commit.message, 'launch one-time partner posts:') || startsWith(github.event.head_commit.message, 'launch one-time direct posts:'))) }}
+      DRY_RUN: ${{ !((github.event_name == 'workflow_dispatch' && inputs.publish == true) || (github.event_name == 'push' && (startsWith(github.event.head_commit.message, 'launch one-time partner posts:') || startsWith(github.event.head_commit.message, 'launch one-time direct posts:')))) }}
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ vars.TELEGRAM_CHAT_ID }}
       AD_NOTICE: ${{ vars.AD_NOTICE }}
@@ -55,7 +55,7 @@ jobs:
       TAKPRODAM_MAX_PAGES: ${{ vars.TAKPRODAM_MAX_PAGES }}
       TAKPRODAM_SUBID: ${{ vars.TAKPRODAM_SUBID }}
       # Partner source is approved. Keep publishing opt-in, but use Takprodam tracking links for eligible partner products.
-      ALLOW_DIRECT_LINKS: "false"
+      ALLOW_DIRECT_LINKS: ${{ github.event_name == 'push' && startsWith(github.event.head_commit.message, 'launch one-time direct posts:') }}
       POST_NOTICE: ${{ vars.POST_NOTICE }}
     steps:
       - name: Checkout
