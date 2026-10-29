@@ -3526,10 +3526,11 @@
       "type": "html",
       "url": "https://www.respublica.ru/",
       "store": "Республика",
-      "enabled": false,
+      "enabled": true,
       "diagnostic": true,
       "category": "books",
-      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа."
+      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа.",
+      "disabled_reason": "Enabled after read-only GitHub Actions diagnostic extracted real product titles, direct product URLs, images, and consistent current/old prices. Normal downstream quality filters still apply."
     },
     {
       "name": "Четыре Лапы — скидки",
@@ -3566,10 +3567,11 @@
       "type": "html",
       "url": "https://hobbygames.ru/",
       "store": "Мир Хобби",
-      "enabled": false,
+      "enabled": true,
       "diagnostic": true,
       "category": "hobby",
-      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа."
+      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа.",
+      "disabled_reason": "Enabled after read-only GitHub Actions diagnostic extracted real product titles, direct product URLs, images, and consistent current/old prices. Normal downstream quality filters still apply."
     },
     {
       "name": "Леонардо — скидки",
