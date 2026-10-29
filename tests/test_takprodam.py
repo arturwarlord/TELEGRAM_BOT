@@ -124,11 +124,26 @@ class TakprodamTests(unittest.TestCase):
         item.pop("discount_percent")
         self.assertEqual(parse_promotion_items([item], "Ozon"), [])
 
-    def test_rejects_contradictory_complete_price_pair_even_with_discount_percent(self):
+    def test_keeps_explicit_discount_when_price_pair_conflicts_without_showing_prices(self):
         item = self.sample_item()
         item["price_discount"] = 13000
         item["discount_percent"] = 50
-        self.assertEqual(parse_promotion_items([item], "Ozon"), [])
+        deals = parse_promotion_items([item], "Ozon")
+        self.assertEqual(len(deals), 1)
+        self.assertIsNone(deals[0].price)
+        self.assertIsNone(deals[0].old_price)
+        self.assertEqual(deals[0].reported_discount_percent, 50)
+
+    def test_reverses_price_pair_only_when_explicit_discount_confirms_it(self):
+        item = self.sample_item()
+        item["price"] = 6000
+        item["price_discount"] = 12000
+        item["discount_percent"] = 50
+        deals = parse_promotion_items([item], "Ozon")
+        self.assertEqual(len(deals), 1)
+        self.assertEqual(deals[0].price, 6000)
+        self.assertEqual(deals[0].old_price, 12000)
+        self.assertIsNone(deals[0].reported_discount_percent)
 
     def test_rejects_unavailable_or_invalid_price_pair(self):
         invalid = self.sample_item()

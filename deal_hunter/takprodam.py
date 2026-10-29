@@ -256,15 +256,33 @@ def parse_promotion_items(
         # one or both price fields. Keep those offers as percentage-only deals;
         # never manufacture an "old price" from a percentage. A complete but
         # contradictory price pair remains a hard rejection.
-        if old_price is not None and discounted_price is not None:
-            if old_price <= discounted_price:
-                count("rejected_invalid_discount_price_pair")
-                continue
+        if old_price is not None and discounted_price is not None and old_price > discounted_price:
             price = discounted_price
             valid_old_price = old_price
             reported_discount = None
+        elif (
+            old_price is not None
+            and discounted_price is not None
+            and discounted_price > old_price
+            and reported_discount is not None
+            and 0 < reported_discount <= 90
+        ):
+            # Some catalog records have the price fields reversed. Only reverse
+            # them when the explicit percentage mathematically confirms that pair;
+            # otherwise retain the source's percentage but suppress both prices.
+            reverse_discount = (discounted_price - old_price) / discounted_price * 100
+            if abs(reverse_discount - reported_discount) <= 2.0:
+                price = old_price
+                valid_old_price = discounted_price
+                reported_discount = None
+                count("accepted_reversed_price_pair")
+            else:
+                price = None
+                valid_old_price = None
+                count("accepted_percentage_only_after_price_conflict")
         elif reported_discount is not None and 0 < reported_discount <= 90:
-            price = discounted_price
+            # Keep explicit source discount data, but never infer an exact price.
+            price = None
             valid_old_price = None
             count("accepted_percentage_only")
         else:
