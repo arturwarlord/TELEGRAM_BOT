@@ -219,7 +219,7 @@ def _deal_channel(deal: Deal) -> str:
 
 
 def select_diverse_deals(evaluated: list[tuple[Deal, DealDecision]], limit: int) -> list[tuple[Deal, DealDecision]]:
-    """Interleave partner, public, and flight offers so one large feed cannot dominate."""
+    """Balance channels and avoid previews dominated by one source or flight offers."""
     if limit <= 0 or not evaluated:
         return []
     channel_order = ("partner", "public", "flights")
@@ -227,16 +227,30 @@ def select_diverse_deals(evaluated: list[tuple[Deal, DealDecision]], limit: int)
     for pair in evaluated:
         channels[_deal_channel(pair[0])].append(pair)
 
+    # Keep flight cards useful but not dominant in the preview. Source caps apply
+    # to merchant/catalog feeds; flights have city-specific source names and use
+    # the channel cap instead.
+    flight_cap = max(1, (limit * 2 + 4) // 5)  # ceil(40% of requested batch)
+    source_counts: Counter[str] = Counter()
+    channel_counts: Counter[str] = Counter()
     selected: list[tuple[Deal, DealDecision]] = []
-    # Each channel retains the global ranking order; taking one from each channel
-    # per pass balances the preview and gives the publisher fallback candidates
-    # from more than one category if an earlier offer fails final checks.
+
     while len(selected) < limit:
         added_this_pass = False
         for channel in channel_order:
-            if channels[channel] and len(selected) < limit:
-                selected.append(channels[channel].pop(0))
+            while channels[channel] and len(selected) < limit:
+                pair = channels[channel].pop(0)
+                deal = pair[0]
+                if channel == "flights" and channel_counts[channel] >= flight_cap:
+                    continue
+                source_key = deal.source.casefold().strip()
+                if channel != "flights" and source_counts[source_key] >= 2:
+                    continue
+                selected.append(pair)
+                channel_counts[channel] += 1
+                source_counts[source_key] += 1
                 added_this_pass = True
+                break
         if not added_this_pass:
             break
     return selected

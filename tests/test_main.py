@@ -170,6 +170,33 @@ class MainDeduplicationTests(unittest.TestCase):
             "Takprodam: Ozon", "Frendi", "Aviasales API — билеты из Москвы"
         ])
 
+
+    def test_diverse_selection_caps_repeated_public_sources(self):
+        same_source = [
+            self.make_coupon(title=f"Magnet item {i}", product_url=f"https://magnet.example.test/{i}", source="Магнит")
+            for i in range(1, 4)
+        ]
+        other_source = self.make_coupon(title="Other store item", product_url="https://other.example.test/item", source="Other store")
+        pairs = [
+            (deal, DealDecision(True, "eligible", 40.0, None, 90.0 - i))
+            for i, deal in enumerate(same_source + [other_source])
+        ]
+        selected = select_diverse_deals(pairs, 4)
+        self.assertEqual(sum(1 for deal, _ in selected if deal.source == "Магнит"), 2)
+        self.assertIn("Other store", [deal.source for deal, _ in selected])
+
+    def test_diverse_selection_caps_flights_at_40_percent(self):
+        public = self.make_coupon(title="Public deal", product_url="https://public.example.test/deal", source="Public")
+        flights = [
+            Deal(title=f"Flight {i}", product_url=f"https://aviasales.example.test/{i}",
+                 source=f"Aviasales API — билеты из города {i}", offer_type="flight", price=2000)
+            for i in range(1, 6)
+        ]
+        pairs = [(public, DealDecision(True, "eligible", 50.0, None, 100.0))]
+        pairs.extend((flight, DealDecision(True, "eligible", None, None, 90.0-i)) for i, flight in enumerate(flights))
+        selected = select_diverse_deals(pairs, 5)
+        self.assertLessEqual(sum(1 for deal, _ in selected if deal.offer_type == "flight"), 2)
+
     def test_diverse_selection_fills_remaining_slots_by_rank(self):
         first = self.make_coupon(title="Public 1", product_url="https://x.test/1", source="public")
         second = self.make_coupon(title="Public 2", product_url="https://x.test/2", source="public")
