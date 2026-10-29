@@ -104,6 +104,12 @@ class TakprodamTests(unittest.TestCase):
             "rejected_missing_or_invalid_discount_price_pair": 1,
             "rejected_marketplace_mismatch": 1,
             "rejected_missing_title_or_tracking_link": 1,
+            "source_price_present": 2,
+            "source_price_discount_present": 1,
+            "source_discount_percent_present": 1,
+            "parsed_price_valid": 2,
+            "parsed_price_discount_valid": 1,
+            "parsed_discount_percent_valid": 1,
         })
 
     def test_accepts_explicit_discount_percent_when_price_pair_is_incomplete(self):
