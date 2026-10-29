@@ -247,8 +247,27 @@ def parse_promotion_items(
             continue
 
         old_price = parse_price(item.get("price"))
-        price = parse_price(item.get("price_discount"))
-        if price is None or old_price is None or old_price <= price:
+        discounted_price = parse_price(item.get("price_discount"))
+        reported_discount = _float_or_none(
+            item.get("discount_percent", item.get("discount_percentage"))
+        )
+
+        # Some promotion products expose a verified discount percentage but omit
+        # one or both price fields. Keep those offers as percentage-only deals;
+        # never manufacture an "old price" from a percentage. A complete but
+        # contradictory price pair remains a hard rejection.
+        if old_price is not None and discounted_price is not None:
+            if old_price <= discounted_price:
+                count("rejected_invalid_discount_price_pair")
+                continue
+            price = discounted_price
+            valid_old_price = old_price
+            reported_discount = None
+        elif reported_discount is not None and 0 < reported_discount <= 90:
+            price = discounted_price
+            valid_old_price = None
+            count("accepted_percentage_only")
+        else:
             count("rejected_missing_or_invalid_discount_price_pair")
             continue
 
@@ -269,8 +288,9 @@ def parse_promotion_items(
                 store=store,
                 source=f"takprodam:{marketplace.lower()}",
                 price=price,
-                old_price=old_price,
+                old_price=valid_old_price,
                 affiliate_url=affiliate_url,
+                reported_discount_percent=reported_discount,
                 image_url=image_url,
                 currency="RUB",
                 description="",

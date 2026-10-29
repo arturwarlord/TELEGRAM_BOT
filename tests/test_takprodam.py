@@ -86,6 +86,7 @@ class TakprodamTests(unittest.TestCase):
         valid = self.sample_item()
         missing_prices = dict(valid)
         missing_prices.pop("price_discount")
+        missing_prices.pop("discount_percent")
         other_market = dict(valid)
         other_market["marketplace_title"] = "Wildberries"
         missing_link = dict(valid)
@@ -104,6 +105,30 @@ class TakprodamTests(unittest.TestCase):
             "rejected_marketplace_mismatch": 1,
             "rejected_missing_title_or_tracking_link": 1,
         })
+
+    def test_accepts_explicit_discount_percent_when_price_pair_is_incomplete(self):
+        item = self.sample_item()
+        item.pop("price")
+        deals = parse_promotion_items([item], "Ozon")
+        self.assertEqual(len(deals), 1)
+        self.assertEqual(deals[0].price, 6000)
+        self.assertIsNone(deals[0].old_price)
+        self.assertEqual(deals[0].reported_discount_percent, 50)
+        decision = evaluate_deal(deals[0], require_affiliate=True, require_image=True)
+        self.assertTrue(decision.eligible)
+        self.assertEqual(decision.discount_percent, 50)
+
+    def test_does_not_accept_incomplete_price_pair_without_explicit_discount(self):
+        item = self.sample_item()
+        item.pop("price_discount")
+        item.pop("discount_percent")
+        self.assertEqual(parse_promotion_items([item], "Ozon"), [])
+
+    def test_rejects_contradictory_complete_price_pair_even_with_discount_percent(self):
+        item = self.sample_item()
+        item["price_discount"] = 13000
+        item["discount_percent"] = 50
+        self.assertEqual(parse_promotion_items([item], "Ozon"), [])
 
     def test_rejects_unavailable_or_invalid_price_pair(self):
         invalid = self.sample_item()
