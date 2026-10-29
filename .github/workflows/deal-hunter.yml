@@ -39,10 +39,10 @@ jobs:
     needs: tests
     runs-on: ubuntu-latest
     env:
-      # Publishing is opt-in only: schedule and ordinary pushes remain dry-run.
-      # Manual publish=true enables mixed partner/public offers. One-time commit prefixes are deliberate opt-ins.
-      PUBLISH_ENABLED: ${{ (github.event_name == 'workflow_dispatch' && inputs.publish == true) || (github.event_name == 'push' && (startsWith(github.event.head_commit.message, 'launch one-time partner posts:') || startsWith(github.event.head_commit.message, 'launch one-time direct posts:'))) }}
-      DRY_RUN: ${{ !((github.event_name == 'workflow_dispatch' && inputs.publish == true) || (github.event_name == 'push' && (startsWith(github.event.head_commit.message, 'launch one-time partner posts:') || startsWith(github.event.head_commit.message, 'launch one-time direct posts:')))) }}
+      # Scheduled runs publish automatically; code pushes stay dry-run so commits never trigger surprise posts.
+      # Manual publish=true and explicit one-time launch prefixes remain available for controlled diagnostics.
+      PUBLISH_ENABLED: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.publish == true) || (github.event_name == 'push' && (startsWith(github.event.head_commit.message, 'launch one-time partner posts:') || startsWith(github.event.head_commit.message, 'launch one-time direct posts:'))) }}
+      DRY_RUN: ${{ !(github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.publish == true) || (github.event_name == 'push' && (startsWith(github.event.head_commit.message, 'launch one-time partner posts:') || startsWith(github.event.head_commit.message, 'launch one-time direct posts:')))) }}
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ vars.TELEGRAM_CHAT_ID }}
       AD_NOTICE: ${{ vars.AD_NOTICE }}
