@@ -339,7 +339,7 @@ def _clean_offer_title(value: str) -> str:
         flags=re.IGNORECASE,
     )
     title = re.sub(r"\s+бесплатно\s+подробнее\s*$", "", title, flags=re.IGNORECASE)
-    return re.sub(r"\s+", " ", title).strip(" \t\n-–—|·")[:240]
+    return re.sub(r"\s+", " ", title).strip(" \t\n|·")[:240]
 
 
 def parse_html_promotions(payload: bytes, source: dict[str, Any], max_items: int = 200) -> list[Deal]:
