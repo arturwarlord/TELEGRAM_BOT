@@ -4,7 +4,7 @@ import unittest
 
 from deal_hunter.models import Deal
 from deal_hunter.scoring import DealDecision
-from main import _flight_origin_priority, _rank_evaluated_deal, choose_best_duplicates
+from main import _flight_origin_priority, _rank_evaluated_deal, choose_best_duplicates, select_diverse_deals
 
 
 class MainDeduplicationTests(unittest.TestCase):
@@ -144,6 +144,46 @@ class MainDeduplicationTests(unittest.TestCase):
             (generic, DealDecision(True, "eligible coupon", 55.0, None, 66.0))
         )
         self.assertGreater(detailed_rank, generic_rank)
+
+
+    def test_diverse_selection_includes_partner_public_and_flight_categories(self):
+        partner = self.make_coupon(
+            title="Корм для кошек 2 кг", product_url="https://market.example.test/cat-food",
+            source="Takprodam: Ozon", affiliate_url="https://track.example.test/123",
+            price=700, old_price=1000, reported_discount_percent=None,
+        )
+        public = self.make_coupon(
+            title="Верёвочный парк со скидкой", product_url="https://frendi.example.test/deal",
+            source="Frendi", reported_discount_percent=50,
+        )
+        flight = Deal(
+            title="Авиабилеты Москва → Казань", product_url="https://aviasales.example.test/search",
+            source="Aviasales API — билеты из Москвы", offer_type="flight", price=2000,
+        )
+        pairs = [
+            (flight, DealDecision(True, "eligible", None, None, 99.0)),
+            (public, DealDecision(True, "eligible", 50.0, None, 80.0)),
+            (partner, DealDecision(True, "eligible", 30.0, 300.0, 70.0)),
+        ]
+        selected = select_diverse_deals(pairs, 3)
+        self.assertEqual([pair[0].source for pair in selected], [
+            "Takprodam: Ozon", "Frendi", "Aviasales API — билеты из Москвы"
+        ])
+
+    def test_diverse_selection_fills_remaining_slots_by_rank(self):
+        first = self.make_coupon(title="Public 1", product_url="https://x.test/1", source="public")
+        second = self.make_coupon(title="Public 2", product_url="https://x.test/2", source="public")
+        flight = Deal(
+            title="Flight", product_url="https://aviasales.example.test/search",
+            source="Aviasales API — билеты из Москвы", offer_type="flight", price=2000,
+        )
+        pairs = [
+            (first, DealDecision(True, "eligible", 50.0, None, 90.0)),
+            (second, DealDecision(True, "eligible", 40.0, None, 80.0)),
+            (flight, DealDecision(True, "eligible", None, None, 70.0)),
+        ]
+        selected = select_diverse_deals(pairs, 2)
+        self.assertEqual([pair[0].title for pair in selected], ["Public 1", "Flight"])
 
 
 if __name__ == "__main__":

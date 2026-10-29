@@ -208,6 +208,57 @@ def _rank_evaluated_deal(pair: tuple[Deal, DealDecision]) -> float:
     return score
 
 
+
+def _deal_channel(deal: Deal) -> str:
+    """Classify a deal for balanced previews and publication batches."""
+    if deal.offer_type == "flight":
+        return "flights"
+    if deal.source.casefold().startswith("takprodam:") or deal.affiliate_url:
+        return "partner"
+    return "public"
+
+
+def select_diverse_deals(evaluated: list[tuple[Deal, DealDecision]], limit: int) -> list[tuple[Deal, DealDecision]]:
+    """Take one best candidate per category, then fill remaining slots by rank."""
+    if limit <= 0 or not evaluated:
+        return []
+    channels: dict[str, list[tuple[Deal, DealDecision]]] = {"partner": [], "public": [], "flights": []}
+    for pair in evaluated:
+        channels[_deal_channel(pair[0])].append(pair)
+    selected: list[tuple[Deal, DealDecision]] = []
+    selected_keys: set[str] = set()
+    for channel in ("partner", "public", "flights"):
+        if channels[channel] and len(selected) < limit:
+            pair = channels[channel][0]
+            selected.append(pair)
+            selected_keys.add(pair[0].key)
+    if len(selected) < limit:
+        for pair in evaluated:
+            if pair[0].key in selected_keys:
+                continue
+            selected.append(pair)
+            selected_keys.add(pair[0].key)
+            if len(selected) >= limit:
+                break
+    return selected
+
+
+def _print_partner_coverage(evaluated: list[tuple[Deal, DealDecision]]) -> None:
+    """Log partner metadata coverage without exposing tracking URLs."""
+    partner_deals = [deal for deal, _ in evaluated if deal.source.casefold().startswith("takprodam:")]
+    if not partner_deals:
+        print("Takprodam coverage: 0 eligible product(s) in the current filtered set.")
+        return
+    links = sum(bool(deal.affiliate_url) for deal in partner_deals)
+    images = sum(bool(deal.image_url) for deal in partner_deals)
+    commissions = sum(deal.commission is not None for deal in partner_deals)
+    legal = sum(bool(deal.legal_text.strip()) for deal in partner_deals)
+    print(
+        "Takprodam coverage (eligible products): "
+        f"{len(partner_deals)} total; tracking links={links}; images={images}; "
+        f"commission data={commissions}; legal_text={legal}."
+    )
+
 def main() -> int:
     source_config_path = Path(os.getenv("SOURCE_CONFIG_PATH", "config/sources.json"))
     if not source_config_path.is_absolute():
@@ -316,12 +367,14 @@ def main() -> int:
 
     evaluated.sort(key=_rank_evaluated_deal, reverse=True)
     print(f"Deals passing price/expiry filters: {len(evaluated)}")
+    _print_partner_coverage(evaluated)
     if rejection_reasons:
         reasons = ", ".join(f"{reason}: {count}" for reason, count in rejection_reasons.most_common(8))
         print(f"Filtered out: {reasons}")
 
     if not publishing:
-        for index, (deal, decision) in enumerate(evaluated[:20], start=1):
+        preview_items = select_diverse_deals(evaluated, 20)
+        for index, (deal, decision) in enumerate(preview_items, start=1):
             has_link = "NO (direct URL mode)" if allow_direct_links else ("yes" if deal.affiliate_url else "NO")
             has_image = "yes" if deal.image_url else "NO"
             commission_text = "not used in direct-link mode" if allow_direct_links else (f"{deal.commission:g}" if deal.commission is not None else "n/a")
@@ -381,7 +434,9 @@ def main() -> int:
     posted = 0
     publish_skips: Counter[str] = Counter()
     publish_errors = 0
-    for deal, _preview_decision in evaluated:
+    # Keep short batches balanced across partner products, public discounts, and flights.
+    publish_candidates = select_diverse_deals(evaluated, max_posts + 20)
+    for deal, _preview_decision in publish_candidates:
         if posted >= max_posts:
             break
 
