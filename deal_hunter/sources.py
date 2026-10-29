@@ -323,6 +323,25 @@ def _extract_offer_description(text: str) -> str:
     return value[:700]
 
 
+def _clean_offer_title(value: str) -> str:
+    """Remove card counters and trailing call-to-action labels from offer titles."""
+    title = clean_text(value, 300)
+    title = re.sub(
+        r"^(?:[−–—-]\s*\d{1,2}(?:[.,]\d+)?\s*%\s*)?(?:получили|купили|активировали)\s*:?\s*\d+\s*",
+        "",
+        title,
+        flags=re.IGNORECASE,
+    )
+    title = re.sub(
+        r"\s+(?:подробнее|получить первым!?|получи первым!?)\s*$",
+        "",
+        title,
+        flags=re.IGNORECASE,
+    )
+    title = re.sub(r"\s+бесплатно\s+подробнее\s*$", "", title, flags=re.IGNORECASE)
+    return re.sub(r"\s+", " ", title).strip(" \t\n-–—|·")[:240]
+
+
 def parse_html_promotions(payload: bytes, source: dict[str, Any], max_items: int = 200) -> list[Deal]:
     """Parse public HTML offer cards that publish a promo code or an explicit percentage.
 
@@ -430,7 +449,7 @@ def parse_html_promotions(payload: bytes, source: dict[str, Any], max_items: int
             return priority, min(len(link[1]), 300)
 
         href, title = max(links, key=link_priority)
-        title = clean_text(title, 300)
+        title = _clean_offer_title(title)
         if not title or len(title) < 4:
             title = next(
                 (clean_text(child.attrs.get("alt"), 300) for child in _html_walk(node)

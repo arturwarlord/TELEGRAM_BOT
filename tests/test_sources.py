@@ -76,6 +76,28 @@ class FeedParserTests(unittest.TestCase):
 
 
 
+    def test_html_promotions_removes_card_counters_and_cta_from_title(self):
+        html = """
+        <html><body><main>
+          <article class="deal">
+            <a href="/deals/quest">-80 % Получили: 2494 Получи первым! Квест в Москве Бесплатно Подробнее</a>
+            <img src="/images/quest.jpg" alt="Квест в Москве">
+          </article>
+        </main></body></html>
+        """
+        deals = parse_feed(html.encode("utf-8"), {
+            "name": "test-title-cleanup",
+            "type": "html_promos",
+            "url": "https://coupon.example.test/",
+            "store": "Test Coupon",
+        })
+        matching = [deal for deal in deals if deal.product_url.endswith("/deals/quest")]
+        self.assertTrue(matching)
+        self.assertNotIn("2494", matching[0].title)
+        self.assertNotIn("Подробнее", matching[0].title)
+        self.assertNotIn("Получили", matching[0].title)
+        self.assertIn("Квест в Москве", matching[0].title)
+
     def test_html_promotions_recognizes_en_dash_discount_before_coupon_discount(self):
         html = """
         <html><body>
