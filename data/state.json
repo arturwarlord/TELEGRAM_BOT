@@ -96,6 +96,22 @@
       "published_at": "2026-10-29T16:52:48.151823+00:00",
       "telegram_message_id": 14,
       "affiliate_url": "https://takprdm.ru/0W9UtG83tmCkZwy29FG/?redirectTo=https%3A%2F%2Fozon.ru%2Fproduct%2F149980536&erid=Y1jgkD6uB6jK1phqkTLTbNKYV13k&subid=telegram_deal_hunter"
+    },
+    "5d4637853f08a89f9a10f8d4": {
+      "title": "Скидка 50%. Посещение веревочного парка «Панда парк „Зеленопарк“» (3000 руб. вместо 6000 руб.)",
+      "store": "Frendi",
+      "price": 3000.0,
+      "published_at": "2026-10-29T21:45:18.740059+00:00",
+      "telegram_message_id": 15,
+      "affiliate_url": null
+    },
+    "529b8128cc55533989b787d3": {
+      "title": "Промокод Авито октябрь 2026 на скидку 70% на продвижение.",
+      "store": "БериКод",
+      "price": null,
+      "published_at": "2026-10-29T21:45:21.175765+00:00",
+      "telegram_message_id": 16,
+      "affiliate_url": null
     }
   },
   "recent_posts": [
@@ -158,6 +174,16 @@
       "key": "cc2b21a2c3f11586c168349e",
       "published_at": "2026-10-29T16:52:48.151823+00:00",
       "telegram_message_id": 14
+    },
+    {
+      "key": "5d4637853f08a89f9a10f8d4",
+      "published_at": "2026-10-29T21:45:18.740059+00:00",
+      "telegram_message_id": 15
+    },
+    {
+      "key": "529b8128cc55533989b787d3",
+      "published_at": "2026-10-29T21:45:21.175765+00:00",
+      "telegram_message_id": 16
     }
   ]
 }
