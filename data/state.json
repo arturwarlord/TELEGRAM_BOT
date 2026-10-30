@@ -128,6 +128,22 @@
       "published_at": "2026-10-30T01:50:50.566547+00:00",
       "telegram_message_id": 18,
       "affiliate_url": null
+    },
+    "d70ae2f11988cb665605728c": {
+      "title": "Скидка 50%. Консультация и лечение у врача-оториноларинголога в клинике «Клиника Москва» (3000 руб. вместо 6000 руб.)",
+      "store": "Frendi",
+      "price": 3000.0,
+      "published_at": "2026-10-30T08:30:03.429684+00:00",
+      "telegram_message_id": 19,
+      "affiliate_url": null
+    },
+    "c343f74b6b6769c5f98c19c5": {
+      "title": "SMAS-лифтинг, инъекции «Ботокса», RF-лифтинг, мезотерапия, биоревитализация Марксистская SMAS-лифтинг, инъекции «Ботокса», RF-лифтинг, мезотерапия, биоревитализация",
+      "store": "КупиКупон",
+      "price": null,
+      "published_at": "2026-10-30T08:30:06.055364+00:00",
+      "telegram_message_id": 20,
+      "affiliate_url": null
     }
   },
   "recent_posts": [
@@ -210,6 +226,16 @@
       "key": "8a7b14c2ee9e9ebc272229c0",
       "published_at": "2026-10-30T01:50:50.566547+00:00",
       "telegram_message_id": 18
+    },
+    {
+      "key": "d70ae2f11988cb665605728c",
+      "published_at": "2026-10-30T08:30:03.429684+00:00",
+      "telegram_message_id": 19
+    },
+    {
+      "key": "c343f74b6b6769c5f98c19c5",
+      "published_at": "2026-10-30T08:30:06.055364+00:00",
+      "telegram_message_id": 20
     }
   ]
 }
