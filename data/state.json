@@ -144,6 +144,22 @@
       "published_at": "2026-10-30T08:30:06.055364+00:00",
       "telegram_message_id": 20,
       "affiliate_url": null
+    },
+    "6585d60fcf476054ee9f9077": {
+      "title": "Отдых с развлечениями в парк-отеле «Покровское»",
+      "store": "Biglion",
+      "price": null,
+      "published_at": "2026-10-30T20:05:33.695937+00:00",
+      "telegram_message_id": 21,
+      "affiliate_url": null
+    },
+    "7873a2a3bb024812653115d1": {
+      "title": "SPA-программа или SPA-свидание в «Мой Тай» со скидкой",
+      "store": "Biglion",
+      "price": null,
+      "published_at": "2026-10-30T20:05:36.788934+00:00",
+      "telegram_message_id": 22,
+      "affiliate_url": null
     }
   },
   "recent_posts": [
@@ -236,6 +252,16 @@
       "key": "c343f74b6b6769c5f98c19c5",
       "published_at": "2026-10-30T08:30:06.055364+00:00",
       "telegram_message_id": 20
+    },
+    {
+      "key": "6585d60fcf476054ee9f9077",
+      "published_at": "2026-10-30T20:05:33.695937+00:00",
+      "telegram_message_id": 21
+    },
+    {
+      "key": "7873a2a3bb024812653115d1",
+      "published_at": "2026-10-30T20:05:36.788934+00:00",
+      "telegram_message_id": 22
     }
   ]
 }
