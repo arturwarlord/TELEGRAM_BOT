@@ -112,6 +112,22 @@
       "published_at": "2026-10-29T21:45:21.175765+00:00",
       "telegram_message_id": 16,
       "affiliate_url": null
+    },
+    "88d986d66214352ebf545306": {
+      "title": "Набор игр \"Oathsworn. Верные клятве. Тайны Темнолесья\": \"Полное погружение\"",
+      "store": "Мир Хобби",
+      "price": 49316.0,
+      "published_at": "2026-10-30T01:50:48.104702+00:00",
+      "telegram_message_id": 17,
+      "affiliate_url": null
+    },
+    "8a7b14c2ee9e9ebc272229c0": {
+      "title": "Набор игр \"Войны Чёрной Розы: Возрождение\": \"Хроники магии\"",
+      "store": "Мир Хобби",
+      "price": 27908.0,
+      "published_at": "2026-10-30T01:50:50.566547+00:00",
+      "telegram_message_id": 18,
+      "affiliate_url": null
     }
   },
   "recent_posts": [
@@ -184,6 +200,16 @@
       "key": "529b8128cc55533989b787d3",
       "published_at": "2026-10-29T21:45:21.175765+00:00",
       "telegram_message_id": 16
+    },
+    {
+      "key": "88d986d66214352ebf545306",
+      "published_at": "2026-10-30T01:50:48.104702+00:00",
+      "telegram_message_id": 17
+    },
+    {
+      "key": "8a7b14c2ee9e9ebc272229c0",
+      "published_at": "2026-10-30T01:50:50.566547+00:00",
+      "telegram_message_id": 18
     }
   ]
 }
