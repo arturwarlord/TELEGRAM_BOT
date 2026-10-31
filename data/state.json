@@ -160,6 +160,22 @@
       "published_at": "2026-10-30T20:05:36.788934+00:00",
       "telegram_message_id": 22,
       "affiliate_url": null
+    },
+    "17ce28f6a0330172d5ac1bb9": {
+      "title": "Чистка зубов в стоматологической клини в стоматологической клинике TOMIdent",
+      "store": "Biglion",
+      "price": null,
+      "published_at": "2026-10-31T00:01:30.353534+00:00",
+      "telegram_message_id": 23,
+      "affiliate_url": null
+    },
+    "2f4989639b230be8f7bfe2a1": {
+      "title": "Химчистка одежды, ковров, мебели и обуви, уборка, стирка и глажка одежды от Airo Москва, улица Золоторожский Вал, 32с2 Химчистка одежды, ковров, мебели и обуви, уборка, стирка и глажка одежды от Airo Промокод",
+      "store": "КупиКупон",
+      "price": null,
+      "published_at": "2026-10-31T00:01:33.440367+00:00",
+      "telegram_message_id": 24,
+      "affiliate_url": null
     }
   },
   "recent_posts": [
@@ -262,6 +278,16 @@
       "key": "7873a2a3bb024812653115d1",
       "published_at": "2026-10-30T20:05:36.788934+00:00",
       "telegram_message_id": 22
+    },
+    {
+      "key": "17ce28f6a0330172d5ac1bb9",
+      "published_at": "2026-10-31T00:01:30.353534+00:00",
+      "telegram_message_id": 23
+    },
+    {
+      "key": "2f4989639b230be8f7bfe2a1",
+      "published_at": "2026-10-31T00:01:33.440367+00:00",
+      "telegram_message_id": 24
     }
   ]
 }
