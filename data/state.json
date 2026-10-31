@@ -176,6 +176,22 @@
       "published_at": "2026-10-31T00:01:33.440367+00:00",
       "telegram_message_id": 24,
       "affiliate_url": null
+    },
+    "34786fc8703320599ee85798": {
+      "title": "Лазерная эпиляция в академии красоты «АК» со скидкой",
+      "store": "Biglion",
+      "price": null,
+      "published_at": "2026-10-31T05:28:34.005252+00:00",
+      "telegram_message_id": 25,
+      "affiliate_url": null
+    },
+    "6e1465ffb2ed2f27d1dde43c": {
+      "title": "Комплексное ультразвуковое обследование в клинике «Норма»",
+      "store": "Biglion",
+      "price": null,
+      "published_at": "2026-10-31T05:28:36.704618+00:00",
+      "telegram_message_id": 26,
+      "affiliate_url": null
     }
   },
   "recent_posts": [
@@ -288,6 +304,16 @@
       "key": "2f4989639b230be8f7bfe2a1",
       "published_at": "2026-10-31T00:01:33.440367+00:00",
       "telegram_message_id": 24
+    },
+    {
+      "key": "34786fc8703320599ee85798",
+      "published_at": "2026-10-31T05:28:34.005252+00:00",
+      "telegram_message_id": 25
+    },
+    {
+      "key": "6e1465ffb2ed2f27d1dde43c",
+      "published_at": "2026-10-31T05:28:36.704618+00:00",
+      "telegram_message_id": 26
     }
   ]
 }
