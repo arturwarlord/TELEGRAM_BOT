@@ -192,6 +192,22 @@
       "published_at": "2026-10-31T05:28:36.704618+00:00",
       "telegram_message_id": 26,
       "affiliate_url": null
+    },
+    "04d9e06d33a66c20410bcc20": {
+      "title": "Промокод Авито 2026 на скидку 70% на продвижение.",
+      "store": "БериКод",
+      "price": null,
+      "published_at": "2026-10-31T11:11:05.815984+00:00",
+      "telegram_message_id": 27,
+      "affiliate_url": null
+    },
+    "597f13b8cf5e441072746ec8": {
+      "title": "Яндекс Маркета промокод скидки 60% до 1 ноября 2026.",
+      "store": "БериКод",
+      "price": null,
+      "published_at": "2026-10-31T11:11:09.121000+00:00",
+      "telegram_message_id": 28,
+      "affiliate_url": null
     }
   },
   "recent_posts": [
@@ -314,6 +330,16 @@
       "key": "6e1465ffb2ed2f27d1dde43c",
       "published_at": "2026-10-31T05:28:36.704618+00:00",
       "telegram_message_id": 26
+    },
+    {
+      "key": "04d9e06d33a66c20410bcc20",
+      "published_at": "2026-10-31T11:11:05.815984+00:00",
+      "telegram_message_id": 27
+    },
+    {
+      "key": "597f13b8cf5e441072746ec8",
+      "published_at": "2026-10-31T11:11:09.121000+00:00",
+      "telegram_message_id": 28
     }
   ]
 }
