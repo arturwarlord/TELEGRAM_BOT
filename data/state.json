@@ -208,6 +208,14 @@
       "published_at": "2026-10-31T11:11:09.121000+00:00",
       "telegram_message_id": 28,
       "affiliate_url": null
+    },
+    "63989863526461e941d8214f": {
+      "title": "с 1 октября по 31 октября INABA: -50% на 2-е лакомство для кошек",
+      "store": "Четыре Лапы",
+      "price": null,
+      "published_at": "2026-10-31T20:16:14.269898+00:00",
+      "telegram_message_id": 29,
+      "affiliate_url": null
     }
   },
   "recent_posts": [
@@ -340,6 +348,11 @@
       "key": "597f13b8cf5e441072746ec8",
       "published_at": "2026-10-31T11:11:09.121000+00:00",
       "telegram_message_id": 28
+    },
+    {
+      "key": "63989863526461e941d8214f",
+      "published_at": "2026-10-31T20:16:14.269898+00:00",
+      "telegram_message_id": 29
     }
   ]
 }
