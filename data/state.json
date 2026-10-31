@@ -216,6 +216,14 @@
       "published_at": "2026-10-31T20:16:14.269898+00:00",
       "telegram_message_id": 29,
       "affiliate_url": null
+    },
+    "fdf1310dd8a8c5ab2debc24e": {
+      "title": "Скидка 50%. Медицинский аппаратный подологический педикюр в салоне красоты премиум-класса «Ноэми» (2750 руб. вместо 5500 руб.)",
+      "store": "Frendi",
+      "price": 2750.0,
+      "published_at": "2026-10-31T23:38:58.916332+00:00",
+      "telegram_message_id": 30,
+      "affiliate_url": null
     }
   },
   "recent_posts": [
@@ -353,6 +361,11 @@
       "key": "63989863526461e941d8214f",
       "published_at": "2026-10-31T20:16:14.269898+00:00",
       "telegram_message_id": 29
+    },
+    {
+      "key": "fdf1310dd8a8c5ab2debc24e",
+      "published_at": "2026-10-31T23:38:58.916332+00:00",
+      "telegram_message_id": 30
     }
   ]
 }
