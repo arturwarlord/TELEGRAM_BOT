@@ -1378,7 +1378,8 @@ def parse_html_catalog(payload: bytes, source: dict[str, Any], max_items: int = 
             (href, label) for href, label in links
             if not _is_generic_link_label(label)
             and not is_listing_page_link(href)
-            and not re.search(r"/(promotions?|actions?|offers?|personaloffers|sp|catalog)(/|$)", urlsplit(href).path, re.I)
+            and not re.search(r"/(promotions?|actions?|offers?|personaloffers|sp|catalog|otzyvy|reviews?)(/|$)", urlsplit(href).path, re.I)
+            and not re.search(r"(?:[?&#](?:tab|section|view)=)(?:reviews?|otzyvy)\\b", href, re.I)
         ]
         if not candidates:
             continue
