@@ -409,6 +409,129 @@ def fetch_promotion_deals(
     return found
 
 
+
+def fetch_catalog_price_drops(
+    token: str,
+    source_id: str | int,
+    history: dict[str, Any],
+    marketplaces: list[str] | None = None,
+    *,
+    limit: int = 1000,
+    max_pages: int = 3,
+    timeout: int = 25,
+    subid: str | None = None,
+    min_drop_percent: float = 10.0,
+    min_savings: float = 50.0,
+    diagnostics: dict[str, int] | None = None,
+) -> list[Deal]:
+    """Track ordinary Takprodam catalog prices and emit only verified observed price drops.
+
+    The first observation is a baseline, not a discount. Later lower prices become
+    deals only when the previous observed price supports the claimed savings.
+    """
+    if not token.strip() or not str(source_id).strip():
+        raise ValueError("Takprodam token and approved source ID are required")
+
+    markets = marketplaces or ["Ozon", "Wildberries", "Avito", "Aliexpress"]
+    page_limit = max(1, min(int(limit), 1000))
+    pages = max(1, min(int(max_pages), 10))
+    found: list[Deal] = []
+
+    def count(name: str) -> None:
+        if diagnostics is not None:
+            diagnostics[name] = diagnostics.get(name, 0) + 1
+
+    for market in markets:
+        normalized = market.strip()
+        if not normalized:
+            continue
+        for page in range(1, pages + 1):
+            data = _request_json(
+                token,
+                "product",
+                params={
+                    "source_id": str(source_id),
+                    "marketplace": normalized.casefold(),
+                    "page": page,
+                    "limit": page_limit,
+                    **({"subid": subid.strip()} if subid and subid.strip() else {}),
+                },
+                timeout=timeout,
+            )
+            items = data.get("items", [])
+            if not isinstance(items, list):
+                raise RuntimeError(
+                    f"Takprodam API product response for {normalized} has no items array"
+                )
+            valid_items = [item for item in items if isinstance(item, dict)]
+            for item in valid_items:
+                count("received")
+                marketplace = clean_text(
+                    item.get("marketplace_title") or item.get("marketplace") or normalized, 100
+                )
+                title = clean_text(item.get("title"), 300)
+                product_id = str(item.get("product_id") or item.get("id") or "").strip()
+                current_price = parse_price(item.get("price"))
+                external_url = _direct_marketplace_url(item.get("external_link"), marketplace)
+                tracking_url = str(item.get("tracking_link") or "").strip()
+                image_url = str(item.get("image_url") or "").strip()
+                if not title or not product_id or current_price is None or current_price <= 0:
+                    count("rejected_missing_identity_or_price")
+                    continue
+                if not external_url or not is_http_url(tracking_url) or not is_http_url(image_url):
+                    count("rejected_missing_product_link_or_media")
+                    continue
+
+                market_key = _marketplace_slug(marketplace) or normalized.casefold()
+                history_key = f"{market_key}:{product_id}"
+                previous = history.get(history_key)
+                previous_price = None
+                if isinstance(previous, dict):
+                    try:
+                        previous_price = float(previous.get("price"))
+                    except (TypeError, ValueError):
+                        previous_price = None
+
+                store_name = clean_text(item.get("store_title"), 100)
+                store = marketplace if not store_name else f"{marketplace} · {store_name}"
+                if previous_price is not None and previous_price > current_price:
+                    savings = previous_price - current_price
+                    drop_percent = savings / previous_price * 100.0 if previous_price > 0 else 0.0
+                    if drop_percent >= min_drop_percent and savings >= min_savings:
+                        found.append(Deal(
+                            title=title,
+                            product_url=external_url,
+                            store=store[:160],
+                            source=f"takprodam:price-history:{market_key}",
+                            price=current_price,
+                            old_price=previous_price,
+                            affiliate_url=tracking_url,
+                            image_url=image_url,
+                            currency="RUB",
+                            description="Снижение цены подтверждено историей наблюдений каталога Takprodam.",
+                            external_id=product_id,
+                            commission=_float_or_none(item.get("commission")),
+                            legal_text=clean_text(item.get("legal_text"), 500),
+                        ))
+                        count("price_drop_detected")
+                history[history_key] = {
+                    "price": current_price,
+                    "title": title[:240],
+                    "store": store[:160],
+                    "product_url": external_url,
+                    "affiliate_url": tracking_url,
+                    "image_url": image_url,
+                }
+                count("history_updated")
+
+            if len(valid_items) < page_limit:
+                break
+
+    if diagnostics is not None:
+        diagnostics["deals_created"] = len(found)
+    return found
+
+
 def fetch_configured_takprodam_deals(
     timeout: int = 25,
     diagnostics: dict[str, int] | None = None,
