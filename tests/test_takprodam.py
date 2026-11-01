@@ -7,6 +7,7 @@ from unittest.mock import patch
 from deal_hunter.scoring import evaluate_deal
 from deal_hunter.takprodam import (
     fetch_catalog_price_drops,
+    fetch_direct_marketplace_promotion_deals,
     fetch_commissions,
     fetch_configured_takprodam_deals,
     fetch_promotion_deals,
@@ -68,6 +69,126 @@ class TakprodamTests(unittest.TestCase):
             fetch_configured_takprodam_deals()
         self.assertEqual(mock_fetch.call_args.kwargs["limit"], 1000)
         self.assertEqual(mock_fetch.call_args.kwargs["max_pages"], 3)
+
+    def test_maps_direct_only_promotion_without_tracking_link_or_commission(self):
+        item = self.sample_item()
+        item["external_link"] = "https://www.ozon.ru/product/example-123/"
+        item.pop("tracking_link")
+        deals = parse_promotion_items([item], "Ozon", direct_only=True)
+
+        self.assertEqual(len(deals), 1)
+        deal = deals[0]
+        self.assertEqual(deal.product_url, "https://www.ozon.ru/product/example-123/")
+        self.assertIsNone(deal.affiliate_url)
+        self.assertIsNone(deal.commission)
+        self.assertEqual(deal.legal_text, "")
+
+    def test_direct_only_parser_never_falls_back_to_tracking_link(self):
+        item = self.sample_item()
+        item.pop("external_link")
+        deals = parse_promotion_items([item], "Ozon", direct_only=True)
+        self.assertEqual(deals, [])
+
+    @patch("deal_hunter.takprodam._request_json")
+    def test_direct_marketplace_feed_joins_prices_to_clean_external_links(self, mock_request):
+        mock_request.side_effect = [
+            {"items": [{"id": "approved-1", "status": "approved"}]},
+            {
+                "items": [{
+                    "id": "feed-item-1",
+                    "product_id": "market-sku-1",
+                    "product_sku": "seller-sku-1",
+                    "title": "Наушники Example",
+                    "image_url": "https://cdn.example.test/headphones.jpg",
+                    "price": 1000,
+                    "marketplace_title": "Ozon",
+                    "store_title": "Продавец Example",
+                    "external_link": "https://www.ozon.ru/product/example-123/",
+                    "tracking_link": "https://track.example.test/affiliate",
+                    "commission": 50,
+                    "legal_text": "Партнёрская реклама",
+                }]
+            },
+            {
+                "items": [{
+                    "id": "promo-item-1",
+                    "product_id": "market-sku-1",
+                    "title": "Наушники Example",
+                    "image_url": "https://cdn.example.test/headphones-sale.jpg",
+                    "price": 1000,
+                    "price_discount": 700,
+                    "discount_percent": 30,
+                    "tracking_link": "https://track.example.test/affiliate",
+                    "commission": 50,
+                    "legal_text": "Партнёрская реклама",
+                }]
+            },
+        ]
+
+        diagnostics = {}
+        deals, resolved_id = fetch_direct_marketplace_promotion_deals(
+            "dummy-token",
+            "approved-1",
+            ["Ozon"],
+            diagnostics=diagnostics,
+        )
+
+        self.assertEqual(resolved_id, "approved-1")
+        self.assertEqual(len(deals), 1)
+        deal = deals[0]
+        self.assertEqual(deal.title, "Наушники Example")
+        self.assertEqual(deal.product_url, "https://www.ozon.ru/product/example-123/")
+        self.assertEqual(deal.price, 700)
+        self.assertEqual(deal.old_price, 1000)
+        self.assertIsNone(deal.affiliate_url)
+        self.assertIsNone(deal.commission)
+        self.assertEqual(deal.legal_text, "")
+        self.assertEqual(diagnostics["catalog_items_received"], 1)
+        self.assertEqual(diagnostics["direct_product_links_mapped"], 1)
+        self.assertEqual(diagnostics["promotion_items_received"], 1)
+        self.assertEqual(diagnostics["direct_deals_created"], 1)
+
+        self.assertEqual(mock_request.call_args_list[1].args[1], "product")
+        self.assertEqual(mock_request.call_args_list[2].args[1], "promotion/product")
+
+    @patch("deal_hunter.takprodam._request_json")
+    def test_direct_marketplace_feed_rejects_promotion_without_direct_catalog_link(self, mock_request):
+        mock_request.side_effect = [
+            {"items": [{"id": "approved-1", "status": "approved"}]},
+            {
+                "items": [{
+                    "product_id": "market-sku-1",
+                    "title": "Товар без прямой ссылки",
+                    "external_link": "https://redirect.example.test/click/1",
+                }]
+            },
+            {
+                "items": [{
+                    "product_id": "market-sku-1",
+                    "title": "Товар без прямой ссылки",
+                    "price": 1000,
+                    "price_discount": 700,
+                    "discount_percent": 30,
+                    "tracking_link": "https://track.example.test/affiliate",
+                }]
+            },
+        ]
+
+        deals, _ = fetch_direct_marketplace_promotion_deals(
+            "dummy-token",
+            "approved-1",
+            ["Ozon"],
+        )
+        self.assertEqual(deals, [])
+
+    def test_direct_marketplace_url_supports_yandex_market(self):
+        item = self.sample_item()
+        item["marketplace_title"] = "Яндекс Маркет"
+        item["external_link"] = "https://market.yandex.ru/product--example/123"
+        deals = parse_promotion_items([item], "Яндекс Маркет", direct_only=True)
+        self.assertEqual(len(deals), 1)
+        self.assertEqual(deals[0].product_url, "https://market.yandex.ru/product--example/123")
+        self.assertIsNone(deals[0].affiliate_url)
 
     def test_maps_promotion_product_into_deal(self):
         deals = parse_promotion_items([self.sample_item()], "Ozon")
