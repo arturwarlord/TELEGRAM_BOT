@@ -66,7 +66,7 @@ class TakprodamTests(unittest.TestCase):
         with patch.dict(os.environ, environment, clear=True):
             fetch_configured_takprodam_deals()
         self.assertEqual(mock_fetch.call_args.kwargs["limit"], 1000)
-        self.assertEqual(mock_fetch.call_args.kwargs["max_pages"], 1)
+        self.assertEqual(mock_fetch.call_args.kwargs["max_pages"], 3)
 
     def test_maps_promotion_product_into_deal(self):
         deals = parse_promotion_items([self.sample_item()], "Ozon")
