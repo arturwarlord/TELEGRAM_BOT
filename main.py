@@ -377,7 +377,7 @@ def main() -> int:
     # Partner feeds are opt-in only; a stored token alone must not activate them.
     partner_api_enabled = env_bool("ENABLE_TAKPRODAM_PARTNER_API", False) and partner_api_token_present
     print(f"Configured public feed/page sources: {len(sources)}")
-    print(f"Takprodam partner API: {'configured' if partner_api_enabled else 'not configured'}")
+    print("Takprodam partner API: " + ("enabled" if partner_api_enabled else "disabled (direct-only mode)"))
     print(
         "Safety: public links only; no affiliate tracking."
         if allow_direct_links
