@@ -1,5 +1,5 @@
 {
-  "min_discount_percent": 25,
+  "min_discount_percent": 10,
   "min_savings_rub": 50,
   "max_discount_percent": 90,
   "require_image_for_publication": true,
