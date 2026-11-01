@@ -49,7 +49,7 @@ class TakprodamTests(unittest.TestCase):
         self.assertEqual(deals, [])
         self.assertEqual(source_id, "24285")
         self.assertEqual(mock_fetch.call_args.kwargs["limit"], 1000)
-        self.assertEqual(mock_fetch.call_args.kwargs["max_pages"], 1)
+        self.assertEqual(mock_fetch.call_args.kwargs["max_pages"], 3)
         mock_resolve.assert_called_once()
 
     @patch("deal_hunter.takprodam.fetch_promotion_deals", return_value=[])
@@ -170,6 +170,21 @@ class TakprodamTests(unittest.TestCase):
         decision = evaluate_deal(deals[0], require_affiliate=True, require_image=True)
         self.assertTrue(decision.eligible)
         self.assertAlmostEqual(decision.discount_percent, 50)
+
+    @patch("deal_hunter.takprodam._request_json")
+    def test_promotion_fetch_reads_additional_pages_until_short_page(self, mock_request):
+        mock_request.side_effect = [
+            {"items": [self.sample_item(), dict(self.sample_item(), id="deal-2")]},
+            {"items": [dict(self.sample_item(), id="deal-3")]},
+        ]
+        deals = fetch_promotion_deals(
+            "dummy-token", "7", ["Ozon"], limit=2, max_pages=3
+        )
+        self.assertEqual(len(deals), 3)
+        self.assertEqual(
+            [call.kwargs["params"]["page"] for call in mock_request.call_args_list],
+            [1, 2],
+        )
 
     @patch("deal_hunter.takprodam._request_json")
     def test_resolves_single_approved_source(self, mock_request):
