@@ -1,18 +1,87 @@
 from __future__ import annotations
 
 import json
+import os
 import unittest
 from datetime import date
 from pathlib import Path
+from unittest.mock import patch
 
 from deal_hunter.models import parse_price
-from deal_hunter.sources import _decode_html_payload, _extract_open_graph_image, _extract_promo_expiry, parse_aviasales_payload, parse_feed, parse_html_travel_articles, parse_html_tour_cards
+from deal_hunter.sources import _decode_html_payload, _extract_open_graph_image, _extract_promo_expiry, _resolve_source_url, _source_request_headers, parse_aviasales_payload, parse_feed, parse_html_travel_articles, parse_html_tour_cards
 
 
 FIXTURE = Path(__file__).parent / "fixtures" / "sample_feed.xml"
 
 
 class FeedParserTests(unittest.TestCase):
+    def test_resolves_private_feed_url_from_environment_secret(self):
+        source = {
+            "name": "seller-feed",
+            "type": "yml",
+            "enabled": True,
+            "url_env": "SELLER_MARKETPLACE_FEED_URL",
+        }
+        with patch.dict(os.environ, {
+            "SELLER_MARKETPLACE_FEED_URL": "https://feeds.example.test/catalog.yml",
+        }):
+            self.assertEqual(
+                _resolve_source_url(source),
+                "https://feeds.example.test/catalog.yml",
+            )
+
+    def test_requires_private_feed_url_secret_when_configured(self):
+        source = {
+            "name": "seller-feed",
+            "type": "yml",
+            "enabled": True,
+            "url_env": "SELLER_MARKETPLACE_FEED_URL",
+        }
+        with patch.dict(os.environ, {}, clear=True):
+            with self.assertRaisesRegex(RuntimeError, "SELLER_MARKETPLACE_FEED_URL"):
+                _resolve_source_url(source)
+
+    def test_adds_bearer_token_for_authorized_private_feed(self):
+        source = {
+            "name": "seller-feed",
+            "type": "yml",
+            "auth_env": "SELLER_MARKETPLACE_FEED_TOKEN",
+            "auth_header": "Authorization",
+        }
+        with patch.dict(os.environ, {
+            "SELLER_MARKETPLACE_FEED_TOKEN": "test-secret-token",
+        }):
+            headers = _source_request_headers(source)
+        self.assertEqual(headers["Authorization"], "Bearer test-secret-token")
+        self.assertIn("application/xml", headers["Accept"])
+
+    def test_supports_api_key_header_without_logging_secret(self):
+        source = {
+            "name": "seller-feed",
+            "type": "json",
+            "auth_env": "SELLER_MARKETPLACE_FEED_TOKEN",
+            "auth_header": "X-API-Key",
+        }
+        with patch.dict(os.environ, {
+            "SELLER_MARKETPLACE_FEED_TOKEN": "test-secret-token",
+        }):
+            headers = _source_request_headers(source)
+        self.assertEqual(headers["X-API-Key"], "test-secret-token")
+        self.assertNotIn("test-secret-token", str(source))
+
+    def test_rejects_unsupported_private_feed_auth_header(self):
+        source = {
+            "name": "seller-feed",
+            "type": "json",
+            "auth_env": "SELLER_MARKETPLACE_FEED_TOKEN",
+            "auth_header": "Cookie",
+        }
+        with patch.dict(os.environ, {
+            "SELLER_MARKETPLACE_FEED_TOKEN": "test-secret-token",
+        }):
+            with self.assertRaisesRegex(ValueError, "unsupported auth_header"):
+                _source_request_headers(source)
+
     def test_parse_price_handles_space_separated_kopecks(self):
         self.assertEqual(parse_price("184 99 ₽"), 184.99)
         self.assertEqual(parse_price("1 299 99 ₽"), 1299.99)
