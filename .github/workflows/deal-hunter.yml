@@ -47,6 +47,9 @@ jobs:
       TELEGRAM_CHAT_ID: ${{ vars.TELEGRAM_CHAT_ID }}
       SOURCE_CONFIG_PATH: config/sources.json
       AVIASALES_API_TOKEN: ${{ secrets.AVIASALES_API_TOKEN }}
+      # Optional free seller-provided feed; credentials are unused unless a source explicitly references these env names.
+      MARKETPLACE_FEED_URL: ${{ secrets.MARKETPLACE_FEED_URL }}
+      MARKETPLACE_FEED_TOKEN: ${{ secrets.MARKETPLACE_FEED_TOKEN }}
       # Every preview and publication uses the retailer's public product URL.
       # Takprodam/affiliate secrets are intentionally not injected into this workflow.
       ALLOW_DIRECT_LINKS: "true"
