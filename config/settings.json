@@ -3,14 +3,14 @@
   "min_savings_rub": 50,
   "max_discount_percent": 90,
   "require_image_for_publication": true,
-  "max_posts_per_run": 10,
+  "max_posts_per_run": 15,
   "duplicate_cooldown_hours": 72,
   "repost_if_price_drop_percent": 10,
   "repost_min_wait_hours": 6,
   "fetch_timeout_seconds": 20,
   "max_feed_bytes": 5242880,
   "max_items_per_source": 200,
-  "max_posts_per_day": 40,
+  "max_posts_per_day": 80,
   "min_tour_discount_percent": 10,
   "min_tour_savings_rub": 1000
 }
