@@ -23,7 +23,7 @@ jobs:
       TAKPRODAM_SOURCE_ID: ${{ vars.TAKPRODAM_SOURCE_ID || secrets.TAKPRODAM_SOURCE_ID }}
       TAKPRODAM_MARKETPLACES: "Ozon,Wildberries"
       TAKPRODAM_LIMIT: "1000"
-      TAKPRODAM_MAX_PAGES: "1"
+      TAKPRODAM_MAX_PAGES: "3"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
