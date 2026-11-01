@@ -181,6 +181,46 @@ class TakprodamTests(unittest.TestCase):
         )
         self.assertEqual(deals, [])
 
+    @patch("deal_hunter.takprodam._request_json")
+    def test_yandex_market_uses_api_slug_value(self, mock_request):
+        mock_request.side_effect = [
+            {"items": [{"id": "approved-1", "status": "approved"}]},
+            {"items": []},
+            {"items": []},
+        ]
+        fetch_direct_marketplace_promotion_deals(
+            "dummy-token",
+            "approved-1",
+            ["Yandex Market"],
+        )
+        self.assertEqual(
+            mock_request.call_args_list[1].kwargs["params"]["marketplace"],
+            "yandex_market",
+        )
+
+    @patch("deal_hunter.takprodam._request_json")
+    def test_unsupported_marketplace_does_not_abort_other_marketplaces(self, mock_request):
+        mock_request.side_effect = [
+            {"items": [{"id": "approved-1", "status": "approved"}]},
+            RuntimeError("Takprodam API returned HTTP 422: unsupported marketplace"),
+            {"items": []},
+            {"items": []},
+        ]
+        errors = []
+        diagnostics = {}
+        deals, _ = fetch_direct_marketplace_promotion_deals(
+            "dummy-token",
+            "approved-1",
+            ["Yandex Market", "Ozon"],
+            diagnostics=diagnostics,
+            errors=errors,
+        )
+        self.assertEqual(deals, [])
+        self.assertEqual(diagnostics["yandex_market_catalog_api_errors"], 1)
+        self.assertEqual(len(errors), 1)
+        self.assertIn("Yandex Market", errors[0])
+        self.assertEqual(mock_request.call_args_list[2].kwargs["params"]["marketplace"], "ozon")
+
     def test_direct_marketplace_url_supports_yandex_market(self):
         item = self.sample_item()
         item["marketplace_title"] = "Яндекс Маркет"
