@@ -2284,7 +2284,7 @@
       "enabled": false,
       "reason": "Public 5ka discounted catalogue candidate. Run read-only diagnostics to confirm real product-card links, image, and explicit old/current price pair before activation.",
       "diagnostic": true,
-      "disabled_reason": "Awaiting GitHub Actions read-only diagnostics of the public discounted catalogue page."
+      "disabled_reason": "The public discounted product catalogue returned HTTP 403 from GitHub Actions. Keep disabled; use only an authorized public feed or an officially approved integration."
     },
     {
       "name": "SPAR — акции и скидки",
@@ -3012,7 +3012,8 @@
       "store": "Самокат",
       "enabled": false,
       "diagnostic": true,
-      "reason": "Добавлен в расширенный каталог. Сначала read-only диагностика: проверить конкретные предложения, цену/условия, изображение и прямую ссылку; не включать в публикацию до успешной проверки."
+      "reason": "Добавлен в расширенный каталог. Сначала read-only диагностика: проверить конкретные предложения, цену/условия, изображение и прямую ссылку; не включать в публикацию до успешной проверки.",
+      "disabled_reason": "The public page returned HTTP 403 from GitHub Actions. Do not bypass the access restriction."
     },
     {
       "name": "Перекрёсток — специальные предложения",
@@ -3021,7 +3022,8 @@
       "store": "Перекрёсток",
       "enabled": false,
       "diagnostic": true,
-      "reason": "Добавлен в расширенный каталог. Сначала read-only диагностика: проверить конкретные предложения, цену/условия, изображение и прямую ссылку; не включать в публикацию до успешной проверки."
+      "reason": "Добавлен в расширенный каталог. Сначала read-only диагностика: проверить конкретные предложения, цену/условия, изображение и прямую ссылку; не включать в публикацию до успешной проверки.",
+      "disabled_reason": "The public catalogue returned HTTP 403 from GitHub Actions. Do not bypass the access restriction."
     },
     {
       "name": "М.Видео — промокоды",
@@ -3238,7 +3240,8 @@
       "enabled": false,
       "diagnostic": true,
       "category": "groceries",
-      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа."
+      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа.",
+      "disabled_reason": "The candidate host 5dostavka.ru failed DNS resolution from GitHub Actions. No product feed is available at this URL."
     },
     {
       "name": "Ozon — товары дня",
@@ -3248,7 +3251,8 @@
       "enabled": false,
       "diagnostic": true,
       "category": "marketplace",
-      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа."
+      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа.",
+      "disabled_reason": "The public page returned HTTP 307 from GitHub Actions. Keep disabled until a stable authorized public feed is available."
     },
     {
       "name": "Wildberries — распродажа",
@@ -3258,7 +3262,8 @@
       "enabled": false,
       "diagnostic": true,
       "category": "marketplace",
-      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа."
+      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа.",
+      "disabled_reason": "The public page returned HTTP 498 from GitHub Actions. Keep disabled; do not bypass anti-bot restrictions."
     },
     {
       "name": "Wildberries — акции и скидки",
@@ -3268,7 +3273,8 @@
       "enabled": false,
       "diagnostic": true,
       "category": "marketplace",
-      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа."
+      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа.",
+      "disabled_reason": "The public page returned HTTP 498 from GitHub Actions. Keep disabled; do not bypass anti-bot restrictions."
     },
     {
       "name": "WB Travel — путешествия",
@@ -3278,7 +3284,8 @@
       "enabled": false,
       "diagnostic": true,
       "category": "travel",
-      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа."
+      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа.",
+      "disabled_reason": "The public page returned HTTP 498 from GitHub Actions. Keep disabled; do not bypass anti-bot restrictions."
     },
     {
       "name": "AliExpress Россия — распродажа",
@@ -3318,7 +3325,8 @@
       "enabled": false,
       "diagnostic": true,
       "category": "food_delivery",
-      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа."
+      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа.",
+      "disabled_reason": "The public catalogue returned HTTP 403 from GitHub Actions. Do not bypass the access restriction."
     },
     {
       "name": "Магнит Косметик — акции",
@@ -3328,7 +3336,8 @@
       "enabled": false,
       "diagnostic": true,
       "category": "beauty",
-      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа."
+      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа.",
+      "disabled_reason": "TLS certificate hostname verification failed for magnitcosmetic.ru. Keep disabled; certificate verification must not be bypassed."
     },
     {
       "name": "Дикси — акции",
@@ -3338,7 +3347,8 @@
       "enabled": false,
       "diagnostic": true,
       "category": "groceries",
-      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа."
+      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа.",
+      "disabled_reason": "The public page returned HTTP 502 from GitHub Actions. No usable product data was returned."
     },
     {
       "name": "Чижик — каталог",
@@ -3348,7 +3358,8 @@
       "enabled": false,
       "diagnostic": true,
       "category": "groceries",
-      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа."
+      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа.",
+      "disabled_reason": "The public catalogue returned HTTP 403 from GitHub Actions. Do not bypass the access restriction."
     },
     {
       "name": "О’КЕЙ — акции",
@@ -3358,7 +3369,8 @@
       "enabled": false,
       "diagnostic": true,
       "category": "groceries",
-      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа."
+      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа.",
+      "disabled_reason": "The public page returned HTTP 403 from GitHub Actions. Do not bypass the access restriction."
     },
     {
       "name": "Лента — акции",
@@ -3368,7 +3380,8 @@
       "enabled": false,
       "diagnostic": true,
       "category": "groceries",
-      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа."
+      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа.",
+      "disabled_reason": "The public page returned HTTP 401 from GitHub Actions. Keep disabled pending an authorized public feed."
     },
     {
       "name": "METRO — акции",
@@ -3378,7 +3391,8 @@
       "enabled": false,
       "diagnostic": true,
       "category": "groceries",
-      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа."
+      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа.",
+      "disabled_reason": "The public page returned HTTP 200, but the current parser extracted no concrete discounted product cards with a direct URL, image, and explicit old/current price pair."
     },
     {
       "name": "Перекрёсток — акции",
@@ -3388,7 +3402,8 @@
       "enabled": false,
       "diagnostic": true,
       "category": "groceries",
-      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа."
+      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа.",
+      "disabled_reason": "The public page returned HTTP 403 from GitHub Actions. Do not bypass the access restriction."
     },
     {
       "name": "Верный — акции",
@@ -3408,7 +3423,8 @@
       "enabled": false,
       "diagnostic": true,
       "category": "groceries",
-      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа."
+      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа.",
+      "disabled_reason": "The public page connection was reset by the remote host from GitHub Actions. No usable product data was returned."
     },
     {
       "name": "Бристоль — предложения",
@@ -3438,7 +3454,8 @@
       "enabled": false,
       "diagnostic": true,
       "category": "retail",
-      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа."
+      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа.",
+      "disabled_reason": "The public page returned HTTP 200, but the current parser extracted no concrete discounted product cards with a direct URL, image, and explicit old/current price pair."
     },
     {
       "name": "Familia — распродажа",
@@ -3830,7 +3847,8 @@
       "enabled": false,
       "diagnostic": true,
       "category": "travel",
-      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа."
+      "reason": "Расширенный каталог кандидатов. Перед публикацией требуется read-only проверка: доступность, конкретная карточка предложения, актуальная цена/условия, изображение и прямая ссылка. Не обходить CAPTCHA/ограничения доступа.",
+      "disabled_reason": "The public page returned HTTP 307 from GitHub Actions. Keep disabled until a stable authorized public feed is available."
     },
     {
       "name": "СберСпасибо — предложения",
