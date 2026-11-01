@@ -244,7 +244,7 @@ def select_diverse_deals(evaluated: list[tuple[Deal, DealDecision]], limit: int)
                 if channel == "flights" and channel_counts[channel] >= flight_cap:
                     continue
                 source_key = deal.source.casefold().strip()
-                if channel != "flights" and source_counts[source_key] >= 2:
+                if channel != "flights" and source_counts[source_key] >= 4:
                     continue
                 selected.append(pair)
                 channel_counts[channel] += 1
@@ -283,7 +283,10 @@ def main() -> int:
     settings = read_json(settings_path, {})
     sources = [
         source for source in source_config.get("sources", [])
-        if isinstance(source, dict) and source.get("enabled") is True
+        if isinstance(source, dict)
+        and source.get("enabled") is True
+        and source.get("type") != "html_promos"
+        and source.get("category") != "coupons"
     ]
 
     publish_enabled = env_bool("PUBLISH_ENABLED", False)
@@ -376,8 +379,25 @@ def main() -> int:
             source_errors += 1
             print(f"[ERROR] {name}: {type(exc).__name__}: {exc}")
 
-    deals = choose_best_duplicates(all_deals)
-    print(f"Fetched {len(all_deals)} item(s); {len(deals)} unique product(s).")
+    # Product-card-only policy: coupon codes and coupon catalog entries are never eligible.
+    # Retail products need an explicit current/old price pair, image and direct product URL.
+    # Flight cards remain eligible as separately priced, direct-booking offers.
+    product_cards = [
+        deal for deal in all_deals
+        if not deal.promo_code
+        and deal.image_url
+        and deal.product_url
+        and (
+            deal.offer_type == "flight"
+            or (deal.price is not None and deal.old_price is not None)
+        )
+    ]
+    rejected_non_product = len(all_deals) - len(product_cards)
+    deals = choose_best_duplicates(product_cards)
+    print(
+        f"Fetched {len(all_deals)} item(s); {len(product_cards)} product-card candidate(s); "
+        f"{rejected_non_product} coupon/incomplete item(s) excluded; {len(deals)} unique card(s)."
+    )
 
     min_discount = float(settings.get("min_discount_percent", 30))
     min_savings = float(settings.get("min_savings_rub", 100))
@@ -455,9 +475,9 @@ def main() -> int:
         print("[FATAL] TELEGRAM_CHAT_ID Actions variable is missing.")
         return 2
     state = load_state(state_path)
-    daily_cap = max(1, int(settings.get("max_posts_per_day", 8)))
+    daily_cap = max(1, int(settings.get("max_posts_per_day", 40)))
     published_last_24h = count_published_within_hours(state, hours=24)
-    configured_per_run = max(1, int(settings.get("max_posts_per_run", 2)))
+    configured_per_run = max(1, int(settings.get("max_posts_per_run", 10)))
     max_posts = min(configured_per_run, max(0, daily_cap - published_last_24h))
     if max_posts <= 0:
         print(f"Daily publication limit reached: {published_last_24h}/{daily_cap} posts in the last 24 hours.")
@@ -523,7 +543,7 @@ def main() -> int:
             mark_published(deal, state, message_id=message_id)
             save_state(state_path, state)
             posted += 1
-            discount_label = f"-{decision.discount_percent:.1f}%" if decision.discount_percent is not None else "coupon"
+            discount_label = f"-{decision.discount_percent:.1f}%" if decision.discount_percent is not None else "flight/offer"
             print(f"[PUBLISHED] {deal.store} | {discount_label} | message_id={message_id}")
             time.sleep(1.1)
         except Exception as exc:
