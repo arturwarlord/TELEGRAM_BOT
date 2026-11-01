@@ -2279,10 +2279,12 @@
     {
       "name": "Пятёрочка — официальные акции",
       "type": "html",
-      "url": "https://5ka.ru/",
+      "url": "https://5ka.ru/catalog/vygodno--251C17047/",
       "store": "Пятёрочка",
       "enabled": false,
-      "reason": "Главная страница не предоставляет пригодных публичных карточек скидок в текущем парсере."
+      "reason": "Public 5ka discounted catalogue candidate. Run read-only diagnostics to confirm real product-card links, image, and explicit old/current price pair before activation.",
+      "diagnostic": true,
+      "disabled_reason": "Awaiting GitHub Actions read-only diagnostics of the public discounted catalogue page."
     },
     {
       "name": "SPAR — акции и скидки",
