@@ -131,7 +131,32 @@ def _infer_price_pair(text: str) -> tuple[float | None, float | None]:
     return None, None
 
 
+def _record_is_available(record: Any) -> bool:
+    raw_value: Any = None
+    if isinstance(record, ET.Element):
+        raw_value = record.attrib.get("available")
+        if raw_value is None:
+            raw_value = record.attrib.get("in_stock")
+    elif isinstance(record, dict):
+        for key in ("available", "in_stock", "is_available", "availability"):
+            raw_value = _json_path(record, key)
+            if raw_value is not None:
+                break
+
+    if raw_value is None:
+        return True
+    if isinstance(raw_value, bool):
+        return raw_value
+    normalized = str(raw_value).strip().casefold()
+    return normalized not in {
+        "", "0", "false", "no", "off", "нет", "нет в наличии",
+        "out_of_stock", "out of stock", "unavailable",
+    }
+
+
 def _record_to_deal(record: Any, source: dict[str, Any]) -> Deal | None:
+    if not _record_is_available(record):
+        return None
     title = clean_text(_field(record, source, "title"), 300)
     product_url = _field(record, source, "product_url").strip()
     if not title or not is_http_url(product_url):
