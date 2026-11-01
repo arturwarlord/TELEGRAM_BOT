@@ -427,6 +427,7 @@ def fetch_direct_marketplace_promotion_deals(
     timeout: int = 25,
     diagnostics: dict[str, int] | None = None,
     errors: list[str] | None = None,
+    sample_fields: list[dict[str, str]] | None = None,
 ) -> tuple[list[Deal], str]:
     """Read Takprodam marketplace data but return only direct product URLs.
 
@@ -484,6 +485,19 @@ def fetch_direct_marketplace_promotion_deals(
                 )
             valid_catalog = [item for item in catalog_items if isinstance(item, dict)]
             count("catalog_items_received", len(valid_catalog))
+            if sample_fields is not None and not any(
+                sample.get("marketplace") == normalized and sample.get("kind") == "catalog"
+                for sample in sample_fields
+            ):
+                for sample_product in valid_catalog[:3]:
+                    sample_fields.append({
+                        "marketplace": normalized,
+                        "kind": "catalog",
+                        "id": str(sample_product.get("id") or ""),
+                        "product_id": str(sample_product.get("product_id") or ""),
+                        "product_sku": str(sample_product.get("product_sku") or ""),
+                        "sku": str(sample_product.get("sku") or ""),
+                    })
             for product in valid_catalog:
                 product_key = str(
                     product.get("product_id")
@@ -531,6 +545,19 @@ def fetch_direct_marketplace_promotion_deals(
                 )
             valid_promotions = [item for item in promotion_items if isinstance(item, dict)]
             count("promotion_items_received", len(valid_promotions))
+            if sample_fields is not None and not any(
+                sample.get("marketplace") == normalized and sample.get("kind") == "promotion"
+                for sample in sample_fields
+            ):
+                for sample_promotion in valid_promotions[:3]:
+                    sample_fields.append({
+                        "marketplace": normalized,
+                        "kind": "promotion",
+                        "id": str(sample_promotion.get("id") or ""),
+                        "product_id": str(sample_promotion.get("product_id") or ""),
+                        "product_sku": str(sample_promotion.get("product_sku") or ""),
+                        "sku": str(sample_promotion.get("sku") or ""),
+                    })
             for promotion in valid_promotions:
                 product_key = str(
                     promotion.get("product_id")
