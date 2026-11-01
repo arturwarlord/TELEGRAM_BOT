@@ -441,7 +441,7 @@ def main() -> int:
     product_cards = [
         deal for deal in all_deals
         if not _is_coupon_or_non_product_offer(deal)
-        and deal.image_url
+        and (deal.offer_type == "flight" or deal.image_url)
         and deal.product_url
         and (
             deal.offer_type == "flight"
@@ -580,7 +580,7 @@ def main() -> int:
             # Mixed mode: both partner and ordinary public offers are eligible.
             # The publisher chooses the correct link for each individual deal.
             require_affiliate=False,
-            require_image=require_image,
+            require_image=require_image and deal.offer_type != "flight",
         )
         if not decision.eligible:
             publish_skips[decision.reason] += 1
