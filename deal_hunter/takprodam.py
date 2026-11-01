@@ -525,6 +525,8 @@ def fetch_direct_marketplace_promotion_deals(
                     continue
                 merged = dict(promotion)
                 merged["external_link"] = catalog_product["external_link"]
+                if not merged.get("marketplace_title"):
+                    merged["marketplace_title"] = normalized
                 if not merged.get("title"):
                     merged["title"] = catalog_product.get("title")
                 if not merged.get("image_url"):
