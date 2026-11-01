@@ -224,6 +224,14 @@
       "published_at": "2026-10-31T23:38:58.916332+00:00",
       "telegram_message_id": 30,
       "affiliate_url": null
+    },
+    "ab319fcc0ae7699347d97b12": {
+      "title": "Комплексное обследование мужчин и женщин со скидкой",
+      "store": "Biglion",
+      "price": null,
+      "published_at": "2026-11-01T05:45:18.032848+00:00",
+      "telegram_message_id": 31,
+      "affiliate_url": null
     }
   },
   "recent_posts": [
@@ -366,6 +374,11 @@
       "key": "fdf1310dd8a8c5ab2debc24e",
       "published_at": "2026-10-31T23:38:58.916332+00:00",
       "telegram_message_id": 30
+    },
+    {
+      "key": "ab319fcc0ae7699347d97b12",
+      "published_at": "2026-11-01T05:45:18.032848+00:00",
+      "telegram_message_id": 31
     }
   ]
 }
