@@ -35,6 +35,7 @@ def main() -> int:
 
     diagnostics: dict[str, int] = {}
     errors: list[str] = []
+    sample_fields: list[dict[str, str]] = []
     try:
         deals, resolved_source_id = fetch_direct_marketplace_promotion_deals(
             token,
@@ -44,6 +45,7 @@ def main() -> int:
             max_pages=max_pages,
             diagnostics=diagnostics,
             errors=errors,
+            sample_fields=sample_fields,
         )
     except Exception as exc:
         # Never print the token or request headers. The API helper does not include them
@@ -70,6 +72,13 @@ def main() -> int:
         print(f"{key}: {diagnostics[key]}")
     for error in errors:
         print(f"[MARKETPLACE WARNING] {error}")
+    for sample in sample_fields:
+        print(
+            "[ID SAMPLE] "
+            f"{sample.get('marketplace')} {sample.get('kind')} "
+            f"id={sample.get('id')} product_id={sample.get('product_id')} "
+            f"product_sku={sample.get('product_sku')} sku={sample.get('sku')}"
+        )
     print(f"Deals with direct card, photo and verified price pair: {len(specific)}")
 
     for index, deal in enumerate(specific[:20], start=1):
