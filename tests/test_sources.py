@@ -41,6 +41,81 @@ class FeedParserTests(unittest.TestCase):
         self.assertEqual(deal.image_url, "https://cdn.example.test/item-123.jpg")
         self.assertEqual(deal.discount_percent, 50.0)
 
+    def test_parses_yml_marketplace_feed_with_offer_id_and_direct_card_link(self):
+        payload = b"""<?xml version="1.0" encoding="UTF-8"?>
+        <yml_catalog date="2026-11-02T00:00:00+03:00">
+          <shop>
+            <name>Seller example</name>
+            <offers>
+              <offer id="offer-123" available="true">
+                <name>Беспроводные наушники Example</name>
+                <vendorCode>SKU-123</vendorCode>
+                <url>https://www.wildberries.ru/catalog/123456789/detail.aspx</url>
+                <price>2499</price>
+                <oldprice>4999</oldprice>
+                <currencyId>RUB</currencyId>
+                <picture>https://cdn.example.test/headphones.jpg</picture>
+              </offer>
+            </offers>
+          </shop>
+        </yml_catalog>
+        """
+        source = {
+            "name": "seller-marketplace-yml",
+            "type": "yml",
+            "enabled": True,
+            "store": "Seller example",
+        }
+
+        deals = parse_feed(payload, source)
+
+        self.assertEqual(len(deals), 1)
+        deal = deals[0]
+        self.assertEqual(deal.title, "Беспроводные наушники Example")
+        self.assertEqual(deal.product_url, "https://www.wildberries.ru/catalog/123456789/detail.aspx")
+        self.assertEqual(deal.price, 2499.0)
+        self.assertEqual(deal.old_price, 4999.0)
+        self.assertEqual(deal.currency, "RUB")
+        self.assertEqual(deal.image_url, "https://cdn.example.test/headphones.jpg")
+        self.assertEqual(deal.external_id, "offer-123")
+        self.assertIsNone(deal.affiliate_url)
+
+    def test_json_feed_can_map_explicit_marketplace_product_url(self):
+        payload = json.dumps({
+            "offers": [{
+                "title": "Кофемолка Example",
+                "marketplace_url": "https://market.yandex.ru/product--coffee-grinder/123456",
+                "main_image": "https://cdn.example.test/grinder.jpg",
+                "discounted_price": "1 500",
+                "original_price": "2 500",
+                "sku": "YANDEX-123",
+            }]
+        }, ensure_ascii=False).encode()
+        source = {
+            "name": "seller-marketplace-json",
+            "type": "json",
+            "items_path": "offers",
+            "fields": {
+                "product_url": "marketplace_url",
+                "image_url": "main_image",
+                "price": "discounted_price",
+                "old_price": "original_price",
+                "external_id": "sku",
+            },
+        }
+
+        deals = parse_feed(payload, source)
+
+        self.assertEqual(len(deals), 1)
+        self.assertEqual(
+            deals[0].product_url,
+            "https://market.yandex.ru/product--coffee-grinder/123456",
+        )
+        self.assertEqual(deals[0].price, 1500.0)
+        self.assertEqual(deals[0].old_price, 2500.0)
+        self.assertEqual(deals[0].external_id, "YANDEX-123")
+        self.assertIsNone(deals[0].affiliate_url)
+
     def test_reads_json_feed_with_custom_fields(self):
         payload = json.dumps({
             "offers": [{
