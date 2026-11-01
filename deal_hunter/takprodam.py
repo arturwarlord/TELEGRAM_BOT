@@ -362,7 +362,7 @@ def fetch_promotion_deals(
     marketplaces: list[str] | None = None,
     *,
     limit: int = 1000,
-    max_pages: int = 1,
+    max_pages: int = 3,
     timeout: int = 25,
     subid: str | None = None,
     diagnostics: dict[str, int] | None = None,
@@ -422,7 +422,7 @@ def fetch_configured_takprodam_deals(
     marketplace_setting = os.getenv("TAKPRODAM_MARKETPLACES", "Ozon,Wildberries,Avito,Aliexpress")
     marketplaces = [name.strip() for name in marketplace_setting.split(",") if name.strip()]
     limit = _env_int("TAKPRODAM_LIMIT", 1000)
-    max_pages = _env_int("TAKPRODAM_MAX_PAGES", 1)
+    max_pages = _env_int("TAKPRODAM_MAX_PAGES", 3)
     # A stable subid lets the commissions API attribute this bot's traffic separately.
     # The value can be overridden in GitHub Actions Variables for campaign experiments.
     subid = os.getenv("TAKPRODAM_SUBID", "").strip() or "telegram_deal_hunter"
