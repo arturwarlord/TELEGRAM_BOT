@@ -71,6 +71,32 @@ def _is_specific_product_url(url: str) -> bool:
     return True
 
 
+def _is_coupon_or_non_product_offer(deal: Deal) -> bool:
+    """Reject coupon-code listings and coupon-platform offers regardless of feed type."""
+    if deal.offer_type == "flight":
+        return False
+    if deal.promo_code:
+        return True
+
+    title = deal.title.casefold()
+    coupon_patterns = (
+        r"\bпромокод\w*\b",
+        r"\bкупон\w*\b",
+        r"\bвведите\s+(?:код|промокод)\b",
+        r"\bкод\s+на\s+скидк\w*\b",
+        r"\bзабронируйте\s+скидк\w*\b",
+        r"\bподарочн\w*\s+курс\w*\b",
+    )
+    if any(re.search(pattern, title, flags=re.IGNORECASE) for pattern in coupon_patterns):
+        return True
+
+    source_identity = f"{deal.source} {deal.store} {urlsplit(deal.product_url).netloc}".casefold()
+    blocked_coupon_sources = (
+        "couponmagic", "promofact", "berikod", "promko.net", "promkod",
+        "promokod", "promocod", "kupon", "biglion",
+    )
+    return any(marker in source_identity for marker in blocked_coupon_sources)
+
 def _coupon_brand_key(deal: Deal) -> str:
     """Approximate merchant identity from coupon title for cross-catalog deduplication."""
     ignored = {
@@ -414,7 +440,7 @@ def main() -> int:
     # Flight cards remain eligible as separately priced, direct-booking offers.
     product_cards = [
         deal for deal in all_deals
-        if not deal.promo_code
+        if not _is_coupon_or_non_product_offer(deal)
         and deal.image_url
         and deal.product_url
         and (
@@ -426,6 +452,7 @@ def main() -> int:
             )
         )
     ]
+    rejected_coupon_offers = sum(1 for deal in all_deals if _is_coupon_or_non_product_offer(deal))
     rejected_non_product = len(all_deals) - len(product_cards)
     rejected_generic_pages = sum(
         1 for deal in all_deals
@@ -436,7 +463,7 @@ def main() -> int:
     deals = choose_best_duplicates(product_cards)
     print(
         f"Fetched {len(all_deals)} item(s); {len(product_cards)} product-card candidate(s); "
-        f"{rejected_non_product} coupon/incomplete/non-product item(s) excluded; "
+        f"{rejected_coupon_offers} coupon offer(s) blocked; {rejected_non_product} incomplete/non-product item(s) excluded; "
         f"{rejected_generic_pages} generic/category/author page(s) rejected; {len(deals)} unique card(s)."
     )
 
