@@ -58,7 +58,8 @@ class FeedParserTests(unittest.TestCase):
               </offer>
             </offers>
           </shop>
-        </yml_catalog>        """.encode("utf-8")
+        </yml_catalog>
+        """.encode("utf-8")
         source = {
             "name": "seller-marketplace-yml",
             "type": "yml",
