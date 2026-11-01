@@ -28,7 +28,7 @@ def main() -> int:
     ]
     try:
         limit = max(1, min(int(os.getenv("TAKPRODAM_LIMIT", "1000")), 1000))
-        max_pages = max(1, min(int(os.getenv("TAKPRODAM_MAX_PAGES", "1")), 5))
+        max_pages = max(1, min(int(os.getenv("TAKPRODAM_MAX_PAGES", "3")), 5))
     except ValueError:
         print("[ERROR] TAKPRODAM_LIMIT and TAKPRODAM_MAX_PAGES must be integers.")
         return 2
