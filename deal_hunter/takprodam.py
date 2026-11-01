@@ -426,6 +426,7 @@ def fetch_direct_marketplace_promotion_deals(
     max_pages: int = 1,
     timeout: int = 25,
     diagnostics: dict[str, int] | None = None,
+    errors: list[str] | None = None,
 ) -> tuple[list[Deal], str]:
     """Read Takprodam marketplace data but return only direct product URLs.
 
@@ -454,19 +455,28 @@ def fetch_direct_marketplace_promotion_deals(
         if not normalized or _marketplace_slug(normalized) is None:
             continue
 
+        market_slug = _marketplace_slug(normalized) or normalized.casefold().replace(" ", "_")
         direct_products: dict[str, dict[str, Any]] = {}
+        catalog_failed = False
         for page in range(1, pages + 1):
-            catalog = _request_json(
-                token,
-                "product",
-                params={
-                    "source_id": resolved_source_id,
-                    "marketplace": normalized.casefold(),
-                    "page": page,
-                    "limit": page_limit,
-                },
-                timeout=timeout,
-            )
+            try:
+                catalog = _request_json(
+                    token,
+                    "product",
+                    params={
+                        "source_id": resolved_source_id,
+                        "marketplace": market_slug,
+                        "page": page,
+                        "limit": page_limit,
+                    },
+                    timeout=timeout,
+                )
+            except Exception as exc:
+                count(f"{market_slug}_catalog_api_errors")
+                if errors is not None:
+                    errors.append(f"{normalized} product catalog: {type(exc).__name__}: {exc}")
+                catalog_failed = True
+                break
             catalog_items = catalog.get("items", [])
             if not isinstance(catalog_items, list):
                 raise RuntimeError(
@@ -493,18 +503,27 @@ def fetch_direct_marketplace_promotion_deals(
             if len(valid_catalog) < page_limit:
                 break
 
+        if catalog_failed:
+            continue
+
         for page in range(1, pages + 1):
-            promotion_response = _request_json(
-                token,
-                "promotion/product",
-                params={
-                    "source_id": resolved_source_id,
-                    "marketplace": normalized.casefold(),
-                    "page": page,
-                    "limit": page_limit,
-                },
-                timeout=timeout,
-            )
+            try:
+                promotion_response = _request_json(
+                    token,
+                    "promotion/product",
+                    params={
+                        "source_id": resolved_source_id,
+                        "marketplace": market_slug,
+                        "page": page,
+                        "limit": page_limit,
+                    },
+                    timeout=timeout,
+                )
+            except Exception as exc:
+                count(f"{market_slug}_promotion_api_errors")
+                if errors is not None:
+                    errors.append(f"{normalized} promotion products: {type(exc).__name__}: {exc}")
+                break
             promotion_items = promotion_response.get("items", [])
             if not isinstance(promotion_items, list):
                 raise RuntimeError(
