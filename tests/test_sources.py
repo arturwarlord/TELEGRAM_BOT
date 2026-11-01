@@ -188,6 +188,52 @@ class FeedParserTests(unittest.TestCase):
         self.assertEqual(deals[0].old_price, 2000.0)
         self.assertIsNone(deals[0].affiliate_url)
 
+    def test_html_catalog_prefers_product_detail_over_reviews_url(self):
+        payload = """
+        <html><body><main>
+          <div class="product-card">
+            <a href="/machi-koro/otzyvy">Мачи Коро — отзывы покупателей и обсуждение игры</a>
+            <a href="/machi-koro">Мачи Коро</a>
+            <img src="/images/machi-koro.jpg" alt="Мачи Коро">
+            <span>Цена 1 341 ₽</span>
+            <span>Старая цена 1 490 ₽</span>
+            <span>-10%</span>
+          </div>
+        </main></body></html>
+        """.encode("utf-8")
+        source = {
+            "name": "test-hobby-store",
+            "type": "html",
+            "enabled": True,
+            "url": "https://shop.example.test/",
+            "store": "Тест-магазин",
+        }
+        deals = parse_feed(payload, source)
+        self.assertEqual(len(deals), 1)
+        self.assertEqual(deals[0].product_url, "https://shop.example.test/machi-koro")
+        self.assertNotIn("/otzyvy", deals[0].product_url)
+
+    def test_html_catalog_rejects_reviews_only_links(self):
+        payload = """
+        <html><body><main>
+          <div class="product-card">
+            <a href="/machi-koro/otzyvy">Мачи Коро — отзывы покупателей и обсуждение игры</a>
+            <img src="/images/machi-koro.jpg" alt="Мачи Коро">
+            <span>Цена 1 341 ₽</span>
+            <span>Старая цена 1 490 ₽</span>
+            <span>-10%</span>
+          </div>
+        </main></body></html>
+        """.encode("utf-8")
+        source = {
+            "name": "test-hobby-store",
+            "type": "html",
+            "enabled": True,
+            "url": "https://shop.example.test/",
+            "store": "Тест-магазин",
+        }
+        self.assertEqual(parse_feed(payload, source), [])
+
     def test_parses_kuper_style_discounted_price_labels(self):
         payload = """
         <div class="product-card">
