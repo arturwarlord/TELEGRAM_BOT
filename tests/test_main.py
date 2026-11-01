@@ -115,6 +115,17 @@ class MainDeduplicationTests(unittest.TestCase):
         self.assertTrue(_is_specific_product_url("https://www.wildberries.ru/catalog/123456789/detail.aspx"))
         self.assertFalse(_is_specific_product_url("https://www.wildberries.ru/promo"))
 
+    def test_product_url_filter_rejects_affiliate_query_parameters(self):
+        from main import _is_specific_product_url
+        self.assertFalse(_is_specific_product_url("https://shop.example.test/product/123?aff_id=partner"))
+        self.assertFalse(_is_specific_product_url("https://shop.example.test/product/123?subid=telegram"))
+        self.assertFalse(_is_specific_product_url("https://shop.example.test/product/123?click_id=abc"))
+
+    def test_product_url_filter_rejects_redirect_query_parameters(self):
+        from main import _is_specific_product_url
+        self.assertFalse(_is_specific_product_url("https://shop.example.test/product/123?redirect_url=https%3A%2F%2Fother.test"))
+        self.assertFalse(_is_specific_product_url("https://shop.example.test/product/123?target=https%3A%2F%2Fother.test"))
+
     def test_product_url_filter_rejects_known_affiliate_redirect_hosts(self):
         from main import _is_specific_product_url
         self.assertFalse(_is_specific_product_url("https://ad.admitad.com/goto/123456"))
