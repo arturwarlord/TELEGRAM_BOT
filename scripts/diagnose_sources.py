@@ -29,7 +29,17 @@ def _read_config() -> list[dict]:
     path = PROJECT_ROOT / "config" / "sources.json"
     data = json.loads(path.read_text(encoding="utf-8"))
     sources = data.get("sources", [])
-    return [item for item in sources if isinstance(item, dict) and (item.get("enabled") is True or item.get("diagnostic") is True)]
+    selected = [item for item in sources if isinstance(item, dict) and (item.get("enabled") is True or item.get("diagnostic") is True)]
+    filters = [value.strip().casefold() for value in os.getenv("DIAGNOSTIC_SOURCE_FILTER", "").split(",") if value.strip()]
+    if filters:
+        selected = [
+            item for item in selected
+            if any(
+                token in " ".join(str(item.get(field) or "") for field in ("name", "store", "url", "category")).casefold()
+                for token in filters
+            )
+        ]
+    return selected
 
 
 def inspect_source(source: dict) -> None:
@@ -217,6 +227,8 @@ def main() -> int:
     sources = _read_config()
     print("===== PUBLIC DEAL SOURCE DIAGNOSTICS (READ-ONLY) =====")
     print(f"Source pages checked: {len(sources)}")
+    source_filter = os.getenv("DIAGNOSTIC_SOURCE_FILTER", "").strip()
+    print(f"Source filter: {source_filter or \"all enabled/diagnostic sources\"}")
     print(f"Production-enabled sources: {sum(1 for item in sources if item.get('enabled') is True)}")
     print(f"Diagnostic-only candidates: {sum(1 for item in sources if item.get('enabled') is not True)}")
     print("No Telegram methods are called. This workflow only downloads public pages and inspects visible product/price markup.")
