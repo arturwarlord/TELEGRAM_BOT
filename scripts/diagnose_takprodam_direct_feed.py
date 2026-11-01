@@ -77,7 +77,10 @@ def main() -> int:
             "[ID SAMPLE] "
             f"{sample.get('marketplace')} {sample.get('kind')} "
             f"id={sample.get('id')} product_id={sample.get('product_id')} "
-            f"product_sku={sample.get('product_sku')} sku={sample.get('sku')}"
+            f"product_sku={sample.get('product_sku')} sku={sample.get('sku')} "
+            f"price={sample.get('price')} price_discount={sample.get('price_discount')} "
+            f"discount_percent={sample.get('discount_percent')} "
+            f"image_present={sample.get('image_present')}"
         )
     print(f"Deals with direct card, photo and verified price pair: {len(specific)}")
 
