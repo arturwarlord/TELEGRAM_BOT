@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      DIAGNOSTIC_SOURCE_FILTER: ${{ inputs.source_filter || (github.event_name == 'push' && 'Пятёрочка') || '' }}
+      DIAGNOSTIC_SOURCE_FILTER: ${{ inputs.source_filter || (github.event_name == 'push' && 'Пятёрочка,Ozon,Wildberries,Самокат,Купер,Магнит,Дикси,Чижик,Лента,Перекрёсток,METRO,Глобус,Fix Price,Ашан,О’КЕЙ') || '' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
