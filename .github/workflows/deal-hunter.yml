@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       publish:
-        description: "Опубликовать подходящие партнёрские и обычные предложения в Telegram"
+        description: "Опубликовать только предложения с прямыми ссылками на товары, без партнёрских редиректов"
         required: true
         type: boolean
         default: false
@@ -41,22 +41,16 @@ jobs:
     env:
       # Scheduled runs publish automatically; code pushes stay dry-run so commits never trigger surprise posts.
       # Manual publish=true and explicit one-time launch prefixes remain available for controlled diagnostics.
-      PUBLISH_ENABLED: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.publish == true) || (github.event_name == 'push' && (startsWith(github.event.head_commit.message, 'launch one-time partner posts:') || startsWith(github.event.head_commit.message, 'launch one-time direct posts:'))) }}
+      PUBLISH_ENABLED: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.publish == true) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'launch one-time direct posts:')) }}
       DRY_RUN: ${{ !(github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.publish == true) || (github.event_name == 'push' && (startsWith(github.event.head_commit.message, 'launch one-time partner posts:') || startsWith(github.event.head_commit.message, 'launch one-time direct posts:')))) }}
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ vars.TELEGRAM_CHAT_ID }}
-      AD_NOTICE: ${{ vars.AD_NOTICE }}
       SOURCE_CONFIG_PATH: config/sources.json
-      TAKPRODAM_API_TOKEN: ${{ secrets.TAKPRODAM_API_TOKEN }}
       AVIASALES_API_TOKEN: ${{ secrets.AVIASALES_API_TOKEN }}
-      TAKPRODAM_SOURCE_ID: ${{ vars.TAKPRODAM_SOURCE_ID }}
-      TAKPRODAM_MARKETPLACES: ${{ vars.TAKPRODAM_MARKETPLACES }}
-      TAKPRODAM_LIMIT: ${{ vars.TAKPRODAM_LIMIT }}
-      TAKPRODAM_MAX_PAGES: ${{ vars.TAKPRODAM_MAX_PAGES }}
-      TAKPRODAM_SUBID: ${{ vars.TAKPRODAM_SUBID }}
-      # Partner source is approved. Keep publishing opt-in, but use Takprodam tracking links for eligible partner products.
-      ALLOW_DIRECT_LINKS: ${{ github.event_name == 'push' && startsWith(github.event.head_commit.message, 'launch one-time direct posts:') }}
-      POST_NOTICE: ${{ vars.POST_NOTICE }}
+      # Every preview and publication uses the retailer's public product URL.
+      # Takprodam/affiliate secrets are intentionally not injected into this workflow.
+      ALLOW_DIRECT_LINKS: "true"
+      DIRECT_POST_NOTICE: ${{ vars.DIRECT_POST_NOTICE }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
