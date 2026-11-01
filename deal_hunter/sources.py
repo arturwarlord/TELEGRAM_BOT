@@ -14,18 +14,21 @@ from .models import Deal, clean_text, is_http_url, parse_price
 
 
 DEFAULT_FIELDS: dict[str, list[str]] = {
-    "title": ["title", "name", "product_name"],
-    "product_url": ["product_url", "product_link", "url", "link", "href"],
+    "title": ["title", "name", "product_name", "product_title"],
+    "product_url": [
+        "product_url", "product_link", "marketplace_url", "marketplace_link",
+        "product_page_url", "showcase_url", "url", "link", "href",
+    ],
     "affiliate_url": ["affiliate_url", "affiliate_link", "tracking_link", "deep_link", "partner_url"],
-    "image_url": ["image_url", "image", "picture", "photo", "thumbnail"],
-    "price": ["sale_price", "current_price", "price", "final_price", "salePrice"],
-    "old_price": ["old_price", "oldprice", "regular_price", "list_price", "price_before_discount"],
-    "currency": ["currency", "currency_code"],
+    "image_url": ["image_url", "image_link", "main_image", "picture_url", "image", "picture", "photo", "thumbnail"],
+    "price": ["sale_price", "current_price", "discounted_price", "price", "final_price", "salePrice"],
+    "old_price": ["old_price", "oldprice", "regular_price", "list_price", "price_before_discount", "original_price"],
+    "currency": ["currency", "currency_code", "currencyId"],
     "description": ["description", "summary", "content", "text"],
     "store": ["store", "shop", "merchant", "retailer"],
     "promo_code": ["promo_code", "promocode", "coupon_code", "coupon"],
     "expires_at": ["expires_at", "expiry", "expiration_date", "valid_until", "end_date"],
-    "external_id": ["guid", "id", "offer_id", "sku"],
+    "external_id": ["guid", "id", "offer_id", "vendorCode", "vendor_code", "nmId", "sku", "product_id"],
 }
 
 
@@ -70,6 +73,11 @@ def _field(record: Any, source: dict[str, Any], field: str) -> str:
         return ""
 
     if isinstance(record, ET.Element):
+        # YML feeds commonly store the stable offer ID as an attribute:
+        # <offer id="...">. Read it before traversing child elements.
+        for key, value in record.attrib.items():
+            if key.lower() in aliases and str(value).strip():
+                return str(value).strip()
         for node in record.iter():
             if _local_name(str(node.tag)) not in aliases:
                 continue
@@ -613,7 +621,7 @@ def parse_feed(payload: bytes, source: dict[str, Any], max_items: int = 200) -> 
             records = items if isinstance(items, list) else []
         else:
             records = []
-    elif feed_type in {"rss", "xml", "atom"}:
+    elif feed_type in {"rss", "xml", "atom", "yml"}:
         root = ET.fromstring(payload)
         record_tags = {str(x).lower() for x in source.get("record_tags", ["item", "entry", "offer", "product"])}
         records = [node for node in root.iter() if _local_name(str(node.tag)) in record_tags]
