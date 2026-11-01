@@ -1012,17 +1012,76 @@ def _fetch_article_preview_image(
     return _extract_open_graph_image(payload, deal.product_url)
 
 
+def _environment_name(source: dict[str, Any], field: str) -> str | None:
+    value = str(source.get(field) or "").strip()
+    if not value:
+        return None
+    if not re.fullmatch(r"[A-Z][A-Z0-9_]{0,63}", value):
+        raise ValueError(f"Source '{source.get('name', 'unnamed')}' has an invalid {field} setting")
+    return value
+
+
+def _resolve_source_url(source: dict[str, Any]) -> str:
+    url_env = _environment_name(source, "url_env")
+    if url_env:
+        url = os.getenv(url_env, "").strip()
+        if not url:
+            raise RuntimeError(f"Source '{source.get('name', 'unnamed')}' requires the {url_env} secret")
+    else:
+        url = str(source.get("url") or "").strip()
+    if not is_http_url(url):
+        raise ValueError(f"Source '{source.get('name', 'unnamed')}' has an invalid URL")
+    return url
+
+
+def _source_request_headers(source: dict[str, Any]) -> dict[str, str]:
+    feed_type = str(source.get("type", "")).lower()
+    accept = (
+        "application/json"
+        if feed_type == "json"
+        else "application/xml,text/xml,application/rss+xml,application/atom+xml,*/*;q=0.8"
+        if feed_type in {"xml", "yml", "rss", "atom"}
+        else "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+    )
+    headers = {
+        "User-Agent": "DealHunterBot/0.1 (+public deal page reader)",
+        "Accept": accept,
+    }
+
+    auth_env = _environment_name(source, "auth_env")
+    if not auth_env:
+        return headers
+
+    token = os.getenv(auth_env, "").strip()
+    if not token:
+        raise RuntimeError(f"Source '{source.get('name', 'unnamed')}' requires the {auth_env} secret")
+    if len(token) > 4096 or "\r" in token or "\n" in token:
+        raise ValueError(f"Source '{source.get('name', 'unnamed')}' has an invalid credential value")
+
+    header_name = str(source.get("auth_header") or "Authorization").strip()
+    allowed_headers = {"Authorization", "X-API-Key", "X-Auth-Token"}
+    if header_name not in allowed_headers:
+        raise ValueError(f"Source '{source.get('name', 'unnamed')}' uses an unsupported auth_header")
+
+    prefix = source.get("auth_prefix")
+    if prefix is None:
+        prefix = "Bearer " if header_name == "Authorization" else ""
+    prefix = str(prefix)
+    if len(prefix) > 64 or "\r" in prefix or "\n" in prefix:
+        raise ValueError(f"Source '{source.get('name', 'unnamed')}' has an invalid auth_prefix")
+    headers[header_name] = prefix + token
+    return headers
+
+
 def fetch_source(
     source: dict[str, Any],
     timeout: int = 20,
     max_bytes: int = 5 * 1024 * 1024,
     max_items: int = 200,
 ) -> list[Deal]:
-    url = str(source.get("url") or "").strip()
-    if not is_http_url(url):
-        raise ValueError(f"Source '{source.get('name', 'unnamed')}' has an invalid URL")
     if source.get("enabled") is not True:
         return []
+    url = _resolve_source_url(source)
 
     if str(source.get("type", "")).lower() == "aviasales_api":
         token = os.getenv("AVIASALES_API_TOKEN", "").strip()
@@ -1052,10 +1111,7 @@ def fetch_source(
 
     request = urllib.request.Request(
         url,
-        headers={
-            "User-Agent": "DealHunterBot/0.1 (+public deal page reader)",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        },
+        headers=_source_request_headers(source),
     )
     try:
         with urllib.request.urlopen(request, timeout=timeout) as response:
