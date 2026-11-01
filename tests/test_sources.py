@@ -5,6 +5,7 @@ import unittest
 from datetime import date
 from pathlib import Path
 
+from deal_hunter.models import parse_price
 from deal_hunter.sources import _decode_html_payload, _extract_open_graph_image, _extract_promo_expiry, parse_aviasales_payload, parse_feed, parse_html_travel_articles, parse_html_tour_cards
 
 
@@ -12,6 +13,15 @@ FIXTURE = Path(__file__).parent / "fixtures" / "sample_feed.xml"
 
 
 class FeedParserTests(unittest.TestCase):
+    def test_parse_price_handles_space_separated_kopecks(self):
+        self.assertEqual(parse_price("184 99 ₽"), 184.99)
+        self.assertEqual(parse_price("1 299 99 ₽"), 1299.99)
+        self.assertEqual(parse_price("2 050 00 руб."), 2050.0)
+
+    def test_parse_price_keeps_three_digit_space_group_as_thousands(self):
+        self.assertEqual(parse_price("1 299 ₽"), 1299.0)
+        self.assertEqual(parse_price("12 999 руб."), 12999.0)
+
     def test_parses_xml_affiliate_feed_with_photo_and_prices(self):
         source = {
             "name": "test-affiliate-feed",
