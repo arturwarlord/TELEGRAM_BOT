@@ -2,6 +2,12 @@ name: Public Deal Source Diagnostics
 
 on:
   workflow_dispatch:
+    inputs:
+      source_filter:
+        description: "Optional comma-separated source name/store/domain filter"
+        required: false
+        type: string
+        default: ""
   push:
     branches: [main]
     paths:
@@ -9,6 +15,7 @@ on:
       - "scripts/diagnose_sources.py"
       - "config/sources.json"
       - "deal_hunter/sources.py"
+      - "deal_hunter/models.py"
 
 permissions:
   contents: read
@@ -17,6 +24,9 @@ jobs:
   inspect:
     name: Inspect public deal pages without posting
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DIAGNOSTIC_SOURCE_FILTER: ${{ inputs.source_filter || (github.event_name == 'push' && 'Пятёрочка') || '' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
