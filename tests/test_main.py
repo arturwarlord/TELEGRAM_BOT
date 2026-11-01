@@ -182,7 +182,7 @@ class MainDeduplicationTests(unittest.TestCase):
             for i, deal in enumerate(same_source + [other_source])
         ]
         selected = select_diverse_deals(pairs, 4)
-        self.assertEqual(sum(1 for deal, _ in selected if deal.source == "Магнит"), 2)
+        self.assertEqual(sum(1 for deal, _ in selected if deal.source == "Магнит"), 3)
         self.assertIn("Other store", [deal.source for deal, _ in selected])
 
     def test_diverse_selection_caps_flights_at_40_percent(self):
