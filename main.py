@@ -14,7 +14,7 @@ from deal_hunter.models import Deal, canonical_url
 from deal_hunter.scoring import DealDecision, evaluate_deal
 from deal_hunter.sources import fetch_source
 from deal_hunter.state import count_published_within_hours, load_state, mark_published, save_state, should_skip_as_duplicate
-from deal_hunter.takprodam import NoApprovedSourceError, fetch_configured_takprodam_deals
+from deal_hunter.takprodam import NoApprovedSourceError, fetch_catalog_price_drops, fetch_configured_takprodam_deals
 from deal_hunter.telegram import TelegramPublisher
 
 
@@ -376,6 +376,8 @@ def main() -> int:
     max_bytes = int(settings.get("max_feed_bytes", 5 * 1024 * 1024))
     max_items = int(settings.get("max_items_per_source", 200))
     all_deals: list[Deal] = []
+    state = load_state(state_path)
+    partner_source_id = ""
     source_errors = 0
     successful_sources = 0
 
@@ -420,6 +422,44 @@ def main() -> int:
             print(f"[ERROR] Takprodam API: {type(exc).__name__}: {exc}")
     else:
         print("[INFO] Takprodam API is not connected (TAKPRODAM_API_TOKEN secret not set).")
+
+    # The ordinary product catalog has no source-provided old price. Establish a
+    # persisted baseline first, then create offers only after a later observed drop.
+    if partner_api_enabled and partner_source_id:
+        try:
+            catalog_history = state.setdefault("price_history", {})
+            catalog_markets = [
+                value.strip()
+                for value in os.getenv(
+                    "TAKPRODAM_MARKETPLACES", "Ozon,Wildberries,Avito,Aliexpress"
+                ).split(",")
+                if value.strip()
+            ]
+            catalog_diagnostics: dict[str, int] = {}
+            catalog_deals = fetch_catalog_price_drops(
+                os.getenv("TAKPRODAM_API_TOKEN", "").strip(),
+                partner_source_id,
+                catalog_history,
+                catalog_markets,
+                min_drop_percent=float(settings.get("min_discount_percent", 10)),
+                min_savings=float(settings.get("min_savings_rub", 50)),
+                diagnostics=catalog_diagnostics,
+            )
+            all_deals.extend(catalog_deals)
+            print(
+                "Takprodam catalog price history: "
+                f"observed={catalog_diagnostics.get('received', 0)}; "
+                f"history updated={catalog_diagnostics.get('history_updated', 0)}; "
+                f"verified drops={catalog_diagnostics.get('price_drop_detected', 0)}; "
+                f"new deal cards={len(catalog_deals)}."
+            )
+            if publishing:
+                save_state(state_path, state)
+        except Exception as exc:
+            source_errors += 1
+            print(f"[ERROR] Takprodam catalog price history: {type(exc).__name__}: {exc}")
+    elif partner_api_enabled:
+        print("[INFO] Takprodam catalog price history is waiting for an approved API source.")
 
     for source in sources:
         name = str(source.get("name") or "unnamed")
@@ -542,7 +582,6 @@ def main() -> int:
     if not os.getenv("TELEGRAM_CHAT_ID", "").strip():
         print("[FATAL] TELEGRAM_CHAT_ID Actions variable is missing.")
         return 2
-    state = load_state(state_path)
     daily_cap = max(1, int(settings.get("max_posts_per_day", 40)))
     published_last_24h = count_published_within_hours(state, hours=24)
     configured_per_run = max(1, int(settings.get("max_posts_per_run", 10)))
