@@ -557,6 +557,10 @@ def fetch_direct_marketplace_promotion_deals(
                         "product_id": str(sample_promotion.get("product_id") or ""),
                         "product_sku": str(sample_promotion.get("product_sku") or ""),
                         "sku": str(sample_promotion.get("sku") or ""),
+                        "price": str(sample_promotion.get("price") or ""),
+                        "price_discount": str(sample_promotion.get("price_discount") or ""),
+                        "discount_percent": str(sample_promotion.get("discount_percent") or ""),
+                        "image_present": str(bool(sample_promotion.get("image_url"))),
                     })
             for promotion in valid_promotions:
                 product_key = str(
