@@ -232,6 +232,14 @@
       "published_at": "2026-11-01T05:45:18.032848+00:00",
       "telegram_message_id": 31,
       "affiliate_url": null
+    },
+    "ae28ef696722afc69d24bbbf": {
+      "title": "Зомбицид: Живым или не очень",
+      "store": "Мир Хобби",
+      "price": 7794.0,
+      "published_at": "2026-11-01T18:31:58.260955+00:00",
+      "telegram_message_id": 32,
+      "affiliate_url": null
     }
   },
   "recent_posts": [
@@ -379,6 +387,11 @@
       "key": "ab319fcc0ae7699347d97b12",
       "published_at": "2026-11-01T05:45:18.032848+00:00",
       "telegram_message_id": 31
+    },
+    {
+      "key": "ae28ef696722afc69d24bbbf",
+      "published_at": "2026-11-01T18:31:58.260955+00:00",
+      "telegram_message_id": 32
     }
   ]
 }
