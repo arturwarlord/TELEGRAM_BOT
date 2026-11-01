@@ -4,7 +4,7 @@ import unittest
 
 from deal_hunter.models import Deal
 from deal_hunter.scoring import DealDecision
-from main import _flight_origin_priority, _rank_evaluated_deal, choose_best_duplicates, select_diverse_deals
+from main import _flight_origin_priority, _is_coupon_or_non_product_offer, _rank_evaluated_deal, choose_best_duplicates, select_diverse_deals
 
 
 class MainDeduplicationTests(unittest.TestCase):
@@ -54,6 +54,42 @@ class MainDeduplicationTests(unittest.TestCase):
         result = choose_best_duplicates([first, second])
         self.assertEqual(len(result), 2)
 
+
+    def test_coupon_offers_are_rejected_even_with_product_prices_and_images(self):
+        coupon = self.make_coupon(
+            title="Забронируйте скидку 60% на курс «ИТ-специалист с нуля»",
+            product_url="https://couponmagic.example/course/it-specialist",
+            source="CouponMagic", store="CouponMagic", promo_code=None,
+            price=1000, old_price=2500,
+        )
+        self.assertTrue(_is_coupon_or_non_product_offer(coupon))
+
+    def test_explicit_coupon_code_is_always_rejected(self):
+        product = self.make_coupon(
+            title="Смартфон со скидкой",
+            product_url="https://market.example/product/123",
+            source="Takprodam: Ozon", promo_code="SAVE20",
+            price=8000, old_price=10000,
+        )
+        self.assertTrue(_is_coupon_or_non_product_offer(product))
+
+    def test_regular_discounted_product_is_not_mistaken_for_coupon(self):
+        product = self.make_coupon(
+            title="Корм для кошек 2 кг — скидка 20%",
+            product_url="https://market.example/product/cat-food-2kg",
+            source="Takprodam: Ozon", store="Ozon", promo_code=None,
+            price=800, old_price=1000,
+        )
+        self.assertFalse(_is_coupon_or_non_product_offer(product))
+
+    def test_flight_offer_is_not_blocked_by_coupon_filter(self):
+        flight = Deal(
+            title="Авиабилеты Москва → Казань",
+            product_url="https://www.aviasales.ru/search/MOWKZN",
+            source="Aviasales API — билеты из Москвы",
+            offer_type="flight", price=2000,
+        )
+        self.assertFalse(_is_coupon_or_non_product_offer(flight))
 
     def test_product_url_filter_rejects_author_and_catalog_pages(self):
         from main import _is_specific_product_url
