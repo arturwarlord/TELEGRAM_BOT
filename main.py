@@ -8,7 +8,7 @@ import time
 from collections import Counter
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlsplit
+from urllib.parse import parse_qsl, urlsplit
 
 from deal_hunter.models import Deal, canonical_url
 from deal_hunter.scoring import DealDecision, evaluate_deal
@@ -81,6 +81,15 @@ def _is_specific_product_url(url: str) -> bool:
         return False
     # Query-only destinations and tracking/redirect endpoints are not product pages.
     if any(marker in path for marker in ("/redirect", "/out/", "/click/", "/go/")):
+        return False
+    query_keys = {key.casefold() for key, _ in parse_qsl(parsed.query, keep_blank_values=True)}
+    blocked_tracking_params = {
+        "aff", "aff_id", "affid", "affiliate", "affiliate_id", "click_id", "clickid",
+        "subid", "tag", "ref", "refid", "ref_id", "partner_id", "campaign_id",
+        "offer_id", "admitad_uid", "source_id",
+    }
+    blocked_redirect_params = {"url", "to", "target", "dest", "destination", "redirect", "redirect_url", "return_url"}
+    if query_keys & blocked_tracking_params or query_keys & blocked_redirect_params:
         return False
     return True
 
@@ -361,30 +370,28 @@ def main() -> int:
 
     publish_enabled = env_bool("PUBLISH_ENABLED", False)
     dry_run = env_bool("DRY_RUN", True)
-    allow_direct_links = env_bool("ALLOW_DIRECT_LINKS", False)
+    # Direct-only is a project invariant, not a user-overridable workflow flag.
+    allow_direct_links = True
     publishing = publish_enabled and not dry_run
-    partner_notice = os.getenv("POST_NOTICE", "").strip() or os.getenv("AD_NOTICE", "").strip()
     direct_notice = os.getenv("DIRECT_POST_NOTICE", "").strip() or (
-        "Публичная ссылка на предложение без партнёрского вознаграждения каналу. "
+        "Публичная ссылка на товар продавца без партнёрского вознаграждения каналу. "
         "Цена, наличие и условия могут измениться — проверьте их на сайте продавца."
     )
-    post_notice = direct_notice if allow_direct_links else partner_notice
+    post_notice = direct_notice
 
     print("===== DEAL HUNTER =====")
     print(f"Mode: {'PUBLISH' if publishing else 'DRY-RUN / PREVIEW'}")
     print(f"Link mode: {'PUBLIC LINKS ONLY' if allow_direct_links else 'MIXED: PARTNER LINK WHEN AVAILABLE, OTHERWISE PUBLIC LINK'}")
     partner_api_token_present = bool(os.getenv("TAKPRODAM_API_TOKEN", "").strip())
-    # Partner feeds are opt-in only; a stored token alone must not activate them.
-    partner_api_enabled = env_bool("ENABLE_TAKPRODAM_PARTNER_API", False) and partner_api_token_present
+    # Affiliate feeds are disabled by project policy, even if old secrets remain in GitHub.
+    partner_api_enabled = False
     print(f"Configured public feed/page sources: {len(sources)}")
-    print("Takprodam partner API: " + ("enabled" if partner_api_enabled else "disabled (direct-only mode)"))
+    print("Takprodam partner API: disabled by direct-only project policy")
     print(
-        "Safety: public links only; no affiliate tracking."
-        if allow_direct_links
-        else "Safety: use partner tracking when present; keep ordinary public discount links eligible too."
+        "Safety: direct retailer product URLs only; affiliate and redirect links are rejected."
     )
     if partner_api_token_present and not partner_api_enabled:
-        print("[POLICY] Takprodam token is present but ignored. Direct-only mode does not use partner-program feeds.")
+        print("[POLICY] Legacy Takprodam token detected but ignored; partner feeds are disabled by project policy.")
     if not sources and not partner_api_enabled:
         print(f"No enabled public feeds are configured in {source_config_path.relative_to(ROOT) if source_config_path.is_relative_to(ROOT) else source_config_path}.")
         print("Add a public retailer catalogue or product feed with direct product URLs. Nothing was published.")
