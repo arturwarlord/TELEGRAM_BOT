@@ -64,7 +64,19 @@ def parse_price(value: object) -> float | None:
     match = re.search(r"(?<!\w)(\d[\d\s]*(?:[.,]\d{1,2})?)", text)
     if not match:
         return None
-    raw = re.sub(r"\s+", "", match.group(1))
+    numeric = match.group(1).strip()
+    # Some Russian stores display kopecks separated by a space:
+    # "184 99 ₽" / "1 299 99 ₽". A final two-digit group is kopecks,
+    # while a three-digit group remains a thousands separator ("1 299 ₽").
+    spaced_kopecks = re.fullmatch(r"(\d[\d\s]*\d)\s+(\d{2})", numeric)
+    if spaced_kopecks:
+        whole = re.sub(r"\s+", "", spaced_kopecks.group(1))
+        try:
+            price = float(int(whole) + int(spaced_kopecks.group(2)) / 100)
+        except ValueError:
+            return None
+        return price if price > 0 else None
+    raw = re.sub(r"\s+", "", numeric)
     if "," in raw and "." in raw:
         if raw.rfind(",") > raw.rfind("."):
             raw = raw.replace(".", "").replace(",", ".")
