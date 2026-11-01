@@ -125,6 +125,14 @@ class FeedParserTests(unittest.TestCase):
                 <currencyId>RUB</currencyId>
                 <picture>https://cdn.example.test/headphones.jpg</picture>
               </offer>
+              <offer id="offer-out-of-stock" available="false">
+                <name>Нет в наличии Example</name>
+                <url>https://www.wildberries.ru/catalog/987654321/detail.aspx</url>
+                <price>100</price>
+                <oldprice>200</oldprice>
+                <currencyId>RUB</currencyId>
+                <picture>https://cdn.example.test/unavailable.jpg</picture>
+              </offer>
             </offers>
           </shop>
         </yml_catalog>
@@ -148,6 +156,28 @@ class FeedParserTests(unittest.TestCase):
         self.assertEqual(deal.image_url, "https://cdn.example.test/headphones.jpg")
         self.assertEqual(deal.external_id, "offer-123")
         self.assertIsNone(deal.affiliate_url)
+
+    def test_ignores_explicitly_unavailable_json_products(self):
+        payload = json.dumps({
+            "items": [
+                {
+                    "title": "Есть в наличии",
+                    "url": "https://market.example.test/product/1",
+                    "price": 100,
+                    "old_price": 200,
+                    "available": True,
+                },
+                {
+                    "title": "Нет в наличии",
+                    "url": "https://market.example.test/product/2",
+                    "price": 100,
+                    "old_price": 200,
+                    "available": False,
+                },
+            ]
+        }, ensure_ascii=False).encode()
+        deals = parse_feed(payload, {"name": "availability-json", "type": "json"})
+        self.assertEqual([deal.title for deal in deals], ["Есть в наличии"])
 
     def test_json_feed_can_map_explicit_marketplace_product_url(self):
         payload = json.dumps({
