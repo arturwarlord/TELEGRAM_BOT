@@ -22,12 +22,12 @@ def main() -> int:
     marketplaces = [
         value.strip()
         for value in os.getenv(
-            "TAKPRODAM_MARKETPLACES", "Ozon,Wildberries,Yandex Market"
+            "TAKPRODAM_MARKETPLACES", "Ozon,Wildberries"
         ).split(",")
         if value.strip()
     ]
     try:
-        limit = max(1, min(int(os.getenv("TAKPRODAM_LIMIT", "100")), 1000))
+        limit = max(1, min(int(os.getenv("TAKPRODAM_LIMIT", "1000")), 1000))
         max_pages = max(1, min(int(os.getenv("TAKPRODAM_MAX_PAGES", "1")), 5))
     except ValueError:
         print("[ERROR] TAKPRODAM_LIMIT and TAKPRODAM_MAX_PAGES must be integers.")
