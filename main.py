@@ -8,6 +8,7 @@ import time
 from collections import Counter
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 from deal_hunter.models import Deal, canonical_url
 from deal_hunter.scoring import DealDecision, evaluate_deal
@@ -39,6 +40,35 @@ def format_rub(value: float | None) -> str:
     if value is None:
         return "—"
     return f"{value:,.0f}".replace(",", " ") + " ₽"
+
+
+
+def _is_specific_product_url(url: str) -> bool:
+    """Reject category, author, search and campaign pages masquerading as products."""
+    try:
+        parsed = urlsplit(url)
+    except ValueError:
+        return False
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+        return False
+    path = re.sub(r"/+", "/", parsed.path or "/").casefold().rstrip("/")
+    if path in {"", "/"}:
+        return False
+    blocked_segments = {
+        "author", "authors", "category", "categories", "catalog", "catalogue",
+        "collection", "collections", "search", "tag", "tags", "brand", "brands",
+        "blog", "news", "promo", "promos", "promotion", "promotions", "coupon",
+        "coupons", "promocode", "promocodes", "sale", "sales", "discount",
+        "discounts", "shares", "store", "stores", "shop", "shops", "seller",
+        "sellers", "account", "profile", "page",
+    }
+    segments = {segment for segment in path.split("/") if segment}
+    if segments & blocked_segments:
+        return False
+    # Query-only destinations and tracking/redirect endpoints are not product pages.
+    if any(marker in path for marker in ("/redirect", "/out/", "/click/", "/go/")):
+        return False
+    return True
 
 
 def _coupon_brand_key(deal: Deal) -> str:
@@ -389,14 +419,25 @@ def main() -> int:
         and deal.product_url
         and (
             deal.offer_type == "flight"
-            or (deal.price is not None and deal.old_price is not None)
+            or (
+                deal.price is not None
+                and deal.old_price is not None
+                and _is_specific_product_url(deal.product_url)
+            )
         )
     ]
     rejected_non_product = len(all_deals) - len(product_cards)
+    rejected_generic_pages = sum(
+        1 for deal in all_deals
+        if deal.offer_type != "flight"
+        and deal.price is not None and deal.old_price is not None
+        and not _is_specific_product_url(deal.product_url)
+    )
     deals = choose_best_duplicates(product_cards)
     print(
         f"Fetched {len(all_deals)} item(s); {len(product_cards)} product-card candidate(s); "
-        f"{rejected_non_product} coupon/incomplete item(s) excluded; {len(deals)} unique card(s)."
+        f"{rejected_non_product} coupon/incomplete/non-product item(s) excluded; "
+        f"{rejected_generic_pages} generic/category/author page(s) rejected; {len(deals)} unique card(s)."
     )
 
     min_discount = float(settings.get("min_discount_percent", 30))
