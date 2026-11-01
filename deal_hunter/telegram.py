@@ -5,6 +5,7 @@ import json
 import secrets
 import urllib.error
 import urllib.request
+from urllib.parse import urlencode
 
 from .models import Deal, is_http_url
 from .scoring import DealDecision
@@ -201,7 +202,7 @@ class TelegramPublisher:
         if not is_http_url(target_url):
             reason = "a valid direct offer URL" if allow_direct_link else "an approved affiliate URL"
             raise ValueError(f"Refusing to publish without {reason}")
-        if not is_http_url(deal.image_url):
+        if deal.offer_type != "flight" and not is_http_url(deal.image_url):
             raise ValueError("Refusing to publish without a product image URL")
         if not ad_notice.strip():
             raise ValueError("A post disclosure/notice is required before publication")
@@ -210,13 +211,6 @@ class TelegramPublisher:
         is_partner_link = not allow_direct_link and bool(deal.affiliate_url)
         button_text = "✈️ Проверить билет" if deal.offer_type == "flight" else ("🔥 Забрать скидку" if is_partner_link else "🛍 Открыть предложение")
 
-        # Download the image in the Actions runner and upload its bytes. This avoids
-        # Telegram's remote-image fetch failing on hotlink protection or CDN rules.
-        photo_bytes, mime_type, filename = _download_photo(
-            deal.image_url,
-            referer=deal.product_url,
-            timeout=self.timeout,
-        )
         fields = {
             "chat_id": self.chat_id,
             "caption": caption,
@@ -227,6 +221,33 @@ class TelegramPublisher:
                 separators=(",", ":"),
             ),
         }
+
+        # Flight offers are text-first: Aviasales often supplies route/airline
+        # artwork or protected URLs rather than downloadable image files.
+        # Publish a clean text card with a direct action button instead.
+        if deal.offer_type == "flight":
+            body = urlencode({
+                "chat_id": self.chat_id,
+                "text": caption,
+                "parse_mode": "HTML",
+                "reply_markup": fields["reply_markup"],
+                "disable_web_page_preview": "true",
+            }).encode("utf-8")
+            request = urllib.request.Request(
+                f"https://api.telegram.org/bot{self.token}/sendMessage",
+                data=body,
+                headers={"Content-Type": "application/x-www-form-urlencoded; charset=utf-8", "Accept": "application/json"},
+                method="POST",
+            )
+            return self._send_request(request)
+
+        # Download and upload real product-card images; do not ask Telegram to
+        # fetch protected remote CDN URLs itself.
+        photo_bytes, mime_type, filename = _download_photo(
+            deal.image_url,
+            referer=deal.product_url,
+            timeout=self.timeout,
+        )
         body, content_type = _multipart_form(
             fields,
             file_field="photo",
@@ -241,6 +262,9 @@ class TelegramPublisher:
             headers={"Content-Type": content_type, "Accept": "application/json"},
             method="POST",
         )
+        return self._send_request(request)
+
+    def _send_request(self, request: urllib.request.Request) -> int | None:
         try:
             with urllib.request.urlopen(request, timeout=self.timeout) as response:
                 result = json.loads(response.read().decode("utf-8"))
