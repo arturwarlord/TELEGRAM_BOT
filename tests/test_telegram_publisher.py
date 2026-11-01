@@ -67,6 +67,36 @@ class TelegramPublisherTests(unittest.TestCase):
 
     @patch("deal_hunter.telegram._download_photo")
     @patch("deal_hunter.telegram.urllib.request.urlopen")
+    def test_flight_uses_text_message_and_skips_unusable_remote_image(self, mock_urlopen, mock_download):
+        mock_urlopen.return_value = FakeResponse(
+            json.dumps({"ok": True, "result": {"message_id": 101}}).encode("utf-8")
+        )
+        flight = self.make_deal(
+            title="Дешёвые авиабилеты Москва — Казань",
+            product_url="https://www.aviasales.ru/search/MOWKZN",
+            affiliate_url="https://www.aviasales.ru/search/MOWKZN?marker=123",
+            image_url="https://cdn.example.test/protected-route-artwork",
+            price=2500,
+            old_price=None,
+            offer_type="flight",
+        )
+        decision = DealDecision(True, "eligible", None, None, None)
+
+        message_id = TelegramPublisher("dummy-token", "@test_channel").publish(
+            flight, decision, "Партнёрская ссылка: канал может получить вознаграждение."
+        )
+
+        self.assertEqual(message_id, 101)
+        mock_download.assert_not_called()
+        request = mock_urlopen.call_args.args[0]
+        self.assertEqual(request.get_method(), "POST")
+        self.assertTrue(request.full_url.endswith("/sendMessage"))
+        self.assertIn("application/x-www-form-urlencoded", request.get_header("Content-type"))
+        self.assertIn(b"Aviasales", request.data)
+        self.assertIn(b"marker%3D123", request.data)
+
+    @patch("deal_hunter.telegram._download_photo")
+    @patch("deal_hunter.telegram.urllib.request.urlopen")
     def test_direct_mode_uploads_image_bytes_and_not_affiliate_url(self, mock_urlopen, mock_download):
         mock_download.return_value = (b"\xff\xd8\xfffake-jpeg", "image/jpeg", "offer.jpg")
         mock_urlopen.return_value = FakeResponse(
