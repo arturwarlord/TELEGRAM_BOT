@@ -82,6 +82,19 @@ class MainDeduplicationTests(unittest.TestCase):
         )
         self.assertFalse(_is_coupon_or_non_product_offer(product))
 
+    def test_flight_without_image_is_kept_as_text_card_candidate(self):
+        flight = Deal(
+            title="Авиабилеты Москва → Казань",
+            product_url="https://www.aviasales.ru/search/MOWKZN",
+            source="Aviasales API — билеты из Москвы",
+            image_url=None,
+            offer_type="flight",
+            price=2000,
+        )
+        self.assertFalse(_is_coupon_or_non_product_offer(flight))
+        self.assertEqual(flight.offer_type, "flight")
+        self.assertIsNone(flight.image_url)
+
     def test_flight_offer_is_not_blocked_by_coupon_filter(self):
         flight = Deal(
             title="Авиабилеты Москва → Казань",
