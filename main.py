@@ -54,6 +54,20 @@ def _is_specific_product_url(url: str) -> bool:
     path = re.sub(r"/+", "/", parsed.path or "/").casefold().rstrip("/")
     if path in {"", "/"}:
         return False
+    host = (parsed.hostname or "").lower().removeprefix("www.")
+    # Wildberries canonical item URL: /catalog/{nmId}/detail.aspx.
+    if host == "wildberries.ru" or host.endswith(".wildberries.ru"):
+        return bool(re.fullmatch(r"/catalog/\d+/detail\.aspx", path))
+    # Ozon canonical item URL: /product/{slug}-{sku}/ or /product/{sku}/.
+    if host == "ozon.ru" or host.endswith(".ozon.ru"):
+        return bool(re.fullmatch(r"/product/(?:[^/]+-)?\d{5,}", path))
+    # Known affiliate/redirect hosts are never valid direct product destinations.
+    blocked_tracking_hosts = (
+        "admitad.com", "takprodam.ru", "epn.bz", "cityads.com",
+        "actionpay.ru", "travelpayouts.com", "awin1.com",
+    )
+    if any(host == domain or host.endswith("." + domain) for domain in blocked_tracking_hosts):
+        return False
     blocked_segments = {
         "author", "authors", "category", "categories", "catalog", "catalogue",
         "collection", "collections", "search", "tag", "tags", "brand", "brands",
@@ -359,7 +373,9 @@ def main() -> int:
     print("===== DEAL HUNTER =====")
     print(f"Mode: {'PUBLISH' if publishing else 'DRY-RUN / PREVIEW'}")
     print(f"Link mode: {'PUBLIC LINKS ONLY' if allow_direct_links else 'MIXED: PARTNER LINK WHEN AVAILABLE, OTHERWISE PUBLIC LINK'}")
-    partner_api_enabled = bool(os.getenv("TAKPRODAM_API_TOKEN", "").strip())
+    partner_api_token_present = bool(os.getenv("TAKPRODAM_API_TOKEN", "").strip())
+    # Partner feeds are opt-in only; a stored token alone must not activate them.
+    partner_api_enabled = env_bool("ENABLE_TAKPRODAM_PARTNER_API", False) and partner_api_token_present
     print(f"Configured public feed/page sources: {len(sources)}")
     print(f"Takprodam partner API: {'configured' if partner_api_enabled else 'not configured'}")
     print(
@@ -367,9 +383,11 @@ def main() -> int:
         if allow_direct_links
         else "Safety: use partner tracking when present; keep ordinary public discount links eligible too."
     )
+    if partner_api_token_present and not partner_api_enabled:
+        print("[POLICY] Takprodam token is present but ignored. Direct-only mode does not use partner-program feeds.")
     if not sources and not partner_api_enabled:
-        print(f"No enabled feeds are configured in {source_config_path.relative_to(ROOT) if source_config_path.is_relative_to(ROOT) else source_config_path}.")
-        print("Connect the Takprodam API or add an approved RSS/XML/JSON partner feed. Nothing was published.")
+        print(f"No enabled public feeds are configured in {source_config_path.relative_to(ROOT) if source_config_path.is_relative_to(ROOT) else source_config_path}.")
+        print("Add a public retailer catalogue or product feed with direct product URLs. Nothing was published.")
         return 0
 
     timeout = int(settings.get("fetch_timeout_seconds", 20))
