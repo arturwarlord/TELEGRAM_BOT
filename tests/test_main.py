@@ -55,6 +55,18 @@ class MainDeduplicationTests(unittest.TestCase):
         self.assertEqual(len(result), 2)
 
 
+    def test_product_url_filter_rejects_author_and_catalog_pages(self):
+        from main import _is_specific_product_url
+        self.assertFalse(_is_specific_product_url("https://www.respublica.ru/authors/31651"))
+        self.assertFalse(_is_specific_product_url("https://shop.example.test/catalog/sale"))
+        self.assertFalse(_is_specific_product_url("https://shop.example.test/search?q=phone"))
+
+    def test_product_url_filter_keeps_direct_product_pages(self):
+        from main import _is_specific_product_url
+        self.assertTrue(_is_specific_product_url("https://ozon.ru/product/249003865"))
+        self.assertTrue(_is_specific_product_url("https://hobbygames.ru/zombicid-zhivim-ili-ne-ochen"))
+        self.assertTrue(_is_specific_product_url("https://www.respublica.ru/knigi/hudozhestvennaya-literatura/1547877-book-title"))
+
     def test_concrete_price_pair_ranks_above_vague_maximum_discount(self):
         concrete = Deal(
             title="Сухой корм для кошек 2 кг",
