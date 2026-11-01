@@ -21,8 +21,8 @@ jobs:
     env:
       TAKPRODAM_API_TOKEN: ${{ secrets.TAKPRODAM_API_TOKEN }}
       TAKPRODAM_SOURCE_ID: ${{ vars.TAKPRODAM_SOURCE_ID || secrets.TAKPRODAM_SOURCE_ID }}
-      TAKPRODAM_MARKETPLACES: "Ozon,Wildberries,Yandex Market"
-      TAKPRODAM_LIMIT: "100"
+      TAKPRODAM_MARKETPLACES: "Ozon,Wildberries"
+      TAKPRODAM_LIMIT: "1000"
       TAKPRODAM_MAX_PAGES: "1"
     steps:
       - name: Checkout
