@@ -27,6 +27,7 @@ def _env_int(name: str, default: int) -> int:
 _DIRECT_MARKETPLACE_HOSTS = {
     "ozon": ("ozon.ru", "ozon.kz", "ozon.by", "ozon.uz"),
     "wildberries": ("wildberries.ru", "wildberries.by", "wildberries.kz", "wildberries.uz", "wb.ru"),
+    "yandex_market": ("market.yandex.ru", "market.yandex.by", "market.yandex.kz"),
     "avito": ("avito.ru",),
     "aliexpress": ("aliexpress.ru", "aliexpress.com", "aliexpress.kz", "aliexpress.by"),
 }
@@ -42,6 +43,8 @@ def _marketplace_slug(value: str) -> str | None:
         return "avito"
     if "ozon" in normalized or "озон" in normalized:
         return "ozon"
+    if "yandex" in normalized or "яндекс" in normalized:
+        return "yandex_market"
     return None
 
 
@@ -207,6 +210,8 @@ def parse_promotion_items(
     items: list[dict[str, Any]],
     marketplace_filter: str | None = None,
     diagnostics: dict[str, int] | None = None,
+    *,
+    direct_only: bool = False,
 ) -> list[Deal]:
     """Map Takprodam/Admitad promotion-product items to the internal deal model."""
     deals: list[Deal] = []
@@ -227,24 +232,26 @@ def parse_promotion_items(
             continue
 
         title = clean_text(item.get("title"), 300)
-        affiliate_url = str(item.get("tracking_link") or "").strip()
-        if not title or not is_http_url(affiliate_url):
-            count("rejected_missing_title_or_tracking_link")
-            continue
+        tracking_url = str(item.get("tracking_link") or "").strip()
+        external_url = _direct_marketplace_url(item.get("external_link"), marketplace)
 
-        # Prefer a verified direct marketplace URL for diagnostics and referer.
-        # In mixed mode, however, a valid partner tracking URL is itself a usable
-        # offer destination when the API does not expose a clean merchant URL.
-        # TelegramPublisher publishes affiliate_url for partner offers and only
-        # uses product_url in explicit direct-link mode, so this fallback never
-        # turns a tracking URL into a public/direct link.
-        product_url = (
-            _direct_marketplace_url(item.get("external_link"), marketplace)
-            or _direct_marketplace_url(affiliate_url, marketplace)
-            or affiliate_url
-        )
-        if not product_url:
-            continue
+        if direct_only:
+            # In data-only mode the direct external_link is the sole accepted
+            # destination. Tracking links and commission fields are never copied.
+            if not title or not external_url:
+                count("rejected_missing_title_or_direct_link")
+                continue
+            product_url = external_url
+            affiliate_url = None
+        else:
+            if not title or not is_http_url(tracking_url):
+                count("rejected_missing_title_or_tracking_link")
+                continue
+            # In mixed mode, keep the historical partner-link behavior.
+            product_url = external_url or _direct_marketplace_url(tracking_url, marketplace) or tracking_url
+            affiliate_url = tracking_url
+            if not product_url:
+                continue
 
         old_price = parse_price(item.get("price"))
         discounted_price = parse_price(item.get("price_discount"))
@@ -327,7 +334,7 @@ def parse_promotion_items(
         if not is_http_url(image_url):
             image_url = None
 
-        commission = _float_or_none(item.get("commission"))
+        commission = None if direct_only else _float_or_none(item.get("commission"))
         seller = clean_text(item.get("store_title"), 100)
         store = marketplace
         if seller and seller.lower() not in marketplace.lower():
@@ -349,7 +356,7 @@ def parse_promotion_items(
                 expires_at=None,
                 external_id=str(item.get("product_id") or item.get("id") or "") or None,
                 commission=commission,
-                legal_text=clean_text(item.get("legal_text"), 500),
+                legal_text="" if direct_only else clean_text(item.get("legal_text"), 500),
             )
         )
         count("accepted")
@@ -408,6 +415,140 @@ def fetch_promotion_deals(
                 break
     return found
 
+
+
+def fetch_direct_marketplace_promotion_deals(
+    token: str,
+    source_id: str | int | None = None,
+    marketplaces: list[str] | None = None,
+    *,
+    limit: int = 100,
+    max_pages: int = 1,
+    timeout: int = 25,
+    diagnostics: dict[str, int] | None = None,
+) -> tuple[list[Deal], str]:
+    """Read Takprodam marketplace data but return only direct product URLs.
+
+    The product endpoint supplies external_link; the promotion-product endpoint
+    supplies the current/discounted price pair. Records are joined by marketplace
+    product_id. tracking_link, commission and legal_text are deliberately ignored.
+    This adapter is intended for read-only diagnosis until direct-link publication
+    rights and advertising requirements have been confirmed with the provider.
+    """
+    if not token.strip():
+        raise ValueError("Takprodam API token is empty")
+
+    resolved_source_id = resolve_source_id(token, source_id, timeout=timeout)
+    markets = marketplaces or ["Ozon", "Wildberries", "Yandex Market"]
+    page_limit = max(1, min(int(limit), 1000))
+    pages = max(1, min(int(max_pages), 5))
+    found: list[Deal] = []
+    seen: set[str] = set()
+
+    def count(name: str, amount: int = 1) -> None:
+        if diagnostics is not None:
+            diagnostics[name] = diagnostics.get(name, 0) + amount
+
+    for market in markets:
+        normalized = market.strip()
+        if not normalized or _marketplace_slug(normalized) is None:
+            continue
+
+        direct_products: dict[str, dict[str, Any]] = {}
+        for page in range(1, pages + 1):
+            catalog = _request_json(
+                token,
+                "product",
+                params={
+                    "source_id": resolved_source_id,
+                    "marketplace": normalized.casefold(),
+                    "page": page,
+                    "limit": page_limit,
+                },
+                timeout=timeout,
+            )
+            catalog_items = catalog.get("items", [])
+            if not isinstance(catalog_items, list):
+                raise RuntimeError(
+                    f"Takprodam product response for {normalized} has no items array"
+                )
+            valid_catalog = [item for item in catalog_items if isinstance(item, dict)]
+            count("catalog_items_received", len(valid_catalog))
+            for product in valid_catalog:
+                product_key = str(
+                    product.get("product_id")
+                    or product.get("product_sku")
+                    or product.get("sku")
+                    or ""
+                ).strip()
+                direct_url = _direct_marketplace_url(product.get("external_link"), normalized)
+                if not product_key or not direct_url:
+                    count("catalog_items_without_direct_product_link")
+                    continue
+                direct_products[product_key] = {
+                    **product,
+                    "external_link": direct_url,
+                }
+                count("direct_product_links_mapped")
+            if len(valid_catalog) < page_limit:
+                break
+
+        for page in range(1, pages + 1):
+            promotion_response = _request_json(
+                token,
+                "promotion/product",
+                params={
+                    "source_id": resolved_source_id,
+                    "marketplace": normalized.casefold(),
+                    "page": page,
+                    "limit": page_limit,
+                },
+                timeout=timeout,
+            )
+            promotion_items = promotion_response.get("items", [])
+            if not isinstance(promotion_items, list):
+                raise RuntimeError(
+                    f"Takprodam promotion/product response for {normalized} has no items array"
+                )
+            valid_promotions = [item for item in promotion_items if isinstance(item, dict)]
+            count("promotion_items_received", len(valid_promotions))
+            for promotion in valid_promotions:
+                product_key = str(
+                    promotion.get("product_id")
+                    or promotion.get("product_sku")
+                    or promotion.get("sku")
+                    or ""
+                ).strip()
+                catalog_product = direct_products.get(product_key)
+                if not catalog_product:
+                    count("promotion_items_without_catalog_match")
+                    continue
+                merged = dict(promotion)
+                merged["external_link"] = catalog_product["external_link"]
+                if not merged.get("title"):
+                    merged["title"] = catalog_product.get("title")
+                if not merged.get("image_url"):
+                    merged["image_url"] = catalog_product.get("image_url")
+                if not merged.get("store_title"):
+                    merged["store_title"] = catalog_product.get("store_title")
+                if not merged.get("product_sku"):
+                    merged["product_sku"] = catalog_product.get("product_sku")
+
+                mapped = parse_promotion_items(
+                    [merged],
+                    normalized,
+                    diagnostics=diagnostics,
+                    direct_only=True,
+                )
+                for deal in mapped:
+                    if deal.key not in seen:
+                        seen.add(deal.key)
+                        found.append(deal)
+            if len(valid_promotions) < page_limit:
+                break
+
+    count("direct_deals_created", len(found))
+    return found, resolved_source_id
 
 
 def fetch_catalog_price_drops(
