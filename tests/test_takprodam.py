@@ -6,6 +6,7 @@ from unittest.mock import patch
 
 from deal_hunter.scoring import evaluate_deal
 from deal_hunter.takprodam import (
+    fetch_catalog_price_drops,
     fetch_commissions,
     fetch_configured_takprodam_deals,
     fetch_promotion_deals,
@@ -324,6 +325,73 @@ class TakprodamTests(unittest.TestCase):
     def test_rejects_unsupported_commission_status_filter(self):
         with self.assertRaisesRegex(ValueError, "Commission status must be"):
             fetch_commissions("dummy-token", status="confirmed")
+
+
+    @patch("deal_hunter.takprodam._request_json")
+    def test_catalog_first_observation_only_establishes_baseline(self, mock_request):
+        item = {
+            "product_id": "sku-900",
+            "title": "Товар из каталога",
+            "price": 1000,
+            "marketplace_title": "Ozon",
+            "store_title": "Продавец",
+            "external_link": "https://www.ozon.ru/product/item-900/",
+            "tracking_link": "https://track.example.test/item-900",
+            "image_url": "https://cdn.example.test/item-900.jpg",
+        }
+        mock_request.return_value = {"items": [item]}
+        history = {}
+        deals = fetch_catalog_price_drops("token", "24285", history, ["Ozon"])
+        self.assertEqual(deals, [])
+        self.assertEqual(history["ozon:sku-900"]["price"], 1000)
+
+    @patch("deal_hunter.takprodam._request_json")
+    def test_catalog_detects_only_verified_price_decrease(self, mock_request):
+        item = {
+            "product_id": "sku-901",
+            "title": "Товар со сниженной ценой",
+            "price": 850,
+            "marketplace_title": "Ozon",
+            "store_title": "Продавец",
+            "external_link": "https://www.ozon.ru/product/item-901/",
+            "tracking_link": "https://track.example.test/item-901",
+            "image_url": "https://cdn.example.test/item-901.jpg",
+        }
+        mock_request.return_value = {"items": [item]}
+        history = {"ozon:sku-901": {"price": 1000}}
+        diagnostics = {}
+        deals = fetch_catalog_price_drops(
+            "token", "24285", history, ["Ozon"],
+            min_drop_percent=10, min_savings=50, diagnostics=diagnostics,
+        )
+        self.assertEqual(len(deals), 1)
+        self.assertEqual(deals[0].price, 850)
+        self.assertEqual(deals[0].old_price, 1000)
+        self.assertEqual(deals[0].product_url, item["external_link"])
+        self.assertEqual(deals[0].affiliate_url, item["tracking_link"])
+        self.assertEqual(diagnostics["price_drop_detected"], 1)
+        self.assertEqual(history["ozon:sku-901"]["price"], 850)
+
+    @patch("deal_hunter.takprodam._request_json")
+    def test_catalog_does_not_report_price_increase_or_too_small_drop(self, mock_request):
+        item = {
+            "product_id": "sku-902",
+            "title": "Товар",
+            "price": 960,
+            "marketplace_title": "Ozon",
+            "external_link": "https://www.ozon.ru/product/item-902/",
+            "tracking_link": "https://track.example.test/item-902",
+            "image_url": "https://cdn.example.test/item-902.jpg",
+        }
+        mock_request.return_value = {"items": [item]}
+        history = {"ozon:sku-902": {"price": 1000}}
+        deals = fetch_catalog_price_drops(
+            "token", "24285", history, ["Ozon"],
+            min_drop_percent=10, min_savings=50,
+        )
+        self.assertEqual(deals, [])
+        self.assertEqual(history["ozon:sku-902"]["price"], 960)
+
 
 if __name__ == "__main__":
     unittest.main()
