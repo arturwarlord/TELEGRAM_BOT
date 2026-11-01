@@ -42,7 +42,7 @@ class FeedParserTests(unittest.TestCase):
         self.assertEqual(deal.discount_percent, 50.0)
 
     def test_parses_yml_marketplace_feed_with_offer_id_and_direct_card_link(self):
-        payload = b"""<?xml version="1.0" encoding="UTF-8"?>
+        payload = """<?xml version="1.0" encoding="UTF-8"?>
         <yml_catalog date="2026-11-02T00:00:00+03:00">
           <shop>
             <name>Seller example</name>
@@ -58,8 +58,7 @@ class FeedParserTests(unittest.TestCase):
               </offer>
             </offers>
           </shop>
-        </yml_catalog>
-        """
+        </yml_catalog>        """.encode("utf-8")
         source = {
             "name": "seller-marketplace-yml",
             "type": "yml",
