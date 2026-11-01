@@ -171,6 +171,32 @@ class FeedParserTests(unittest.TestCase):
         self.assertTrue(any("Скидка 25% на отель" in deal.title for deal in deals))
         self.assertTrue(any(deal.image_url and deal.product_url.endswith("/promo/hotel") for deal in deals))
 
+    def test_parses_pyaterochka_style_product_prices_with_space_kopecks(self):
+        payload = """
+        <html><body><main>
+          <div class="product-card">
+            <a href="/product/svinina-velikolukskiy-mk-tushenaya-325g--3675349/">
+              <img src="/images/svinina.jpg" alt="Свинина Великолукский МК тушеная 325 г">
+            </a>
+            <a href="/product/svinina-velikolukskiy-mk-tushenaya-325g--3675349/">Свинина Великолукский МК тушеная 325 г</a>
+            <span>-16%</span>
+            <span>219 99 ₽</span>
+            <span>184 99 ₽</span>
+          </div>
+        </main></body></html>
+        """.encode("utf-8")
+        source = {
+            "name": "test-pyaterochka",
+            "type": "html",
+            "url": "https://5ka.ru/catalog/vygodno--251C17047/",
+            "store": "Пятёрочка",
+        }
+        deals = parse_feed(payload, source)
+        self.assertEqual(len(deals), 1)
+        self.assertEqual(deals[0].price, 184.99)
+        self.assertEqual(deals[0].old_price, 219.99)
+        self.assertEqual(deals[0].product_url, "https://5ka.ru/product/svinina-velikolukskiy-mk-tushenaya-325g--3675349/")
+
     def test_parses_public_html_retailer_card_with_old_and_current_prices(self):
         payload = """
         <html><body><main>
