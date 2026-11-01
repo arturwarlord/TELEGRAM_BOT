@@ -34,6 +34,7 @@ def main() -> int:
         return 2
 
     diagnostics: dict[str, int] = {}
+    errors: list[str] = []
     try:
         deals, resolved_source_id = fetch_direct_marketplace_promotion_deals(
             token,
@@ -42,6 +43,7 @@ def main() -> int:
             limit=limit,
             max_pages=max_pages,
             diagnostics=diagnostics,
+            errors=errors,
         )
     except Exception as exc:
         # Never print the token or request headers. The API helper does not include them
@@ -66,6 +68,8 @@ def main() -> int:
     print(f"Marketplaces requested: {', '.join(marketplaces)}")
     for key in sorted(diagnostics):
         print(f"{key}: {diagnostics[key]}")
+    for error in errors:
+        print(f"[MARKETPLACE WARNING] {error}")
     print(f"Deals with direct card, photo and verified price pair: {len(specific)}")
 
     for index, deal in enumerate(specific[:20], start=1):
