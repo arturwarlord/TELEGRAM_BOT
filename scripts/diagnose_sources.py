@@ -227,8 +227,8 @@ def main() -> int:
     sources = _read_config()
     print("===== PUBLIC DEAL SOURCE DIAGNOSTICS (READ-ONLY) =====")
     print(f"Source pages checked: {len(sources)}")
-    source_filter = os.getenv("DIAGNOSTIC_SOURCE_FILTER", "").strip()
-    print(f"Source filter: {source_filter or \"all enabled/diagnostic sources\"}")
+    source_filter = os.getenv("DIAGNOSTIC_SOURCE_FILTER", "").strip() or "all enabled/diagnostic sources"
+    print("Source filter: " + source_filter)
     print(f"Production-enabled sources: {sum(1 for item in sources if item.get('enabled') is True)}")
     print(f"Diagnostic-only candidates: {sum(1 for item in sources if item.get('enabled') is not True)}")
     print("No Telegram methods are called. This workflow only downloads public pages and inspects visible product/price markup.")
