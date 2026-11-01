@@ -110,6 +110,16 @@ class MainDeduplicationTests(unittest.TestCase):
         self.assertFalse(_is_specific_product_url("https://shop.example.test/catalog/sale"))
         self.assertFalse(_is_specific_product_url("https://shop.example.test/search?q=phone"))
 
+    def test_product_url_filter_accepts_canonical_wildberries_product_page(self):
+        from main import _is_specific_product_url
+        self.assertTrue(_is_specific_product_url("https://www.wildberries.ru/catalog/123456789/detail.aspx"))
+        self.assertFalse(_is_specific_product_url("https://www.wildberries.ru/promo"))
+
+    def test_product_url_filter_rejects_known_affiliate_redirect_hosts(self):
+        from main import _is_specific_product_url
+        self.assertFalse(_is_specific_product_url("https://ad.admitad.com/goto/123456"))
+        self.assertFalse(_is_specific_product_url("https://takprodam.ru/click/123456"))
+
     def test_product_url_filter_keeps_direct_product_pages(self):
         from main import _is_specific_product_url
         self.assertTrue(_is_specific_product_url("https://ozon.ru/product/249003865"))
