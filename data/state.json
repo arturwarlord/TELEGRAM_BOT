@@ -600,6 +600,126 @@
       "published_at": "2026-11-02T09:53:34.061572+00:00",
       "telegram_message_id": 78,
       "affiliate_url": null
+    },
+    "6870ec6a660f8cf80b895a06": {
+      "title": "Дешевые авиабилеты из Москвы в Казань",
+      "store": "Aviasales",
+      "price": 1427.0,
+      "published_at": "2026-11-02T20:12:35.557349+00:00",
+      "telegram_message_id": 79,
+      "affiliate_url": null
+    },
+    "82467eaa2830f7826acb8dbf": {
+      "title": "Дешевые авиабилеты из Сочи в Махачкалу",
+      "store": "Aviasales",
+      "price": 1488.0,
+      "published_at": "2026-11-02T20:12:37.221012+00:00",
+      "telegram_message_id": 80,
+      "affiliate_url": null
+    },
+    "1b229fa7ca8eb256f0ec49c6": {
+      "title": "Дешевые авиабилеты из Пскова в Москву",
+      "store": "Aviasales",
+      "price": 1587.0,
+      "published_at": "2026-11-02T20:12:38.853523+00:00",
+      "telegram_message_id": 81,
+      "affiliate_url": null
+    },
+    "296d635a7900c49fa9e5e9c5": {
+      "title": "Дешевые авиабилеты из Москвы в Псков",
+      "store": "Aviasales",
+      "price": 1588.0,
+      "published_at": "2026-11-02T20:12:40.485044+00:00",
+      "telegram_message_id": 82,
+      "affiliate_url": null
+    },
+    "67e3bff2eaa2854a3a206ea3": {
+      "title": "Стивенсон Бенджамин: В этом поезде каждый — подозреваемый",
+      "store": "Республика",
+      "price": 820.0,
+      "published_at": "2026-11-02T20:13:01.019715+00:00",
+      "telegram_message_id": 83,
+      "affiliate_url": null
+    },
+    "2b00acbfdefdfc0f0a73146b": {
+      "title": "Дешевые авиабилеты из Новосибирска в Красноярск",
+      "store": "Aviasales",
+      "price": 1605.0,
+      "published_at": "2026-11-02T20:13:02.632958+00:00",
+      "telegram_message_id": 84,
+      "affiliate_url": null
+    },
+    "aaeb724bc9acd32422d2cc4f": {
+      "title": "Кондитерская на Хай-стрит: зарождение любви",
+      "store": "Республика",
+      "price": 820.0,
+      "published_at": "2026-11-02T20:13:05.877956+00:00",
+      "telegram_message_id": 85,
+      "affiliate_url": null
+    },
+    "546f8304a7119b31c142a4a0": {
+      "title": "Дешевые авиабилеты из Казани в Самару: Казань → Самара",
+      "store": "Aviasales",
+      "price": 1625.0,
+      "published_at": "2026-11-02T20:13:07.491598+00:00",
+      "telegram_message_id": 86,
+      "affiliate_url": null
+    },
+    "1d757c05b94e21a0f9c74008": {
+      "title": "Счастливый понедельник: Как расти, добиваться успеха и получать удовольствие от р",
+      "store": "Республика",
+      "price": 850.0,
+      "published_at": "2026-11-02T20:13:21.762471+00:00",
+      "telegram_message_id": 87,
+      "affiliate_url": null
+    },
+    "4100a288fb2973dfd8cf03a4": {
+      "title": "Дешевые авиабилеты из Екатеринбурга в Набережные Челны (Нижнекамск)",
+      "store": "Aviasales",
+      "price": 1839.0,
+      "published_at": "2026-11-02T20:13:23.390584+00:00",
+      "telegram_message_id": 88,
+      "affiliate_url": null
+    },
+    "40fe00ee4adb1e805d2bef8a": {
+      "title": "Дешевые авиабилеты из Екатеринбурга в Челябинск",
+      "store": "Aviasales",
+      "price": 1949.0,
+      "published_at": "2026-11-02T20:13:25.074212+00:00",
+      "telegram_message_id": 89,
+      "affiliate_url": null
+    },
+    "2a379d116f44fcdc11ae6496": {
+      "title": "Дешевые авиабилеты из Челябинска в Екатеринбург",
+      "store": "Aviasales",
+      "price": 1949.0,
+      "published_at": "2026-11-02T20:13:27.441578+00:00",
+      "telegram_message_id": 90,
+      "affiliate_url": null
+    },
+    "72f8baf81afecc43d5b8d0a8": {
+      "title": "Дешевые авиабилеты из Екатеринбурга в Самару",
+      "store": "Aviasales",
+      "price": 2025.0,
+      "published_at": "2026-11-02T20:13:29.080978+00:00",
+      "telegram_message_id": 91,
+      "affiliate_url": null
+    },
+    "8d9167246e268cf08730e6fe": {
+      "title": "Дешевые авиабилеты из Мурманска в Санкт-Петербург",
+      "store": "Aviasales",
+      "price": 2140.0,
+      "published_at": "2026-11-02T20:13:30.691231+00:00",
+      "telegram_message_id": 92,
+      "affiliate_url": null
+    },
+    "9a2989393682a8c394b1e8e0": {
+      "title": "Дешевые авиабилеты из Перми в Москву: Пермь → Москва",
+      "store": "Aviasales",
+      "price": 2194.0,
+      "published_at": "2026-11-02T20:13:32.361265+00:00",
+      "telegram_message_id": 93,
+      "affiliate_url": null
     }
   },
   "recent_posts": [
@@ -977,6 +1097,81 @@
       "key": "ac956c11deb42d325e0d19d0",
       "published_at": "2026-11-02T09:53:34.061572+00:00",
       "telegram_message_id": 78
+    },
+    {
+      "key": "6870ec6a660f8cf80b895a06",
+      "published_at": "2026-11-02T20:12:35.557349+00:00",
+      "telegram_message_id": 79
+    },
+    {
+      "key": "82467eaa2830f7826acb8dbf",
+      "published_at": "2026-11-02T20:12:37.221012+00:00",
+      "telegram_message_id": 80
+    },
+    {
+      "key": "1b229fa7ca8eb256f0ec49c6",
+      "published_at": "2026-11-02T20:12:38.853523+00:00",
+      "telegram_message_id": 81
+    },
+    {
+      "key": "296d635a7900c49fa9e5e9c5",
+      "published_at": "2026-11-02T20:12:40.485044+00:00",
+      "telegram_message_id": 82
+    },
+    {
+      "key": "67e3bff2eaa2854a3a206ea3",
+      "published_at": "2026-11-02T20:13:01.019715+00:00",
+      "telegram_message_id": 83
+    },
+    {
+      "key": "2b00acbfdefdfc0f0a73146b",
+      "published_at": "2026-11-02T20:13:02.632958+00:00",
+      "telegram_message_id": 84
+    },
+    {
+      "key": "aaeb724bc9acd32422d2cc4f",
+      "published_at": "2026-11-02T20:13:05.877956+00:00",
+      "telegram_message_id": 85
+    },
+    {
+      "key": "546f8304a7119b31c142a4a0",
+      "published_at": "2026-11-02T20:13:07.491598+00:00",
+      "telegram_message_id": 86
+    },
+    {
+      "key": "1d757c05b94e21a0f9c74008",
+      "published_at": "2026-11-02T20:13:21.762471+00:00",
+      "telegram_message_id": 87
+    },
+    {
+      "key": "4100a288fb2973dfd8cf03a4",
+      "published_at": "2026-11-02T20:13:23.390584+00:00",
+      "telegram_message_id": 88
+    },
+    {
+      "key": "40fe00ee4adb1e805d2bef8a",
+      "published_at": "2026-11-02T20:13:25.074212+00:00",
+      "telegram_message_id": 89
+    },
+    {
+      "key": "2a379d116f44fcdc11ae6496",
+      "published_at": "2026-11-02T20:13:27.441578+00:00",
+      "telegram_message_id": 90
+    },
+    {
+      "key": "72f8baf81afecc43d5b8d0a8",
+      "published_at": "2026-11-02T20:13:29.080978+00:00",
+      "telegram_message_id": 91
+    },
+    {
+      "key": "8d9167246e268cf08730e6fe",
+      "published_at": "2026-11-02T20:13:30.691231+00:00",
+      "telegram_message_id": 92
+    },
+    {
+      "key": "9a2989393682a8c394b1e8e0",
+      "published_at": "2026-11-02T20:13:32.361265+00:00",
+      "telegram_message_id": 93
     }
   ]
 }
