@@ -360,6 +360,126 @@
       "published_at": "2026-11-01T22:43:16.142408+00:00",
       "telegram_message_id": 47,
       "affiliate_url": null
+    },
+    "42a65d8447e8936a8d3b9749": {
+      "title": "Дешевые авиабилеты из Москвы в Казань",
+      "store": "Aviasales",
+      "price": 1417.0,
+      "published_at": "2026-11-02T02:18:18.780629+00:00",
+      "telegram_message_id": 49,
+      "affiliate_url": null
+    },
+    "3bafa30cfe8264141b148fb1": {
+      "title": "Дешевые авиабилеты из Пскова в Москву",
+      "store": "Aviasales",
+      "price": 1588.0,
+      "published_at": "2026-11-02T02:18:20.339106+00:00",
+      "telegram_message_id": 50,
+      "affiliate_url": null
+    },
+    "40150e4bf090946181320104": {
+      "title": "Warhammer Underworlds: Wyrdhollow",
+      "store": "Мир Хобби",
+      "price": 7693.0,
+      "published_at": "2026-11-02T02:18:23.380911+00:00",
+      "telegram_message_id": 51,
+      "affiliate_url": null
+    },
+    "e74b20095236ae2338433962": {
+      "title": "Лавка чудес. История о том, как обычный мальчик стал великим хирургом, разгадав тайны мозга и секреты сердца",
+      "store": "Республика",
+      "price": 350.0,
+      "published_at": "2026-11-02T02:18:26.112309+00:00",
+      "telegram_message_id": 52,
+      "affiliate_url": null
+    },
+    "8896c6e64e364cfead19fc78": {
+      "title": "Дешевые авиабилеты из Челябинска в Екатеринбург",
+      "store": "Aviasales",
+      "price": 1598.0,
+      "published_at": "2026-11-02T02:18:27.675503+00:00",
+      "telegram_message_id": 53,
+      "affiliate_url": null
+    },
+    "9dadb9e25819ab70f8fc1d6c": {
+      "title": "Дом профессора",
+      "store": "Республика",
+      "price": 950.0,
+      "published_at": "2026-11-02T02:18:29.920327+00:00",
+      "telegram_message_id": 54,
+      "affiliate_url": null
+    },
+    "adc3372b74936bdca9aae90e": {
+      "title": "Хвосты Кумихо",
+      "store": "Республика",
+      "price": 970.0,
+      "published_at": "2026-11-02T02:18:32.199453+00:00",
+      "telegram_message_id": 55,
+      "affiliate_url": null
+    },
+    "92910fe066eca0c915190186": {
+      "title": "Дешевые авиабилеты из Новосибирска в Красноярск",
+      "store": "Aviasales",
+      "price": 1651.0,
+      "published_at": "2026-11-02T02:18:33.772189+00:00",
+      "telegram_message_id": 56,
+      "affiliate_url": null
+    },
+    "adbbb97079cb35f9063c924e": {
+      "title": "Музей Невинности",
+      "store": "Республика",
+      "price": 970.0,
+      "published_at": "2026-11-02T02:18:36.085915+00:00",
+      "telegram_message_id": 57,
+      "affiliate_url": null
+    },
+    "672bdf06ce1c9791eee79fed": {
+      "title": "Дешевые авиабилеты из Красноярска в Новосибирск",
+      "store": "Aviasales",
+      "price": 2145.0,
+      "published_at": "2026-11-02T02:18:39.464528+00:00",
+      "telegram_message_id": 58,
+      "affiliate_url": null
+    },
+    "9701c06788642eae0af317ae": {
+      "title": "Дешевые авиабилеты из Перми в Москву: Пермь → Москва",
+      "store": "Aviasales",
+      "price": 2194.0,
+      "published_at": "2026-11-02T02:18:41.035514+00:00",
+      "telegram_message_id": 59,
+      "affiliate_url": null
+    },
+    "d7ce6aaee1e66b73a43d517b": {
+      "title": "Дешевые авиабилеты из Кирова в Сочи",
+      "store": "Aviasales",
+      "price": 2195.0,
+      "published_at": "2026-11-02T02:18:42.600032+00:00",
+      "telegram_message_id": 60,
+      "affiliate_url": null
+    },
+    "6cc45659aa115e467f5dd778": {
+      "title": "Дешевые авиабилеты из Саратова в Москву",
+      "store": "Aviasales",
+      "price": 2196.0,
+      "published_at": "2026-11-02T02:18:44.159823+00:00",
+      "telegram_message_id": 61,
+      "affiliate_url": null
+    },
+    "5d0b92eff890a52a382b80bb": {
+      "title": "Дешевые авиабилеты из Самары в Казань",
+      "store": "Aviasales",
+      "price": 2366.0,
+      "published_at": "2026-11-02T02:18:45.723746+00:00",
+      "telegram_message_id": 62,
+      "affiliate_url": null
+    },
+    "32d4326cb32b49eed0c74bd1": {
+      "title": "Дешевые авиабилеты из Тюмени в Москву: Тюмень → Москва",
+      "store": "Aviasales",
+      "price": 2596.0,
+      "published_at": "2026-11-02T02:18:47.565490+00:00",
+      "telegram_message_id": 63,
+      "affiliate_url": null
     }
   },
   "recent_posts": [
@@ -587,6 +707,81 @@
       "key": "06aa04bd50a0bb268b29e14c",
       "published_at": "2026-11-01T22:43:16.142408+00:00",
       "telegram_message_id": 47
+    },
+    {
+      "key": "42a65d8447e8936a8d3b9749",
+      "published_at": "2026-11-02T02:18:18.780629+00:00",
+      "telegram_message_id": 49
+    },
+    {
+      "key": "3bafa30cfe8264141b148fb1",
+      "published_at": "2026-11-02T02:18:20.339106+00:00",
+      "telegram_message_id": 50
+    },
+    {
+      "key": "40150e4bf090946181320104",
+      "published_at": "2026-11-02T02:18:23.380911+00:00",
+      "telegram_message_id": 51
+    },
+    {
+      "key": "e74b20095236ae2338433962",
+      "published_at": "2026-11-02T02:18:26.112309+00:00",
+      "telegram_message_id": 52
+    },
+    {
+      "key": "8896c6e64e364cfead19fc78",
+      "published_at": "2026-11-02T02:18:27.675503+00:00",
+      "telegram_message_id": 53
+    },
+    {
+      "key": "9dadb9e25819ab70f8fc1d6c",
+      "published_at": "2026-11-02T02:18:29.920327+00:00",
+      "telegram_message_id": 54
+    },
+    {
+      "key": "adc3372b74936bdca9aae90e",
+      "published_at": "2026-11-02T02:18:32.199453+00:00",
+      "telegram_message_id": 55
+    },
+    {
+      "key": "92910fe066eca0c915190186",
+      "published_at": "2026-11-02T02:18:33.772189+00:00",
+      "telegram_message_id": 56
+    },
+    {
+      "key": "adbbb97079cb35f9063c924e",
+      "published_at": "2026-11-02T02:18:36.085915+00:00",
+      "telegram_message_id": 57
+    },
+    {
+      "key": "672bdf06ce1c9791eee79fed",
+      "published_at": "2026-11-02T02:18:39.464528+00:00",
+      "telegram_message_id": 58
+    },
+    {
+      "key": "9701c06788642eae0af317ae",
+      "published_at": "2026-11-02T02:18:41.035514+00:00",
+      "telegram_message_id": 59
+    },
+    {
+      "key": "d7ce6aaee1e66b73a43d517b",
+      "published_at": "2026-11-02T02:18:42.600032+00:00",
+      "telegram_message_id": 60
+    },
+    {
+      "key": "6cc45659aa115e467f5dd778",
+      "published_at": "2026-11-02T02:18:44.159823+00:00",
+      "telegram_message_id": 61
+    },
+    {
+      "key": "5d0b92eff890a52a382b80bb",
+      "published_at": "2026-11-02T02:18:45.723746+00:00",
+      "telegram_message_id": 62
+    },
+    {
+      "key": "32d4326cb32b49eed0c74bd1",
+      "published_at": "2026-11-02T02:18:47.565490+00:00",
+      "telegram_message_id": 63
     }
   ]
 }
