@@ -1640,6 +1640,118 @@
       "published_at": "2026-11-05T01:25:10.148923+00:00",
       "telegram_message_id": 208,
       "affiliate_url": null
+    },
+    "35ef1e73953a9ee739a9b2c9": {
+      "title": "Дешевые авиабилеты из Москвы в Казань",
+      "store": "Aviasales",
+      "price": 1421.0,
+      "published_at": "2026-11-05T08:25:11.049057+00:00",
+      "telegram_message_id": 209,
+      "affiliate_url": null
+    },
+    "512fd1944933a91bb29227ed": {
+      "title": "Дешевые авиабилеты из Москвы в Псков",
+      "store": "Aviasales",
+      "price": 1584.0,
+      "published_at": "2026-11-05T08:25:12.590675+00:00",
+      "telegram_message_id": 210,
+      "affiliate_url": null
+    },
+    "c2ab15553600f2aef60e8c3d": {
+      "title": "Дешевые авиабилеты из Пскова в Москву",
+      "store": "Aviasales",
+      "price": 1584.0,
+      "published_at": "2026-11-05T08:25:14.237622+00:00",
+      "telegram_message_id": 211,
+      "affiliate_url": null
+    },
+    "c6ab7245cda18efa942189e1": {
+      "title": "Дешевые авиабилеты из Уфы в Москву: Уфа → Москва",
+      "store": "Aviasales",
+      "price": 1616.0,
+      "published_at": "2026-11-05T08:25:15.793121+00:00",
+      "telegram_message_id": 212,
+      "affiliate_url": null
+    },
+    "8c1c1a913fb9706f9e18c879": {
+      "title": "Дешевые авиабилеты из Казани в Самару: Казань → Самара",
+      "store": "Aviasales",
+      "price": 1625.0,
+      "published_at": "2026-11-05T08:25:17.329622+00:00",
+      "telegram_message_id": 213,
+      "affiliate_url": null
+    },
+    "288f962e8cbff26aae936cc2": {
+      "title": "Дешевые авиабилеты из Волгограда в Москву",
+      "store": "Aviasales",
+      "price": 1690.0,
+      "published_at": "2026-11-05T08:25:18.886362+00:00",
+      "telegram_message_id": 214,
+      "affiliate_url": null
+    },
+    "d75f48b5c37ed61f46af42e3": {
+      "title": "Дешевые авиабилеты из Екатеринбурга в Санкт-Петербург",
+      "store": "Aviasales",
+      "price": 1866.0,
+      "published_at": "2026-11-05T08:25:20.418258+00:00",
+      "telegram_message_id": 215,
+      "affiliate_url": null
+    },
+    "ab67e3a388bda486cc9459bf": {
+      "title": "Дешевые авиабилеты из Екатеринбурга в Челябинск",
+      "store": "Aviasales",
+      "price": 1945.0,
+      "published_at": "2026-11-05T08:25:21.947392+00:00",
+      "telegram_message_id": 216,
+      "affiliate_url": null
+    },
+    "e025472fdc59db772078e395": {
+      "title": "Дешевые авиабилеты из Челябинска в Екатеринбург",
+      "store": "Aviasales",
+      "price": 1950.0,
+      "published_at": "2026-11-05T08:25:24.250031+00:00",
+      "telegram_message_id": 217,
+      "affiliate_url": null
+    },
+    "98d9b21736627ff81f53ba89": {
+      "title": "Дешевые авиабилеты из Уфы в Сочи",
+      "store": "Aviasales",
+      "price": 2099.0,
+      "published_at": "2026-11-05T08:25:25.827590+00:00",
+      "telegram_message_id": 218,
+      "affiliate_url": null
+    },
+    "c10c157a57ce8d24275322a6": {
+      "title": "Дешевые авиабилеты из Омска в Красноярск",
+      "store": "Aviasales",
+      "price": 2170.0,
+      "published_at": "2026-11-05T08:25:27.364960+00:00",
+      "telegram_message_id": 219,
+      "affiliate_url": null
+    },
+    "7ec721c5665065713b85ad20": {
+      "title": "Дешевые авиабилеты из Уфы в Санкт-Петербург",
+      "store": "Aviasales",
+      "price": 2189.0,
+      "published_at": "2026-11-05T08:25:28.903928+00:00",
+      "telegram_message_id": 220,
+      "affiliate_url": null
+    },
+    "f6f3f914a5daf6f7fbc104a4": {
+      "title": "Дешевые авиабилеты из Саратова в Москву",
+      "store": "Aviasales",
+      "price": 2189.0,
+      "published_at": "2026-11-05T08:25:30.453473+00:00",
+      "telegram_message_id": 221,
+      "affiliate_url": null
+    },
+    "d6abaaf397f73d1152665644": {
+      "title": "Дешевые авиабилеты из Кирова в Сочи",
+      "store": "Aviasales",
+      "price": 2189.0,
+      "published_at": "2026-11-05T08:25:32.131099+00:00",
+      "telegram_message_id": 222,
+      "affiliate_url": null
     }
   },
   "recent_posts": [
@@ -2617,6 +2729,76 @@
       "key": "2037322150bd20a205b1a1e8",
       "published_at": "2026-11-05T01:25:10.148923+00:00",
       "telegram_message_id": 208
+    },
+    {
+      "key": "35ef1e73953a9ee739a9b2c9",
+      "published_at": "2026-11-05T08:25:11.049057+00:00",
+      "telegram_message_id": 209
+    },
+    {
+      "key": "512fd1944933a91bb29227ed",
+      "published_at": "2026-11-05T08:25:12.590675+00:00",
+      "telegram_message_id": 210
+    },
+    {
+      "key": "c2ab15553600f2aef60e8c3d",
+      "published_at": "2026-11-05T08:25:14.237622+00:00",
+      "telegram_message_id": 211
+    },
+    {
+      "key": "c6ab7245cda18efa942189e1",
+      "published_at": "2026-11-05T08:25:15.793121+00:00",
+      "telegram_message_id": 212
+    },
+    {
+      "key": "8c1c1a913fb9706f9e18c879",
+      "published_at": "2026-11-05T08:25:17.329622+00:00",
+      "telegram_message_id": 213
+    },
+    {
+      "key": "288f962e8cbff26aae936cc2",
+      "published_at": "2026-11-05T08:25:18.886362+00:00",
+      "telegram_message_id": 214
+    },
+    {
+      "key": "d75f48b5c37ed61f46af42e3",
+      "published_at": "2026-11-05T08:25:20.418258+00:00",
+      "telegram_message_id": 215
+    },
+    {
+      "key": "ab67e3a388bda486cc9459bf",
+      "published_at": "2026-11-05T08:25:21.947392+00:00",
+      "telegram_message_id": 216
+    },
+    {
+      "key": "e025472fdc59db772078e395",
+      "published_at": "2026-11-05T08:25:24.250031+00:00",
+      "telegram_message_id": 217
+    },
+    {
+      "key": "98d9b21736627ff81f53ba89",
+      "published_at": "2026-11-05T08:25:25.827590+00:00",
+      "telegram_message_id": 218
+    },
+    {
+      "key": "c10c157a57ce8d24275322a6",
+      "published_at": "2026-11-05T08:25:27.364960+00:00",
+      "telegram_message_id": 219
+    },
+    {
+      "key": "7ec721c5665065713b85ad20",
+      "published_at": "2026-11-05T08:25:28.903928+00:00",
+      "telegram_message_id": 220
+    },
+    {
+      "key": "f6f3f914a5daf6f7fbc104a4",
+      "published_at": "2026-11-05T08:25:30.453473+00:00",
+      "telegram_message_id": 221
+    },
+    {
+      "key": "d6abaaf397f73d1152665644",
+      "published_at": "2026-11-05T08:25:32.131099+00:00",
+      "telegram_message_id": 222
     }
   ]
 }
