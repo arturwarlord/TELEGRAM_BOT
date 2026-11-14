@@ -5672,74 +5672,121 @@
       "published_at": "2026-11-14T16:58:03.809529+00:00",
       "telegram_message_id": 712,
       "affiliate_url": null
+    },
+    "c60610f955339dfaf275dfdc": {
+      "title": "Дешевые авиабилеты из Казани в Уфу: Казань → Уфа",
+      "store": "Aviasales",
+      "price": 1299.0,
+      "published_at": "2026-11-14T21:21:45.051216+00:00",
+      "telegram_message_id": 713,
+      "affiliate_url": null
+    },
+    "1a53f7c6ec1e688c1b83925b": {
+      "title": "Дешевые авиабилеты из Уфы в Казань",
+      "store": "Aviasales",
+      "price": 1299.0,
+      "published_at": "2026-11-14T21:21:46.650220+00:00",
+      "telegram_message_id": 714,
+      "affiliate_url": null
+    },
+    "043f69c00175a41982b38cb9": {
+      "title": "Дешевые авиабилеты из Москвы в Псков",
+      "store": "Aviasales",
+      "price": 1588.0,
+      "published_at": "2026-11-14T21:21:48.091104+00:00",
+      "telegram_message_id": 715,
+      "affiliate_url": null
+    },
+    "cd72a4c2267ba9924bebefa4": {
+      "title": "Дешевые авиабилеты из Пскова в Москву",
+      "store": "Aviasales",
+      "price": 1588.0,
+      "published_at": "2026-11-14T21:21:49.534627+00:00",
+      "telegram_message_id": 716,
+      "affiliate_url": null
+    },
+    "7a6e47db178074967a4de793": {
+      "title": "Дешевые авиабилеты из Москвы в Казань",
+      "store": "Aviasales",
+      "price": 1599.0,
+      "published_at": "2026-11-14T21:21:50.990941+00:00",
+      "telegram_message_id": 717,
+      "affiliate_url": null
+    },
+    "d3111aca365e9afcf5bcfddf": {
+      "title": "Дешевые авиабилеты из Уфы в Магнитогорск",
+      "store": "Aviasales",
+      "price": 1736.0,
+      "published_at": "2026-11-14T21:21:52.437158+00:00",
+      "telegram_message_id": 718,
+      "affiliate_url": null
+    },
+    "da9448942a311a16532435b6": {
+      "title": "Дешевые авиабилеты из Екатеринбурга в Набережные Челны (Нижнекамск)",
+      "store": "Aviasales",
+      "price": 1836.0,
+      "published_at": "2026-11-14T21:21:53.933725+00:00",
+      "telegram_message_id": 719,
+      "affiliate_url": null
+    },
+    "ef54b418a2f9b6ce5896f9bf": {
+      "title": "Дешевые авиабилеты из Екатеринбурга в Челябинск",
+      "store": "Aviasales",
+      "price": 1938.0,
+      "published_at": "2026-11-14T21:21:55.398841+00:00",
+      "telegram_message_id": 720,
+      "affiliate_url": null
+    },
+    "140d4919b8129cefcaf0ca5a": {
+      "title": "Дешевые авиабилеты из Челябинска в Екатеринбург",
+      "store": "Aviasales",
+      "price": 1950.0,
+      "published_at": "2026-11-14T21:21:56.846064+00:00",
+      "telegram_message_id": 721,
+      "affiliate_url": null
+    },
+    "f52f8ffe58ed0c505ba93e7a": {
+      "title": "Дешевые авиабилеты из Уфы в Нижний Новгород",
+      "store": "Aviasales",
+      "price": 2018.0,
+      "published_at": "2026-11-14T21:21:58.286677+00:00",
+      "telegram_message_id": 722,
+      "affiliate_url": null
+    },
+    "821910991a4555f297aebd73": {
+      "title": "Дешевые авиабилеты из Нижнего Новгорода в Уфу: Нижний Новгород → Уфа",
+      "store": "Aviasales",
+      "price": 2019.0,
+      "published_at": "2026-11-14T21:21:59.732760+00:00",
+      "telegram_message_id": 723,
+      "affiliate_url": null
+    },
+    "d24d42e6ecd3fc793be791d8": {
+      "title": "Дешевые авиабилеты из Казани в Набережные Челны (Нижнекамск)",
+      "store": "Aviasales",
+      "price": 2041.0,
+      "published_at": "2026-11-14T21:22:01.174897+00:00",
+      "telegram_message_id": 724,
+      "affiliate_url": null
+    },
+    "c2de1e797a6ce133e6321003": {
+      "title": "Дешевые авиабилеты из Омска в Красноярск",
+      "store": "Aviasales",
+      "price": 2153.0,
+      "published_at": "2026-11-14T21:22:02.655125+00:00",
+      "telegram_message_id": 725,
+      "affiliate_url": null
+    },
+    "7f4fd07eb09e8cd75d6932ce": {
+      "title": "Дешевые авиабилеты из Мурманска в Санкт-Петербург",
+      "store": "Aviasales",
+      "price": 2154.0,
+      "published_at": "2026-11-14T21:22:04.095734+00:00",
+      "telegram_message_id": 726,
+      "affiliate_url": null
     }
   },
   "recent_posts": [
-    {
-      "key": "56953b70f1810cc93021815c",
-      "published_at": "2026-11-07T20:46:55.465799+00:00",
-      "telegram_message_id": 352
-    },
-    {
-      "key": "3150d4ba7da5224d2f324eec",
-      "published_at": "2026-11-07T20:46:57.019288+00:00",
-      "telegram_message_id": 353
-    },
-    {
-      "key": "93c9a2a76208777a62125c6d",
-      "published_at": "2026-11-07T20:46:58.523759+00:00",
-      "telegram_message_id": 354
-    },
-    {
-      "key": "c9ab97582246c35781ff2bef",
-      "published_at": "2026-11-07T20:47:00.033610+00:00",
-      "telegram_message_id": 355
-    },
-    {
-      "key": "21aa533fcc3e9ea2ae911aab",
-      "published_at": "2026-11-07T20:47:01.554508+00:00",
-      "telegram_message_id": 356
-    },
-    {
-      "key": "a6c96434693b02b59163f7dc",
-      "published_at": "2026-11-07T20:47:03.084348+00:00",
-      "telegram_message_id": 357
-    },
-    {
-      "key": "26531dd4c9d07a389f0732b7",
-      "published_at": "2026-11-07T20:47:04.604358+00:00",
-      "telegram_message_id": 358
-    },
-    {
-      "key": "50810c110d26e4d44fddff61",
-      "published_at": "2026-11-07T20:47:06.164663+00:00",
-      "telegram_message_id": 359
-    },
-    {
-      "key": "030a2c89fc1b885740418ba3",
-      "published_at": "2026-11-07T20:47:07.677653+00:00",
-      "telegram_message_id": 360
-    },
-    {
-      "key": "dde2161179874945014ab530",
-      "published_at": "2026-11-07T20:47:09.342041+00:00",
-      "telegram_message_id": 361
-    },
-    {
-      "key": "fb59b7876a61f02a37d25c64",
-      "published_at": "2026-11-07T20:47:10.855397+00:00",
-      "telegram_message_id": 362
-    },
-    {
-      "key": "30e3e5079794b8f4d8f0323e",
-      "published_at": "2026-11-07T20:47:12.381470+00:00",
-      "telegram_message_id": 363
-    },
-    {
-      "key": "a8945153efd61db015465dab",
-      "published_at": "2026-11-07T20:47:13.890186+00:00",
-      "telegram_message_id": 364
-    },
     {
       "key": "bda6628f26b1efe00e757277",
       "published_at": "2026-11-08T00:22:52.944675+00:00",
@@ -7479,6 +7526,76 @@
       "key": "1569e0d3f0cea247df01906b",
       "published_at": "2026-11-14T16:58:03.809529+00:00",
       "telegram_message_id": 712
+    },
+    {
+      "key": "c60610f955339dfaf275dfdc",
+      "published_at": "2026-11-14T21:21:45.051216+00:00",
+      "telegram_message_id": 713
+    },
+    {
+      "key": "1a53f7c6ec1e688c1b83925b",
+      "published_at": "2026-11-14T21:21:46.650220+00:00",
+      "telegram_message_id": 714
+    },
+    {
+      "key": "043f69c00175a41982b38cb9",
+      "published_at": "2026-11-14T21:21:48.091104+00:00",
+      "telegram_message_id": 715
+    },
+    {
+      "key": "cd72a4c2267ba9924bebefa4",
+      "published_at": "2026-11-14T21:21:49.534627+00:00",
+      "telegram_message_id": 716
+    },
+    {
+      "key": "7a6e47db178074967a4de793",
+      "published_at": "2026-11-14T21:21:50.990941+00:00",
+      "telegram_message_id": 717
+    },
+    {
+      "key": "d3111aca365e9afcf5bcfddf",
+      "published_at": "2026-11-14T21:21:52.437158+00:00",
+      "telegram_message_id": 718
+    },
+    {
+      "key": "da9448942a311a16532435b6",
+      "published_at": "2026-11-14T21:21:53.933725+00:00",
+      "telegram_message_id": 719
+    },
+    {
+      "key": "ef54b418a2f9b6ce5896f9bf",
+      "published_at": "2026-11-14T21:21:55.398841+00:00",
+      "telegram_message_id": 720
+    },
+    {
+      "key": "140d4919b8129cefcaf0ca5a",
+      "published_at": "2026-11-14T21:21:56.846064+00:00",
+      "telegram_message_id": 721
+    },
+    {
+      "key": "f52f8ffe58ed0c505ba93e7a",
+      "published_at": "2026-11-14T21:21:58.286677+00:00",
+      "telegram_message_id": 722
+    },
+    {
+      "key": "821910991a4555f297aebd73",
+      "published_at": "2026-11-14T21:21:59.732760+00:00",
+      "telegram_message_id": 723
+    },
+    {
+      "key": "d24d42e6ecd3fc793be791d8",
+      "published_at": "2026-11-14T21:22:01.174897+00:00",
+      "telegram_message_id": 724
+    },
+    {
+      "key": "c2de1e797a6ce133e6321003",
+      "published_at": "2026-11-14T21:22:02.655125+00:00",
+      "telegram_message_id": 725
+    },
+    {
+      "key": "7f4fd07eb09e8cd75d6932ce",
+      "published_at": "2026-11-14T21:22:04.095734+00:00",
+      "telegram_message_id": 726
     }
   ]
 }
